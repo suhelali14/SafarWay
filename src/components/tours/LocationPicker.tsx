@@ -56,24 +56,17 @@ export function LocationPicker({ isOpen, onClose, onSelect }: LocationPickerProp
     })
   }, [searchQuery, isLoaded])
 
-  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
-    if (!e.latLng || !isLoaded) return
-
-    const geocoder = new window.google.maps.Geocoder()
-    geocoder.geocode(
-      { location: { lat: e.latLng.lat(), lng: e.latLng.lng() } },
-      (results, status) => {
-        if (status === 'OK' && results?.[0]) {
-          setSelectedLocation({
-            lat: e.latLng.lat(),
-            lng: e.latLng.lng(),
-            name: results[0].formatted_address
-          })
-          setLocationName(results[0].formatted_address)
-        }
-      }
-    )
-  }, [isLoaded])
+  const handleMapClick = (e: google.maps.MapMouseEvent) => {
+    if (e.latLng) {
+      const newLocation = {
+        lat: e.latLng.lat(),
+        lng: e.latLng.lng(),
+        name: locationName || 'Selected Location'
+      };
+      setSelectedLocation(newLocation);
+      onSelect(newLocation);
+    }
+  };
 
   const handleConfirm = () => {
     if (selectedLocation) {

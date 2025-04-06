@@ -1,4 +1,4 @@
-import { Package, Calendar, DollarSign, Star, TrendingUp, TrendingDown } from 'lucide-react'
+import { Package, Calendar, DollarSign, Star, } from 'lucide-react'
 import { StatCard } from '../../components/dashboard/cards/stat-card'
 
 export function DashboardPage() {
