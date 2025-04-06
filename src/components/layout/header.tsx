@@ -1,129 +1,93 @@
-"use client"
-
 import { useState } from "react"
-import Link from "next/link"
-import { Menu, X, Globe, Star } from "lucide-react"
+import { Link } from "react-router-dom"
+import { Menu, X, Globe, Star, Plane, Building2, Train, Car, Bus, Mountain, DollarSign, Shield } from "lucide-react"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isReligiousMode, setIsReligiousMode] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+
+  const navItems = [
+    { icon: <Mountain className="w-5 h-5" />, label: 'Tours', href: '/tours' },
+    { icon: <Plane className="w-5 h-5" />, label: 'Flights', href: '/flights' },
+    { icon: <Building2 className="w-5 h-5" />, label: 'Hotels', href: '/hotels' },
+    { icon: <Train className="w-5 h-5" />, label: 'Trains', href: '/trains' },
+    { icon: <Car className="w-5 h-5" />, label: 'Cabs', href: '/cabs' },
+    { icon: <Bus className="w-5 h-5" />, label: 'Bus', href: '/bus' },
+    { icon: <DollarSign className="w-5 h-5" />, label: 'Forex', href: '/forex' },
+    { icon: <Shield className="w-5 h-5" />, label: 'Insurance', href: '/insurance' },
+  ]
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <span className="text-2xl font-bold text-sky-600">Safar<span className="text-orange-500">Way</span></span>
+          <Link to="/" className="flex items-center">
+            <Mountain className="w-8 h-8 text-emerald-600" />
+            <span className="text-2xl font-bold text-emerald-600">SafarWay</span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/packages" className="text-gray-700 hover:text-orange-500 transition-colors">
-              All Packages
-            </Link>
-            <Link href="/destinations" className="text-gray-700 hover:text-orange-500 transition-colors">
-              Destinations
-            </Link>
-            <Link href="/agencies" className="text-gray-700 hover:text-orange-500 transition-colors">
-              Travel Agencies
-            </Link>
-            <Link href="/about" className="text-gray-700 hover:text-orange-500 transition-colors">
-              About Us
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors"
+              >
+                {item.icon}
+                <span className="text-sm font-medium">{item.label}</span>
+              </Link>
+            ))}
           </nav>
 
-          {/* Religious Mode Toggle */}
-          <div className="hidden md:flex items-center">
-            <div className="flex items-center mr-4">
-              <span className="text-sm text-gray-600 mr-2">
-                {isReligiousMode ? <Star className="w-4 h-4 text-orange-500" /> : <Globe className="w-4 h-4 text-sky-500" />}
-              </span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  className="sr-only peer" 
-                  checked={isReligiousMode}
-                  onChange={() => setIsReligiousMode(!isReligiousMode)}
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
-              </label>
-            </div>
-            <Link 
-              href="/login" 
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
-            >
+          {/* User Menu */}
+          <div className="hidden md:flex items-center space-x-4">
+            <button className="text-gray-700 hover:text-emerald-600 transition-colors">
               Login
-            </Link>
+            </button>
+            <button className="bg-emerald-600 text-white px-4 py-2 rounded-full hover:bg-emerald-700 transition-colors">
+              Register
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
+          <button
             className="md:hidden text-gray-700"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-t">
-          <div className="container mx-auto px-4 py-4 space-y-4">
-            <Link 
-              href="/packages" 
-              className="block text-gray-700 hover:text-orange-500 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              All Packages
-            </Link>
-            <Link 
-              href="/destinations" 
-              className="block text-gray-700 hover:text-orange-500 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Destinations
-            </Link>
-            <Link 
-              href="/agencies" 
-              className="block text-gray-700 hover:text-orange-500 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Travel Agencies
-            </Link>
-            <Link 
-              href="/about" 
-              className="block text-gray-700 hover:text-orange-500 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              About Us
-            </Link>
-            
-            {/* Mobile Religious Mode Toggle */}
-            <div className="flex items-center justify-between py-2">
-              <span className="text-gray-700">Religious Tourism Mode</span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  className="sr-only peer" 
-                  checked={isReligiousMode}
-                  onChange={() => setIsReligiousMode(!isReligiousMode)}
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
-              </label>
-            </div>
-            
-            <Link 
-              href="/login" 
-              className="block bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors text-center"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Login
-            </Link>
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden py-4">
+            <nav className="flex flex-col space-y-4">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.icon}
+                  <span className="text-sm font-medium">{item.label}</span>
+                </Link>
+              ))}
+              <div className="pt-4 border-t">
+                <button className="w-full text-gray-700 hover:text-emerald-600 transition-colors mb-2">
+                  Login
+                </button>
+                <button className="w-full bg-emerald-600 text-white px-4 py-2 rounded-full hover:bg-emerald-700 transition-colors">
+                  Register
+                </button>
+              </div>
+            </nav>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   )
 } 

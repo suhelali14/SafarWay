@@ -8,20 +8,7 @@
     "types": ["vite/client", "node"],
     "baseUrl": ".",
     "paths": {
-      "@components/*": ["components/*"],
-      "@layouts/*": ["layouts/*"],
-      "@pages/*": ["pages/*"],
-      "@styles/*": ["styles/*"],
-      "@lib/*": ["lib/*"],
-      "@hooks/*": ["hooks/*"],
-      "@utils/*": ["utils/*"],
-      "@assets/*": ["assets/*"],
-      "@types/*": ["types/*"],
-      "@constants/*": ["constants/*"],
-      "@config/*": ["config/*"],
-      "@services/*": ["services/*"],
-      "@store/*": ["store/*"],
-      "@routes/*": ["routes/*"]
+      "@/*": ["src/*"]
     }
   }
 }
