@@ -1,207 +1,123 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { Search, MapPin, Calendar, Users, ArrowRight, X } from "lucide-react"
+import { useState } from "react"
+import { Search, Map, Calendar, Users, Mountain } from "lucide-react"
 
 export function SearchBar() {
+  const [tourType, setTourType] = useState("adventure")
   const [destination, setDestination] = useState("")
-  const [dates, setDates] = useState("")
-  const [travelers, setTravelers] = useState("")
-  const [category, setCategory] = useState("")
-  const [showCalendar, setShowCalendar] = useState(false)
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const calendarRef = useRef<HTMLDivElement>(null)
-  const dateButtonRef = useRef<HTMLButtonElement>(null)
-
-  // Close calendar when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (calendarRef.current && !calendarRef.current.contains(event.target as Node) &&
-          dateButtonRef.current && !dateButtonRef.current.contains(event.target as Node)) {
-        setShowCalendar(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
-
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date)
-    setDates(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }))
-    setShowCalendar(false)
-  }
-
-  const generateCalendarDays = () => {
-    const today = new Date()
-    const days = []
-    const currentMonth = today.getMonth()
-    const currentYear = today.getFullYear()
-    
-    // Get first day of the month
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay()
-    
-    // Get number of days in the month
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
-    
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="w-10 h-10" aria-hidden="true"></div>)
-    }
-    
-    // Add cells for each day of the month
-    for (let i = 1; i <= daysInMonth; i++) {
-      const date = new Date(currentYear, currentMonth, i)
-      const isToday = i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()
-      const isSelected = selectedDate && i === selectedDate.getDate() && currentMonth === selectedDate.getMonth() && currentYear === selectedDate.getFullYear()
-      
-      days.push(
-        <button
-          key={`day-${i}`}
-          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-            isToday ? 'bg-orange-100 text-orange-600 font-medium' : ''
-          } ${
-            isSelected ? 'bg-orange-500 text-white' : 'hover:bg-orange-100 text-gray-800'
-          }`}
-          onClick={() => handleDateSelect(date)}
-          aria-label={`Select date ${i}`}
-          aria-current={isToday ? 'date' : undefined}
-        >
-          {i}
-        </button>
-      )
-    }
-    
-    return days
-  }
+  const [startDate, setStartDate] = useState("")
+  const [duration, setDuration] = useState("3-5 days")
+  const [groupSize, setGroupSize] = useState("2-4 people")
 
   return (
-    <div className="bg-white rounded-xl shadow-xl p-6">
-      {/* Row 1: Destination */}
-      <div className="mb-4">
-        <div className="relative">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" size={20} />
-          <input
-            type="text"
-            className="w-full pl-10 pr-4 py-3.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-gray-800 placeholder-gray-400"
-            placeholder="Where do you want to go?"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Row 2: Date and Travelers */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        {/* Date Input */}
-        <div className="relative">
-          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" size={20} />
+    <div className="flex flex-col gap-4">
+      {/* Tour Type Selection */}
+      <div className="flex gap-4 mb-2 overflow-x-auto pb-2">
+        {[
+          { id: "adventure", label: "Adventure" },
+          { id: "heritage", label: "Heritage" },
+          { id: "wildlife", label: "Wildlife" },
+          { id: "photography", label: "Photography" },
+          { id: "pilgrimage", label: "Pilgrimage" }
+        ].map((type) => (
           <button
-            ref={dateButtonRef}
-            className="w-full pl-10 pr-4 py-3.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-left transition-all text-gray-800 hover:border-orange-300"
-            onClick={() => setShowCalendar(!showCalendar)}
+            key={type.id}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
+              tourType === type.id
+                ? "bg-emerald-500 text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            }`}
+            onClick={() => setTourType(type.id)}
           >
-            <span className={dates ? "text-gray-800" : "text-gray-400"}>
-              {dates || "Select Date"}
-            </span>
+            {type.label}
           </button>
-          
-          {/* Calendar Popup - Positioned relative to button */}
-          {showCalendar && (
-            <div 
-              ref={calendarRef}
-              className="absolute left-0 top-full mt-2 bg-white rounded-lg shadow-xl p-4 w-[320px] border border-gray-200 animate-scale-in calendar-container z-50"
-              role="dialog"
-              aria-label="Calendar"
-              aria-modal="true"
+        ))}
+      </div>
+
+      {/* Search Fields */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Destination */}
+        <div className="col-span-1 bg-gray-50 rounded p-2">
+          <label className="block text-xs text-gray-500 mb-1">DESTINATION</label>
+          <div className="flex items-center gap-2">
+            <Map className="text-gray-400" size={20} />
+            <input
+              type="text"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              placeholder="Where do you want to go?"
+              className="bg-transparent w-full focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Start Date */}
+        <div className="col-span-1 bg-gray-50 rounded p-2">
+          <label className="block text-xs text-gray-500 mb-1">START DATE</label>
+          <div className="flex items-center gap-2">
+            <Calendar className="text-gray-400" size={20} />
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="bg-transparent w-full focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Duration */}
+        <div className="col-span-1 bg-gray-50 rounded p-2">
+          <label className="block text-xs text-gray-500 mb-1">DURATION</label>
+          <div className="flex items-center gap-2">
+            <Mountain className="text-gray-400" size={20} />
+            <select
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              className="bg-transparent w-full focus:outline-none text-sm"
             >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-medium text-gray-800">Select Date</h3>
-                <button 
-                  className="text-orange-500 hover:text-orange-600 text-sm flex items-center"
-                  onClick={() => setShowCalendar(false)}
-                >
-                  <X size={16} className="mr-1" />
-                  Close
-                </button>
-              </div>
-              <div className="grid grid-cols-7 gap-1 mb-2">
-                {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                  <div key={day} className="text-center text-xs font-medium text-gray-500">
-                    {day}
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-7 gap-1">
-                {generateCalendarDays()}
-              </div>
-            </div>
-          )}
+              <option value="1-2 days">1-2 Days</option>
+              <option value="3-5 days">3-5 Days</option>
+              <option value="6-10 days">6-10 Days</option>
+              <option value="10+ days">10+ Days</option>
+            </select>
+          </div>
         </div>
 
-        {/* Travelers Select */}
-        <div className="relative">
-          <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" size={20} />
-          <select
-            className="w-full pl-10 pr-4 py-3.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all appearance-none bg-white text-gray-800 hover:border-orange-300"
-            value={travelers}
-            onChange={(e) => setTravelers(e.target.value)}
-          >
-            <option value="">Select Travelers</option>
-            <option value="1">1 Traveler</option>
-            <option value="2">2 Travelers</option>
-            <option value="3">3 Travelers</option>
-            <option value="4">4 Travelers</option>
-            <option value="5+">5+ Travelers</option>
-          </select>
+        {/* Group Size */}
+        <div className="col-span-1 bg-gray-50 rounded p-2">
+          <label className="block text-xs text-gray-500 mb-1">GROUP SIZE</label>
+          <div className="flex items-center gap-2">
+            <Users className="text-gray-400" size={20} />
+            <select
+              value={groupSize}
+              onChange={(e) => setGroupSize(e.target.value)}
+              className="bg-transparent w-full focus:outline-none text-sm"
+            >
+              <option value="1 person">Solo Traveler</option>
+              <option value="2-4 people">2-4 People</option>
+              <option value="5-8 people">5-8 People</option>
+              <option value="9+ people">9+ People</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Row 3: Category and Search */}
-      <div className="grid grid-cols-12 gap-4">
-        {/* Categories Select */}
-        <div className="col-span-8 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" size={20} />
-          <select
-            className="w-full pl-10 pr-4 py-3.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all appearance-none bg-white text-gray-800 hover:border-orange-300"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="">All Categories</option>
-            <option value="leisure">Leisure</option>
-            <option value="adventure">Adventure</option>
-            <option value="honeymoon">Honeymoon</option>
-            <option value="family">Family</option>
-            <option value="business">Business</option>
-          </select>
-        </div>
+      {/* Search Button */}
+      <button className="mt-4 bg-emerald-500 text-white py-3 rounded-lg font-medium hover:bg-emerald-600 transition-colors">
+        FIND PERFECT TOUR
+      </button>
 
-        {/* Search Button */}
-        <div className="col-span-4">
-          <button 
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3.5 rounded-lg transition-all duration-300 flex items-center justify-center group font-medium shadow-lg shadow-orange-100 hover:shadow-orange-200"
-            onClick={() => {
-              console.log("Searching with:", { destination, dates, travelers, category })
-            }}
+      {/* Popular Destinations */}
+      <div className="mt-4 flex flex-wrap gap-2 text-sm">
+        <span className="text-gray-500">Popular:</span>
+        {["Ladakh", "Kerala", "Rajasthan", "Himachal"].map((place) => (
+          <button
+            key={place}
+            onClick={() => setDestination(place)}
+            className="text-emerald-600 hover:text-emerald-700 hover:underline"
           >
-            Search
-            <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
-          </button>
-        </div>
-      </div>
-
-      {/* Popular Searches */}
-      <div className="mt-5 flex flex-wrap gap-3 border-t border-gray-100 pt-4">
-        <span className="text-sm text-gray-500">Popular:</span>
-        {['Bali Packages', 'Dubai Tours', 'Maldives Getaways', 'European Tours'].map((item) => (
-          <button 
-            key={item}
-            className="text-sm text-orange-500 hover:text-orange-600 transition-colors hover:underline"
-            onClick={() => setDestination(item.split(' ')[0])}
-          >
-            {item}
+            {place}
           </button>
         ))}
       </div>
