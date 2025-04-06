@@ -1,11 +1,9 @@
 import { useState } from "react"
-import { useParams } from "react-router-dom"
-import { Calendar, Users, CreditCard, CheckCircle2 } from "lucide-react"
+import { CreditCard } from "lucide-react"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 
@@ -29,8 +27,7 @@ const mockTour = {
   maxGroupSize: 12,
 };
 
-export default function BookTourPage() {
-  const { id } = useParams();
+export default function BookTour() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<BookingFormData>({
     date: null,

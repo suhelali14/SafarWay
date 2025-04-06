@@ -1,16 +1,14 @@
 import { useState } from "react"
-import { MapPin, Calendar as CalendarIcon, Users, Clock, IndianRupee, Image as ImageIcon, Plus, Trash2, Check, AlertCircle, Camera, Mountain, Navigation, Phone, Mail, MessageCircle, ChevronDown } from "lucide-react"
+import { Users, Clock, IndianRupee, Plus, Trash2, Check, AlertCircle, Camera, Mountain, Phone, Mail, MessageCircle } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
-import { Alert, AlertDescription } from "../../components/ui/alert"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import { format } from "date-fns"
+
 
 interface Activity {
   title: string;
@@ -107,100 +105,6 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({ dayIndex, handleItine
     </div>
   );
 };
-
-interface ItineraryTimelineProps {
-  itinerary: DayItinerary[];
-}
-
-const ItineraryTimeline: React.FC<ItineraryTimelineProps> = ({ itinerary }) => (
-  <div className="relative mt-8 mb-12">
-    <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-blue-200"></div>
-    {itinerary.map((day, index) => (
-      <div key={index} className="relative pl-16 pb-8">
-        <div className="absolute left-6 -translate-x-1/2 w-4 h-4 rounded-full bg-blue-500 border-4 border-white shadow-md"></div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold text-gray-900">Day {index + 1}</h3>
-            {day.date && (
-              <span className="text-sm text-gray-500">
-                {new Date(day.date).toLocaleDateString()}
-              </span>
-            )}
-          </div>
-          <h4 className="text-blue-600 font-medium mb-2">{day.title || 'Untitled'}</h4>
-          <p className="text-gray-600 text-sm mb-3">{day.description || 'No description'}</p>
-          
-          {day.activities && day.activities.length > 0 && (
-            <div className="space-y-2">
-              <h5 className="text-sm font-medium text-gray-700">Activities:</h5>
-              <div className="grid gap-2">
-                {day.activities.map((activity, actIndex) => (
-                  <div key={actIndex} className="flex items-start gap-3 bg-gray-50 p-3 rounded-md">
-                    <div className="w-1 self-stretch bg-blue-200 rounded"></div>
-                    <div>
-                      <div className="font-medium text-sm text-gray-900">{activity.title}</div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {activity.startTime} - {activity.endTime}
-                      </div>
-                      {activity.description && (
-                        <div className="text-sm text-gray-600 mt-1">{activity.description}</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-4 grid grid-cols-1 gap-3">
-            {/* Accommodation */}
-            {day.accommodation && (
-              <div className="bg-green-50 p-3 rounded-md">
-                <h5 className="text-sm font-medium text-green-700 mb-1">Accommodation</h5>
-                <div className="text-sm text-green-600">
-                  <div className="font-medium">{day.accommodation.name}</div>
-                  <div className="text-green-500">{day.accommodation.type}</div>
-                  {day.accommodation.notes && (
-                    <div className="mt-1 text-green-600">{day.accommodation.notes}</div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Transport */}
-            {day.transport && (
-              <div className="bg-purple-50 p-3 rounded-md">
-                <h5 className="text-sm font-medium text-purple-700 mb-1">Transport</h5>
-                <div className="text-sm text-purple-600">
-                  <div className="font-medium">{day.transport.type}</div>
-                  <div className="text-purple-500">{day.transport.details}</div>
-                </div>
-              </div>
-            )}
-
-            {/* Meals */}
-            {(day.breakfast || day.lunch || day.dinner) && (
-              <div className="bg-orange-50 p-3 rounded-md">
-                <h5 className="text-sm font-medium text-orange-700 mb-2">Included Meals</h5>
-                <div className="flex gap-2 text-sm">
-                  {day.breakfast && (
-                    <span className="bg-orange-100 text-orange-600 px-2 py-1 rounded">Breakfast</span>
-                  )}
-                  {day.lunch && (
-                    <span className="bg-orange-100 text-orange-600 px-2 py-1 rounded">Lunch</span>
-                  )}
-                  {day.dinner && (
-                    <span className="bg-orange-100 text-orange-600 px-2 py-1 rounded">Dinner</span>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
 
 export function AddTourPackage() {
   const [activeStep, setActiveStep] = useState("basic")
@@ -390,12 +294,6 @@ export function AddTourPackage() {
       }));
     }
   };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    // TODO: Implement form submission
-    console.log(tourData)
-  }
 
   const validateBasicInfo = (): StepValidation => {
     const errors: string[] = [];

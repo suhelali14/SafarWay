@@ -1,4 +1,4 @@
-import { MapPin, Calendar, Users } from "lucide-react"
+import { MapPin, Calendar } from "lucide-react"
 
 export function TopDestinations() {
   const destinations = [
@@ -65,16 +65,10 @@ export function TopDestinations() {
   ]
 
   return (
-    <section className="py-16 bg-gray-50">
+    <div className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold mb-4">Top Travel Destinations</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Explore India's most captivating destinations, each offering unique experiences and unforgettable memories
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <h2 className="text-3xl font-bold text-center mb-12">Top Destinations</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {destinations.map((destination) => (
             <div
               key={destination.id}
@@ -118,14 +112,8 @@ export function TopDestinations() {
             </div>
           ))}
         </div>
-
-        <div className="text-center mt-12">
-          <button className="bg-emerald-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-600 transition-colors">
-            View All Destinations
-          </button>
-        </div>
       </div>
-    </section>
+    </div>
   )
 }
 
