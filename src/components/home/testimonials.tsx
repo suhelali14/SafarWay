@@ -1,87 +1,171 @@
-import { Star, Quote } from "lucide-react"
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Star, Quote } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Card } from '../ui/card';
 
-export function Testimonials() {
-  const testimonials = [
-    {
-      id: 1,
-      name: "Priya Sharma",
-      location: "Mumbai",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=120&h=120&fit=crop",
-      rating: 5,
-      text: "The Ladakh adventure tour was beyond my expectations! The team took care of everything, from accommodation to local experiences. A perfect blend of adventure and comfort.",
-      tourName: "Mystical Ladakh Adventure"
-    },
-    {
-      id: 2,
-      name: "Rahul Verma",
-      location: "Bangalore",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=120&h=120&fit=crop",
-      rating: 5,
-      text: "Kerala backwaters tour was a serene experience. The houseboat stay and local cuisine were highlights. Perfectly organized and great attention to detail.",
-      tourName: "Kerala Backwater Bliss"
-    },
-    {
-      id: 3,
-      name: "Anjali Patel",
-      location: "Delhi",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=120&h=120&fit=crop",
-      rating: 5,
-      text: "The Rajasthan heritage tour was magical! From palace stays to desert camping, every moment was special. The guides were knowledgeable and friendly.",
-      tourName: "Royal Rajasthan Heritage"
-    }
-  ]
+export interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  image: string;
+  rating: number;
+  text: string;
+  location: string;
+}
+
+interface TestimonialsProps {
+  testimonials: Testimonial[];
+  autoPlay?: boolean;
+  interval?: number;
+  className?: string;
+}
+
+export function Testimonials({
+  testimonials,
+  autoPlay = true,
+  interval = 5000,
+  className = '',
+}: TestimonialsProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(autoPlay);
+
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [isAutoPlaying, interval, testimonials.length]);
+
+  const nextTestimonial = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
+  };
+
+  const goToTestimonial = (index: number) => {
+    setCurrentIndex(index);
+  };
+
+  const currentTestimonial = testimonials[currentIndex];
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold mb-4">What Our Travelers Say</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Real experiences shared by our valued travelers who explored India with us
-          </p>
-        </div>
+    <div className={`relative ${className}`}>
+      <div className="absolute -top-10 left-1/2 -translate-x-1/2">
+        <Quote className="h-20 w-20 text-amber-200 opacity-50" />
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((testimonial) => (
-            <div key={testimonial.id} className="bg-white rounded-lg shadow-md p-6 relative">
-              <Quote className="absolute top-6 right-6 text-emerald-100" size={40} />
-              
-              <div className="flex items-start gap-4 mb-4">
-                <img
-                  src={testimonial.image}
-                  alt={testimonial.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <h3 className="font-semibold">{testimonial.name}</h3>
-                  <p className="text-sm text-gray-500">{testimonial.location}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1 mb-3">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} size={16} className="fill-emerald-500 text-emerald-500" />
+      <div className="relative mx-auto max-w-4xl px-4 py-12">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="text-center"
+          >
+            <Card className="p-8 shadow-lg">
+              <div className="mb-6 flex justify-center">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-5 w-5 ${
+                      i < currentTestimonial.rating
+                        ? 'fill-amber-400 text-amber-400'
+                        : 'text-gray-300'
+                    }`}
+                  />
                 ))}
               </div>
 
-              <p className="text-gray-600 mb-4 relative z-10">
-                "{testimonial.text}"
-              </p>
+              <blockquote className="mb-6 text-lg italic text-gray-700">
+                "{currentTestimonial.text}"
+              </blockquote>
 
-              <div className="text-sm text-emerald-600 font-medium">
-                {testimonial.tourName}
+              <div className="flex items-center justify-center gap-4">
+                <img
+                  src={currentTestimonial.image}
+                  alt={currentTestimonial.name}
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+                <div className="text-left">
+                  <p className="font-semibold text-gray-900">{currentTestimonial.name}</p>
+                  <p className="text-sm text-gray-500">
+                    {currentTestimonial.role} • {currentTestimonial.location}
+                  </p>
+                </div>
               </div>
-            </div>
+            </Card>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Navigation Dots */}
+        <div className="mt-6 flex justify-center gap-2">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToTestimonial(index)}
+              className={`h-2 w-2 rounded-full transition-colors ${
+                index === currentIndex ? 'bg-amber-500' : 'bg-gray-300'
+              }`}
+              aria-label={`Go to testimonial ${index + 1}`}
+            />
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <button className="bg-white text-emerald-600 px-6 py-3 rounded-lg font-medium border-2 border-emerald-500 hover:bg-emerald-50 transition-colors">
-            View All Reviews
-          </button>
+        {/* Navigation Buttons */}
+        <div className="absolute left-0 right-0 top-1/2 flex -translate-y-1/2 justify-between px-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full bg-white/80 shadow-md hover:bg-white"
+            onClick={prevTestimonial}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full bg-white/80 shadow-md hover:bg-white"
+            onClick={nextTestimonial}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </Button>
         </div>
       </div>
-    </section>
-  )
+    </div>
+  );
 }
 
