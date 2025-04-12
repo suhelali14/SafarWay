@@ -1,11 +1,15 @@
-import { useState } from "react"
-import { CreditCard } from "lucide-react"
+import { useState, useEffect } from "react"
+import { useParams, useNavigate } from "react-router-dom"
+import { CreditCard, Loader2 } from "lucide-react"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
+import { useToast } from "../components/ui/use-toast"
+import { toursApi } from "../lib/api/tours"
+import { TourPackage } from "../lib/api/tours"
 
 interface BookingFormData {
   date: Date | null;
@@ -18,17 +22,13 @@ interface BookingFormData {
   specialRequests: string;
 }
 
-// Mock tour data - replace with actual API call
-const mockTour = {
-  id: "1",
-  title: "Himalayan Adventure",
-  price: 29999,
-  duration: 7,
-  maxGroupSize: 12,
-};
-
 export default function BookTour() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [tour, setTour] = useState<TourPackage | null>(null);
   const [formData, setFormData] = useState<BookingFormData>({
     date: null,
     adults: 1,
@@ -40,7 +40,28 @@ export default function BookTour() {
     specialRequests: "",
   });
 
-  const totalPrice = (formData.adults + formData.children) * mockTour.price;
+  useEffect(() => {
+    const fetchTour = async () => {
+      try {
+        setLoading(true);
+        const response = await toursApi.getById(id);
+        setTour(response.data);
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error?.response?.data?.message || "Failed to fetch tour details",
+          variant: "destructive",
+        });
+        navigate("/tours");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTour();
+  }, [id, navigate, toast]);
+
+  const totalPrice = tour ? (formData.adults + formData.children) * tour.pricePerPerson : 0;
 
   const handleInputChange = (field: keyof BookingFormData, value: any) => {
     setFormData(prev => ({
@@ -50,42 +71,99 @@ export default function BookTour() {
   };
 
   const validateStep1 = () => {
-    return formData.date !== null && formData.adults > 0;
+    if (!formData.date) {
+      toast({
+        title: "Error",
+        description: "Please select a date",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (formData.adults + formData.children > (tour?.maxGroupSize || 0)) {
+      toast({
+        title: "Error",
+        description: `Maximum group size is ${tour?.maxGroupSize} people`,
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
   };
 
   const validateStep2 = () => {
-    return (
-      formData.firstName.trim() !== "" &&
-      formData.lastName.trim() !== "" &&
-      formData.email.trim() !== "" &&
-      formData.phone.trim() !== ""
-    );
+    if (!formData.firstName || !formData.lastName) {
+      toast({
+        title: "Error",
+        description: "Please enter your full name",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!formData.phone || !/^\+?[\d\s-]{10,}$/.test(formData.phone)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid phone number",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
   };
 
   const handleNext = () => {
-    if (currentStep === 1 && validateStep1()) {
-      setCurrentStep(2);
-    } else if (currentStep === 2 && validateStep2()) {
-      setCurrentStep(3);
-    }
+    if (currentStep === 1 && !validateStep1()) return;
+    if (currentStep === 2 && !validateStep2()) return;
+    setCurrentStep(prev => prev + 1);
   };
 
   const handleBack = () => {
     setCurrentStep(prev => prev - 1);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log(formData);
+    try {
+      // TODO: Implement booking submission
+      toast({
+        title: "Success",
+        description: "Your booking has been submitted successfully!",
+      });
+      navigate("/dashboard/bookings");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit booking. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!tour) {
+    return null;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Book Your Tour</h1>
-          <p className="text-gray-600 mt-2">{mockTour.title}</p>
+          <h1 className="text-3xl font-bold text-gray-900">{tour.title}</h1>
+          <p className="text-gray-600 mt-2">Duration: {tour.duration} days</p>
         </div>
 
         {/* Progress Steps */}
@@ -172,13 +250,13 @@ export default function BookTour() {
                           value={formData.adults}
                           onChange={(e) => handleInputChange("adults", parseInt(e.target.value))}
                           min={1}
-                          max={mockTour.maxGroupSize}
+                          max={tour.maxGroupSize}
                           className="text-center"
                         />
                         <Button
                           type="button"
                           variant="outline"
-                          onClick={() => handleInputChange("adults", Math.min(mockTour.maxGroupSize, formData.adults + 1))}
+                          onClick={() => handleInputChange("adults", Math.min(tour.maxGroupSize, formData.adults + 1))}
                         >
                           +
                         </Button>
@@ -200,13 +278,13 @@ export default function BookTour() {
                           value={formData.children}
                           onChange={(e) => handleInputChange("children", parseInt(e.target.value))}
                           min={0}
-                          max={mockTour.maxGroupSize - formData.adults}
+                          max={tour.maxGroupSize - formData.adults}
                           className="text-center"
                         />
                         <Button
                           type="button"
                           variant="outline"
-                          onClick={() => handleInputChange("children", Math.min(mockTour.maxGroupSize - formData.adults, formData.children + 1))}
+                          onClick={() => handleInputChange("children", Math.min(tour.maxGroupSize - formData.adults, formData.children + 1))}
                         >
                           +
                         </Button>
@@ -278,7 +356,7 @@ export default function BookTour() {
                     <CardContent className="space-y-4">
                       <div className="flex justify-between">
                         <span>Tour</span>
-                        <span>{mockTour.title}</span>
+                        <span>{tour.title}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Date</span>
@@ -286,12 +364,12 @@ export default function BookTour() {
                       </div>
                       <div className="flex justify-between">
                         <span>Adults</span>
-                        <span>{formData.adults} × ₹{mockTour.price.toLocaleString()}</span>
+                        <span>{formData.adults} × ₹{tour.pricePerPerson.toLocaleString()}</span>
                       </div>
                       {formData.children > 0 && (
                         <div className="flex justify-between">
                           <span>Children</span>
-                          <span>{formData.children} × ₹{mockTour.price.toLocaleString()}</span>
+                          <span>{formData.children} × ₹{tour.pricePerPerson.toLocaleString()}</span>
                         </div>
                       )}
                       <div className="border-t pt-4">
@@ -355,7 +433,7 @@ export default function BookTour() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
                   <span>Price per person</span>
-                  <span>₹{mockTour.price.toLocaleString()}</span>
+                  <span>₹{tour.pricePerPerson.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Number of guests</span>
