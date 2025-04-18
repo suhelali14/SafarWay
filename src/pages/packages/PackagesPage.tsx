@@ -4,6 +4,7 @@ import { Search, Filter, MapPin, Calendar, Users, Star } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../lib/api';
+import { generateMockTours } from '../../utils/mockData';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
@@ -52,16 +53,27 @@ export function PackagesPage() {
   const fetchTours = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/tours');
-      setTours(response.data);
+      const response = await api.get('/packages/all');
+      
+      if (Array.isArray(response.data)) {
+        setTours(response.data);
+      } else {
+        console.error('API returned non-array data:', response.data);
+        // Use mock data as fallback
+        const mockTours = generateMockTours();
+        setTours(mockTours);
+      }
     } catch (error) {
       console.error('Error fetching tours:', error);
+      // Use mock data as fallback
+      const mockTours = generateMockTours();
+      setTours(mockTours);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredTours = tours.filter((tour) => {
+  const filteredTours = (tours || []).filter((tour) => {
     const matchesSearch = tour.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tour.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tour.location.toLowerCase().includes(searchQuery.toLowerCase());

@@ -9,47 +9,45 @@ import {
   TrendingUp,
   Calendar,
 } from 'lucide-react';
+import { adminAPI } from '../../services/api';
+import { getToken } from '../../utils/session';
+import { toast } from 'react-hot-toast';
 
 interface DashboardStats {
   totalUsers: number;
   totalAgencies: number;
-  totalPayments: number;
-  totalPackages: number;
   totalBookings: number;
-  revenueStats: {
-    total: number;
-    currency: string;
-    growth: number;
-  };
+  totalRevenue: number;
+  totalPackages: number;
+  refundRequests: number;
+  supportTickets: number;
+  recentBookings: any[];
+  recentUsers: any[];
 }
 
 export const DashboardPage = () => {
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     totalAgencies: 0,
-    totalPayments: 0,
-    totalPackages: 0,
     totalBookings: 0,
-    revenueStats: {
-      total: 0,
-      currency: 'USD',
-      growth: 0,
-    },
+    totalRevenue: 0,
+    totalPackages: 0,
+    refundRequests: 0,
+    supportTickets: 0,
+    recentBookings: [],
+    recentUsers: []
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
       try {
-        const response = await fetch('/api/admin/dashboard/stats', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        const data = await response.json();
-        setStats(data);
+        setLoading(true);
+        const response = await adminAPI.getDashboardSummary();
+        setStats(response.data);
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
+        toast.error('Failed to load dashboard statistics');
       } finally {
         setLoading(false);
       }
@@ -58,7 +56,7 @@ export const DashboardPage = () => {
     fetchDashboardStats();
   }, []);
 
-  const formatCurrency = (amount: number, currency: string) => {
+  const formatCurrency = (amount: number, currency: string = 'USD') => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency,
@@ -127,9 +125,9 @@ export const DashboardPage = () => {
             />
             <StatCard
               title="Total Revenue"
-              value={formatCurrency(stats.revenueStats.total, stats.revenueStats.currency)}
+              value={formatCurrency(stats.totalRevenue)}
               icon={TrendingUp}
-              description={`${stats.revenueStats.growth >= 0 ? '+' : ''}${stats.revenueStats.growth}% from last month`}
+              description="Platform revenue"
             />
             <StatCard
               title="Total Packages"
@@ -144,10 +142,10 @@ export const DashboardPage = () => {
               description="Completed bookings"
             />
             <StatCard
-              title="Total Payments"
-              value={formatNumber(stats.totalPayments)}
+              title="Support Tickets"
+              value={formatNumber(stats.supportTickets)}
               icon={CreditCard}
-              description="Processed transactions"
+              description="Open support issues"
             />
           </div>
         )}

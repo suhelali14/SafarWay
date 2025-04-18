@@ -1,23 +1,8 @@
-import { useState, useCallback } from "react";
+import { useToast as useToastHook } from "./toast";
 
-interface Toast {
-  title: string;
-  description?: string;
-  variant?: "default" | "destructive";
-}
+export const useToast = useToastHook;
 
-export function useToast() {
-  const [toasts, setToasts] = useState<Toast[]>([]);
+export type { Toast, ToastActionElement } from "./toast";
 
-  const toast = useCallback(
-    ({ title, description, variant = "default" }: Toast) => {
-      setToasts(prev => [...prev, { title, description, variant }]);
-      setTimeout(() => {
-        setToasts(prev => prev.slice(1));
-      }, 3000);
-    },
-    []
-  );
-
-  return { toast, toasts };
-} 
+// Re-export toast function for direct use
+export { toast } from "./toast"; 

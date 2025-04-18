@@ -129,18 +129,3 @@ export function HeroSection() {
     </div>
   )
 }
-
-
-                    alt={destination.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-                <span className="text-white text-sm font-medium">{destination.name}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  )
-}

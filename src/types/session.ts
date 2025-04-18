@@ -1,0 +1,1 @@
+export type UserRole = "CUSTOMER" | "AGENCY_ADMIN" | "AGENCY_USER" | "SAFARWAY_ADMIN" | "SAFARWAY_USER"; 

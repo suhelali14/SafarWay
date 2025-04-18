@@ -1,0 +1,5 @@
+{
+  "name": "agency-dashboard",
+  "private": true,
+  "main": "index.tsx"
+} 

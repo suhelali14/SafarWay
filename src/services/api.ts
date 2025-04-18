@@ -1,10 +1,13 @@
-import axios from 'axios';
-import { getToken, clearSession } from '../utils/session';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { API_URL } from '../config/constants';
+import { getToken } from '../utils/session';
 import { toast } from 'react-hot-toast';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-
 // Types
+
+export type PackageStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+export type TourType = 'ADVENTURE' | 'CULTURAL' | 'WILDLIFE' | 'BEACH' | 'MOUNTAIN' | 'CITY' | 'CRUISE' | 'OTHER';
+
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -21,15 +24,48 @@ export interface RegisterData {
 export interface TourPackage {
   id: string;
   title: string;
+  name?: string;
+  subtitle?: string;
+  summary?: string;
   description: string;
-  price: number;
+  price?: number;
+  pricePerPerson: number;
+  discountPrice?: number;
   duration: number;
-  location: string;
+  destination: string;
+  validFrom?: string;
+  validTill?: string;
   startDate: string;
-  maxParticipants: number;
-  currentParticipants: number;
-  status: 'ACTIVE' | 'INACTIVE' | 'CANCELLED';
+  endDate: string;
+  minCapacity: number;
+  minimumAge?: number;
+  maxPeople: number;
+  maxGroupSize?: number;
+  maximumPeople?: number;
+  tourType: TourType;
+  packageType?: string;
+  status: PackageStatus;
+  inclusions: string[];
+  exclusions: string[];
+  includedItems?: string[];
+  excludedItems?: string[];
+  highlights?: string[];
+  coverImage?: string;
   images: string[];
+  galleryImages?: string[];
+  phoneNumber?: string;
+  email?: string;
+  whatsapp?: string;
+  cancellationPolicy?: string;
+  cancelationPolicy?: string;
+  additionalInfo?: string;
+  difficultyLevel?: string;
+  isFlexible?: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: string;
+  agencyId: string;
+  itinerary?: any[];
 }
 
 export interface Booking {
@@ -45,18 +81,98 @@ export interface Booking {
   customerEmail: string;
   customerPhone: string;
   tour: TourPackage;
+  paymentStatus: 'PENDING' | 'PAID' | 'REFUNDED' | 'PARTIALLY_REFUNDED';
+  refundRequested: boolean;
+  refundStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: 'CUSTOMER' | 'AGENCY_ADMIN' | 'AGENCY_USER' | 'SAFARWAY_ADMIN';
+  status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
+  profileImage?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Agency {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
+  logo?: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RefundRequest {
+  id: string;
+  bookingId: string;
+  userId: string;
+  reason: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  amount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SupportTicket {
+  id: string;
+  userId: string;
+  subject: string;
+  message: string;
+  status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DashboardStats {
+  totalUsers: number;
+  totalAgencies: number;
+  totalBookings: number;
+  totalRevenue: number;
+  totalPackages: number;
+  refundRequests: number;
+  supportTickets: number;
+  recentBookings: Booking[];
+  recentUsers: User[];
+}
+
+export interface AgencyDashboardStats {
+  totalPackages: number;
+  totalBookings: number;
+  totalRevenue: number;
+  recentBookings: Booking[];
+  recentCustomers: User[];
+}
+
+export interface RevenueData {
+  total: number;
+  daily: { date: string; amount: number }[];
+  weekly: { week: string; amount: number }[];
+  monthly: { month: string; amount: number }[];
+  currency: string;
 }
 
 // Create axios instance with default config
-const api = axios.create({
+const api: AxiosInstance = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true
+  timeout: 10000, // 10 seconds
 });
 
-// Add request interceptor for auth token
+// Add request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
     const token = getToken();
@@ -70,19 +186,13 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor for error handling
+// Add response interceptor to handle common errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      config: error.config,
-      url: error.config?.url
-    });
-
-    if (error.response?.status === 401) {
-      clearSession();
+    // Handle 401 Unauthorized errors
+    if (error.response && error.response.status === 401) {
+      // Redirect to login page
       window.location.href = '/login';
     } else if (error.response?.status === 500) {
       toast.error('Server error. Please try again later.');
@@ -95,96 +205,140 @@ api.interceptors.response.use(
   }
 );
 
-// Auth APIs
+// Auth API
 export const authAPI = {
-  login: (credentials: LoginCredentials) => 
-    api.post('/auth/login', credentials),
-  registerCustomer: (userData: Omit<RegisterData, 'role'>) => 
+  login: (email: string, password: string) => 
+    api.post('/auth/login', { email, password }),
+  
+  registerCustomer: (userData: any) => 
     api.post('/auth/register/customer', userData),
-  registerAgency: (userData: Omit<RegisterData, 'role'>) => 
-    api.post('/auth/register/agency', userData),
-  registerAgencyUser: (userData: Omit<RegisterData, 'role'>) => 
+  
+  registerAgency: (agencyData: any) => 
+    api.post('/auth/register/agency', agencyData),
+  
+  registerAgencyUser: (userData: any) => 
     api.post('/auth/register/agency-user', userData),
-  getCurrentUser: () => api.get('/auth/me'),
-  updateProfile: (data: Partial<RegisterData>) => api.patch('/auth/profile', data),
+  
+  getCurrentUser: async () => {
+    console.log('Fetching current user...');
+    try {
+      const response = await api.get('/auth/me');
+      console.log('Current user response:', response);
+      return response;
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+      throw error;
+    }
+  },
+  
+  verifyToken: () => 
+    api.get('/auth/verify'),
+  
+  updateProfile: (userData: any) => 
+    api.patch('/auth/profile', userData),
 };
 
-// Tour Package APIs
-export const tourAPI = {
-  getAll: (params?: any) => api.get('/packages', { params }),
-  getById: (id: string) => api.get(`/packages/${id}`),
-  create: (data: Partial<TourPackage>) => api.post('/packages', data),
-  update: (id: string, data: Partial<TourPackage>) => api.put(`/packages/${id}`, data),
-  delete: (id: string) => api.delete(`/packages/${id}`),
-  search: (params: any) => api.get('/packages/search', { params }),
+// Agency API
+export const agencyAPI = {
+  getProfile: () => 
+    api.get('/agency/profile'),
+  
+  updateProfile: (profileData: any) => 
+    api.put('/agency/profile', profileData),
+  
+  getDashboardSummary: (timeRange: string = 'week') => 
+    api.get('/agency/dashboard/summary', { params: { timeRange } }),
+  
+  getAllPackages: (filters: PackageFilters) => 
+    api.get('/agency/packages', { params: filters }),
+  
+  getPackageById: (id: string) => 
+    api.get(`/agency/packages/${id}`),
+  
+  createPackage: (packageData: FormData) => 
+    api.post('/agency/packages', packageData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  
+  updatePackage: (id: string, packageData: FormData) => 
+    api.put(`/agency/packages/${id}`, packageData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  
+  deletePackage: (id: string) => 
+    api.delete(`/agency/packages/${id}`),
+  
+  getAllBookings: (status?: string) => 
+    api.get('/agency/bookings', { params: { status } }),
+  
+  getBookingById: (id: string) => 
+    api.get(`/agency/bookings/${id}`),
+  
+  updateBookingStatus: (id: string, status: string) => 
+    api.patch(`/agency/bookings/${id}/status`, { status }),
+  
+  getRefundRequests: (status?: string) => 
+    api.get('/agency/refunds', { params: { status } }),
+  
+  processRefundRequest: (id: string, status: string, remarks?: string) => 
+    api.patch(`/agency/refunds/${id}`, { status, remarks }),
 };
 
-// Booking APIs
-export const bookingAPI = {
-  getAll: (params?: any) => api.get('/bookings', { params }),
-  getById: (id: string) => api.get(`/bookings/${id}`),
-  create: (data: Partial<Booking>) => api.post('/bookings', data),
-  update: (id: string, data: Partial<Booking>) => api.put(`/bookings/${id}`, data),
-  updateStatus: (id: string, status: Booking['status']) => 
-    api.patch(`/bookings/${id}/status`, { status }),
-  getCustomerBookings: () => api.get('/bookings/customer/bookings'),
-};
-
-// Customer APIs
-export const customerAPI = {
-  getAll: (params?: any) => api.get('/customers', { params }),
-  getById: (id: string) => api.get(`/customers/${id}`),
-  create: (data: any) => api.post('/customers', data),
-  update: (id: string, data: any) => api.put(`/customers/${id}`, data),
-  delete: (id: string) => api.delete(`/customers/${id}`),
-  getBookings: (id: string, params?: any) => api.get(`/customers/${id}/bookings`, { params }),
-};
-
-// Upload APIs
-export const uploadAPI = {
-  uploadImage: (formData: FormData) => api.post('/uploads', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  }),
-};
-
-// Invite APIs
-export const inviteAPI = {
-  create: (data: any) => api.post('/invites', data),
-  completeOnboarding: (data: any) => api.post('/invites/onboard', data),
-  resend: (userId: string) => api.post(`/invites/${userId}/resend`),
-  revoke: (userId: string) => api.delete(`/invites/${userId}`),
-};
-
-// Message APIs
-export const messageAPI = {
-  getAll: (params?: any) => api.get('/messages', { params }),
-  getById: (id: string) => api.get(`/messages/${id}`),
-  send: (data: any) => api.post('/messages', data),
-  markAsRead: (id: string) => api.put(`/messages/${id}/read`),
-};
-
-// Analytics APIs
-export const analyticsAPI = {
-  getDashboardStats: () => api.get('/analytics/dashboard'),
-  getBookingStats: (params: any) => api.get('/analytics/bookings', { params }),
-  getRevenueStats: (params: any) => api.get('/analytics/revenue', { params }),
-};
-
-// Team APIs
-export const teamAPI = {
-  getAll: () => api.get('/team'),
-  getById: (id: string) => api.get(`/team/${id}`),
-  create: (data: any) => api.post('/team', data),
-  update: (id: string, data: any) => api.put(`/team/${id}`, data),
-  delete: (id: string) => api.delete(`/team/${id}`),
-};
-
-// Settings APIs
-export const settingsAPI = {
-  get: () => api.get('/settings'),
-  update: (data: any) => api.put('/settings', data),
+// Admin API
+export const adminAPI = {
+  getDashboardSummary: () => 
+    api.get('/admin/dashboard/summary'),
+  
+  getAllUsers: () => 
+    api.get('/admin/users'),
+  
+  getUserById: (id: string) => 
+    api.get(`/admin/users/${id}`),
+  
+  createUser: (userData: any) => 
+    api.post('/admin/users', userData),
+  
+  updateUser: (id: string, userData: any) => 
+    api.put(`/admin/users/${id}`, userData),
+  
+  deleteUser: (id: string) => 
+    api.delete(`/admin/users/${id}`),
+  
+  getAllAgencies: () => 
+    api.get('/admin/agencies'),
+  
+  getAgencyById: (id: string) => 
+    api.get(`/admin/agencies/${id}`),
+  
+  createAgency: (agencyData: any) => 
+    api.post('/admin/agencies', agencyData),
+  
+  updateAgency: (id: string, agencyData: any) => 
+    api.put(`/admin/agencies/${id}`, agencyData),
+  
+  approveAgency: (id: string) => 
+    api.patch(`/admin/agencies/${id}/approve`),
+  
+  suspendAgency: (id: string) => 
+    api.patch(`/admin/agencies/${id}/suspend`),
+  
+  getAllBookings: () => 
+    api.get('/admin/bookings'),
+  
+  getBookingById: (id: string) => 
+    api.get(`/admin/bookings/${id}`),
+  
+  updateBookingStatus: (id: string, status: string) => 
+    api.patch(`/admin/bookings/${id}/status`, { status }),
+  
+  getRefundRequests: () => 
+    api.get('/admin/refunds'),
+  
+  approveRefund: (id: string, remarks?: string) => 
+    api.patch(`/admin/refunds/${id}/approve`, { remarks }),
+  
+  rejectRefund: (id: string, remarks?: string) => 
+    api.patch(`/admin/refunds/${id}/reject`, { remarks }),
 };
 
 export default api; 
