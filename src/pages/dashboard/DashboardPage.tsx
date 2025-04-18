@@ -28,6 +28,7 @@ import {
   XCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { adminAPI } from '../../services/api';
 
 // Types for different dashboard data
 interface DashboardMetrics {
@@ -63,15 +64,9 @@ export const DashboardPage = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API calls based on user role
-      const response = await fetch('/api/dashboard', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setMetrics(data);
-      setChartData(data.chartData || []);
+      const response = await adminAPI.getDashboardSummary();
+      setMetrics(response.data);
+      setChartData(response.data.chartData || []);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       toast.error('Failed to load dashboard data');
@@ -199,7 +194,7 @@ export const DashboardPage = () => {
     switch (user?.role) {
       case 'SAFARWAY_ADMIN':
         return renderSafarwayAdminMetrics();
-      case 'USER':
+      case 'CUSTOMER':
         return renderUserDashboard();
       case 'AGENCY_ADMIN':
         return renderAgencyAdminDashboard();

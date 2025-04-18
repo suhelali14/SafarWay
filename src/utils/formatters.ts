@@ -1,38 +1,111 @@
 /**
- * Format a date string to a readable format
- * @param dateString - The date string to format
- * @param format - The format to use (default: 'medium')
+ * Format a date string into a more readable format.
+ * @param dateString Date string in ISO format
+ * @param options Intl.DateTimeFormatOptions for formatting
  * @returns Formatted date string
  */
-export const formatDate = (dateString: string | Date, format: 'short' | 'medium' | 'long' = 'medium'): string => {
-  if (!dateString) return '';
-  
-  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-  
-  if (isNaN(date.getTime())) return '';
-  
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: format === 'short' ? '2-digit' : format === 'medium' ? 'short' : 'long',
-    day: '2-digit',
-  };
-  
-  return new Intl.DateTimeFormat('en-US', options).format(date);
+export const formatDate = (
+  dateString: string, 
+  options: Intl.DateTimeFormatOptions = { 
+    day: 'numeric', 
+    month: 'short', 
+    year: 'numeric' 
+  }
+): string => {
+  try {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return dateString;
+  }
 };
 
 /**
- * Format a currency value
- * @param value - The value to format
- * @param currency - The currency code (default: 'USD')
+ * Format a number as currency
+ * @param amount The amount to format
+ * @param currency Currency code (default: USD)
+ * @param locale Locale for formatting (default: en-US)
  * @returns Formatted currency string
  */
-export const formatCurrency = (value: number, currency: string = 'USD'): string => {
-  if (value === undefined || value === null) return '';
-  
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  }).format(value);
+export const formatCurrency = (
+  amount: number,
+  currency: string = 'USD',
+  locale: string = 'en-US'
+): string => {
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  } catch (error) {
+    console.error('Error formatting currency:', error);
+    return `${amount}`;
+  }
+};
+
+/**
+ * Format a number with thousands separators
+ * @param number The number to format
+ * @param locale Locale for formatting (default: en-US)
+ * @returns Formatted number string
+ */
+export const formatNumber = (
+  number: number,
+  locale: string = 'en-US'
+): string => {
+  try {
+    return new Intl.NumberFormat(locale).format(number);
+  } catch (error) {
+    console.error('Error formatting number:', error);
+    return `${number}`;
+  }
+};
+
+/**
+ * Format a date relative to now (e.g., "2 days ago")
+ * @param dateString Date string in ISO format
+ * @returns Relative time string
+ */
+export const formatRelativeTime = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInSecs = Math.floor(diffInMs / 1000);
+    
+    if (diffInSecs < 60) {
+      return 'just now';
+    }
+    
+    const diffInMins = Math.floor(diffInSecs / 60);
+    if (diffInMins < 60) {
+      return `${diffInMins} minute${diffInMins > 1 ? 's' : ''} ago`;
+    }
+    
+    const diffInHours = Math.floor(diffInMins / 60);
+    if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    }
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 30) {
+      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    }
+    
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) {
+      return `${diffInMonths} month${diffInMonths > 1 ? 's' : ''} ago`;
+    }
+    
+    const diffInYears = Math.floor(diffInMonths / 12);
+    return `${diffInYears} year${diffInYears > 1 ? 's' : ''} ago`;
+  } catch (error) {
+    console.error('Error formatting relative time:', error);
+    return dateString;
+  }
 };
 
 /**

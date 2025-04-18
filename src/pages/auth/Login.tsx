@@ -14,7 +14,8 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Checkbox } from '../../components/ui/checkbox';
 import { useToast } from '../../components/ui/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { authAPI } from '../../services/api';
 
 type LoginFormData = {
   email: string;
@@ -29,6 +30,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const { loading, error } = useSelector((state: RootState) => state.auth);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -46,6 +48,25 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
+      // First try to check if this is a temporary password
+      try {
+        const tempPasswordResponse = await authAPI.verifyTempPassword(data.password);
+        
+        if (tempPasswordResponse.data?.requiresPasswordChange) {
+          // This is a temporary password, redirect to the new password page
+          navigate(`/auth/set-new-password?userId=${tempPasswordResponse.data.userId}&email=${encodeURIComponent(data.email)}`);
+          toast({
+            title: 'Password Change Required',
+            description: 'You need to set a new password to continue.',
+          });
+          return;
+        }
+      } catch (error) {
+        // Not a temporary password, proceed with normal login
+        console.log("Not a temporary password, proceeding with normal login");
+      }
+
+      // Normal login flow
       await dispatch(login(data)).unwrap();
       toast({
         title: 'Success',
@@ -104,13 +125,22 @@ export default function LoginPage() {
               Forgot password?
             </Link>
           </div>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Enter your password"
-            {...register('password')}
-            className={errors.password ? 'border-red-500' : ''}
-          />
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              {...register('password')}
+              className={errors.password ? 'border-red-500' : ''}
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
           {errors.password && (
             <p className="text-sm text-red-500">{errors.password.message}</p>
           )}

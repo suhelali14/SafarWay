@@ -1,46 +1,61 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import axios, { AxiosError } from 'axios';
+import { API_URL } from '../config/constants';
 import { authAPI } from '../services/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { getToken, setToken, removeToken, getUserData, setUserData, removeUserData, clearSession, isValid, UserData } from '../utils/session';
+import { 
+  getToken, 
+  getUserData, 
+  clearSession, 
+  isValid, 
+  UserData,
+  initializeSession 
+} from '../utils/session';
+
+// Update User interface to match UserData
+interface User extends Omit<UserData, 'profileImage'> {
+  profilePicture?: string | undefined;
+}
 
 interface AuthContextType {
   user: UserData | null;
-  isAuthenticated: boolean;
   isLoading: boolean;
+  isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: any) => Promise<void>;
-  logout: () => void;
-  updateProfile: (data: any) => Promise<void>;
-  navigateTo: (path: string) => void;
+  logout: () => Promise<void>;
+  register: (data: any) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-const getDashboardPathByRole = (role: string): string => {
-  switch (role) {
-    case 'SAFARWAY_ADMIN':
-    case 'SAFARWAY_USER':
-      return '/admin/dashboard';
-    case 'AGENCY_ADMIN':
-    case 'AGENCY_USER':
-      return '/agency/dashboard';
-    case 'CUSTOMER':
-      return '/customer/dashboard';
-    default:
-      console.warn('Unknown user role:', role);
-      return '/dashboard';
-  }
+// Create the context with a default value
+export const AuthContext = createContext<AuthContextType | null>(null);
+
+// Convert UserData to User
+const convertUserDataToUser = (userData: UserData | null): User | null => {
+  if (!userData) return null;
+  
+  // Using optional chaining and nullish coalescing to handle missing property
+  const { profileImage, ...rest } = userData as any;
+  return {
+    ...rest,
+    profilePicture: profileImage ?? undefined
+  };
 };
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   // Custom navigation function that can be used safely
   const navigateTo = (path: string) => {
+    console.log('navigateTo called with path:', path);
     try {
       navigate(path);
     } catch (error) {
@@ -50,73 +65,123 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
+  // Check authentication status
   const checkAuth = async () => {
     try {
-      if (isValid()) {
-        const storedUser = getUserData();
-        if (storedUser) {
-          setUser(storedUser);
-          try {
-            // Verify token with backend
-            await authAPI.getCurrentUser();
-          } catch (error: any) {
-            // Only clear session for auth errors (401), not server errors (500)
-            if (error.response?.status === 401) {
-              console.log('Auth verification failed, clearing session');
-              clearSession();
-              setUser(null);
-            } else {
-              console.warn('Non-auth error during verification:', error);
-              // Keep the session for non-auth errors
-            }
+      setIsLoading(true);
+      
+      // First check if we have a valid session in cookies/localStorage
+      if (!isValid()) {
+        console.log('Session is not valid, clearing session');
+        clearSession();
+        setUser(null);
+        setIsAuthenticated(false);
+        return;
+      }
+
+      const token = getToken();
+      if (!token) {
+        console.log('No token found');
+        setIsAuthenticated(false);
+        return;
+      }
+
+      try {
+        // Try to verify token with backend
+        console.log('Verifying token with backend...');
+        const response = await authAPI.getCurrentUser();
+        console.log('getCurrentUser response full:', response);
+        
+        // Extract user data from the correct response structure
+        const userData = response.data.data;
+        
+        console.log('Extracted user data:', userData);
+        
+        if (!userData || !userData.id) {
+          console.error('Invalid or missing user data in response');
+          clearSession();
+          setUser(null);
+          setIsAuthenticated(false);
+          return;
+        }
+        
+        console.log('Setting user and authenticated state');
+        
+        // Update user state with verified data
+        setUser(userData);
+        setIsAuthenticated(true);
+        
+        // Re-initialize session with fresh data
+        initializeSession(token, userData);
+        
+      } catch (error: any) {
+        console.error('Auth verification error:', error);
+        
+        // Handle different error scenarios
+        if (error.response?.status === 401) {
+          console.log('Auth verification failed (401), clearing session');
+          clearSession();
+          setUser(null);
+          setIsAuthenticated(false);
+          navigateTo('/login');
+        } else if (error.response?.status === 403) {
+          console.log('User is forbidden (403), clearing session');
+          clearSession();
+          setUser(null);
+          setIsAuthenticated(false);
+          navigateTo('/login');
+        } else {
+          console.warn('Non-auth error during verification:', error);
+          // Keep existing session for non-auth errors
+          const existingUser = getUserData();
+          if (existingUser) {
+            setUser(existingUser);
+            setIsAuthenticated(true);
+          } else {
+            clearSession();
+            setUser(null);
+            setIsAuthenticated(false);
           }
         }
       }
     } catch (error) {
       console.error('Error in checkAuth:', error);
-      // Only clear session for critical errors
-      if (error instanceof Error && error.message.includes('auth')) {
-        clearSession();
-        setUser(null);
-      }
+      clearSession();
+      setUser(null);
+      setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Check auth on mount
+  useEffect(() => {
+    console.log('AuthProvider mounted, checking auth...');
+    checkAuth();
+  }, []);
+
+  // Login function
   const login = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
-      const response = await authAPI.login({ email, password });
+      const response = await authAPI.login(email, password);
+      console.log('Login API response:', response);
       
-      if (!response.data || !response.data.data) {
-        throw new Error('No data received from server');
+      const { data } = response.data; // Extract the data object from response
+      const { token, user: userData } = data; // Extract token and user from data
+
+      console.log('Login response processed:', { token: !!token, userData });
+      
+      if (!token || !userData || !userData.id) {
+        throw new Error('Invalid response from server');
       }
+
+      // Initialize session with new token and user data
+      initializeSession(token, userData);
       
-      const { user, token } = response.data.data;
-      
-      if (!user || !token) {
-        throw new Error('Invalid response from server: missing user or token');
-      }
-      
-      // Store session data
-      await Promise.all([
-        new Promise<void>((resolve) => {
-          setToken(token);
-          resolve();
-        }),
-        new Promise<void>((resolve) => {
-          setUserData(user);
-          resolve();
-        }),
-        new Promise<void>((resolve) => {
-          setUser(user);
-          resolve();
-        })
-      ]);
+      // Update state
+      setUser(userData);
+      setIsAuthenticated(true);
       
       toast.success('Login successful!');
       
@@ -124,102 +189,116 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await new Promise(resolve => setTimeout(resolve, 100));
       
       // Get the appropriate dashboard path based on user role
-      const dashboardPath = getDashboardPathByRole(user.role);
+      const dashboardPath = getDashboardPathByRole(userData.role);
       console.log('Navigating to dashboard:', dashboardPath);
       
       // Use the from path from location state if available, otherwise use the dashboard path
       const from = (location.state as any)?.from || dashboardPath;
+      console.log('Redirecting to:', from);
       navigateTo(from);
       
-    } catch (error: any) {
-      console.error('Login error:', error);
-      const errorMessage = error.response?.data?.message || 
-        error.message || 
-        'Login failed. Please check your credentials and try again.';
+    } catch (error: unknown) {
+      console.error('Login failed:', error);
+      clearSession();
+      setUser(null);
+      setIsAuthenticated(false);
+      
+      const errorMessage = error instanceof AxiosError && error.response?.data?.message 
+        ? error.response.data.message 
+        : error instanceof Error 
+          ? error.message 
+          : 'Login failed. Please check your credentials and try again.';
       toast.error(errorMessage);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const register = async (userData: any) => {
+  // Logout function
+  const logout = async () => {
     try {
-      const response = await authAPI.registerCustomer(userData);
-      
-      if (!response.data || !response.data.data) {
-        throw new Error('Invalid response from server');
-      }
+      clearSession();
+      setUser(null);
+      setIsAuthenticated(false);
+      toast.success('Logged out successfully');
+      navigateTo('/login');
+    } catch (error: unknown) {
+      console.error('Logout failed:', error);
+      toast.error('Failed to logout. Please try again.');
+    }
+  };
 
-      const { user, token } = response.data.data;
+  // Get dashboard path based on user role
+  const getDashboardPathByRole = (role: string): string => {
+    console.log('Getting dashboard path for role:', role);
+    switch (role) {
+      case 'SAFARWAY_ADMIN':
+        return '/admin/dashboard';
+      case 'AGENCY_ADMIN':
+      case 'AGENCY_USER':
+        return '/agency/dashboard';
+      case 'CUSTOMER':
+        return '/';
+      default:
+        return '/';
+    }
+  };
+
+  // Register function
+  const register = async (data: any) => {
+    setIsLoading(true);
+    try {
+      const response = await authAPI.registerCustomer(data);
+      const { token, user: userData } = response.data.data;
+
+      // Initialize session with new token and user data
+      initializeSession(token, userData);
       
-      if (!user || !token) {
-        throw new Error('Invalid response from server: missing user or token');
-      }
-      
-      // Store session data
-      setToken(token);
-      setUserData(user);
-      setUser(user);
+      // Update state
+      setUser(userData);
+      setIsAuthenticated(true);
       
       toast.success('Registration successful!');
       
-      // Get the appropriate dashboard path based on user role
-      const dashboardPath = getDashboardPathByRole(user.role);
+      // Navigate to dashboard
+      const dashboardPath = getDashboardPathByRole(userData.role);
       navigateTo(dashboardPath);
       
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 
-        error.message || 
-        'Registration failed. Please try again.';
+    } catch (error: unknown) {
+      console.error('Registration failed:', error);
+      const errorMessage = error instanceof AxiosError && error.response?.data?.message 
+        ? error.response.data.message 
+        : error instanceof Error 
+          ? error.message 
+          : 'Registration failed. Please try again.';
       toast.error(errorMessage);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    clearSession();
-    setUser(null);
-    navigateTo('/login');
-    toast.success('Logged out successfully');
-  };
-
-  const updateProfile = async (data: any) => {
-    try {
-      const response = await authAPI.updateProfile(data);
-      const updatedUser = response.data;
-      
-      setUserData(updatedUser);
-      setUser(updatedUser);
-      
-      toast.success('Profile updated successfully');
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Profile update failed';
-      toast.error(errorMessage);
-      throw error;
-    }
+  const value = {
+    user,
+    isLoading,
+    isAuthenticated,
+    login,
+    logout,
+    register
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        isLoading,
-        login,
-        register,
-        logout,
-        updateProfile,
-        navigateTo,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}; 

@@ -1,169 +1,151 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Calendar, Users, Star, Clock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button } from '../ui/button';
+import { motion } from 'framer-motion';
+import { Calendar, MapPin, Users, Tag, Building2 } from 'lucide-react';
 import { Badge } from '../ui/badge';
-import { formatCurrency } from '../../utils/formatters';
+import { Button } from '../ui/button';
+import { formatDate, formatCurrency } from '../../utils/formatters';
 
-export interface PackageCardProps {
-  id: string;
-  title: string;
-  description: string;
-  location: string;
-  price: number;
-  duration: number;
-  maxParticipants: number;
-  rating: number;
-  imageUrl: string;
-  agencyName: string;
-  agencyLogo?: string;
-  discount?: number;
-  isFeatured?: boolean;
-  isPopular?: boolean;
-  isNew?: boolean;
+interface PackageCardProps {
+  packageData: {
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    discountedPrice?: number;
+    discount?: number;
+    imageUrl: string;
+    location: string;
+    duration: number;
+    maxGroupSize: number;
+    validFrom: string;
+    validTill: string;
+    featured: boolean;
+    agencyId: string;
+  };
+  showAgencyLink?: boolean;
 }
 
-export function PackageCard({
-  id,
-  title,
-  description,
-  location,
-  price,
-  duration,
-  maxParticipants,
-  rating,
-  imageUrl,
-  agencyName,
-  agencyLogo,
-  discount,
-  isFeatured,
-  isPopular,
-  isNew,
+export function PackageCard({ 
+  packageData,
+  showAgencyLink = true
 }: PackageCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  
-  const discountedPrice = discount ? price - (price * discount / 100) : price;
+  const {
+    id,
+    title,
+    description,
+    price,
+    discountedPrice,
+    discount,
+    imageUrl,
+    location,
+    duration,
+    maxGroupSize,
+    validFrom,
+    validTill,
+    featured,
+    agencyId
+  } = packageData;
+
+  // Fallback image
+  const fallbackImage = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1421&q=80';
   
   return (
     <motion.div
-      className="group relative overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:shadow-xl"
+      className="rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow"
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.3 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
     >
-      {/* Badges */}
-      <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
-        {isFeatured && (
-          <Badge variant="default" className="bg-amber-500 hover:bg-amber-600">
+      {/* Package Image */}
+      <div className="relative h-48">
+        <img 
+          src={imageUrl || fallbackImage} 
+          alt={title}
+          className="w-full h-full object-cover"
+          loading="lazy"
+        />
+        
+        {/* Featured Badge */}
+        {featured && (
+          <Badge 
+            className="absolute top-2 left-2 bg-amber-500 hover:bg-amber-600"
+          >
             Featured
           </Badge>
         )}
-        {isPopular && (
-          <Badge variant="default" className="bg-rose-500 hover:bg-rose-600">
-            Popular
-          </Badge>
-        )}
-        {isNew && (
-          <Badge variant="default" className="bg-emerald-500 hover:bg-emerald-600">
-            New
-          </Badge>
-        )}
-        {discount && (
-          <Badge variant="default" className="bg-blue-500 hover:bg-blue-600">
+        
+        {/* Discount Badge */}
+        {discount && discount > 0 && (
+          <Badge 
+            className="absolute top-2 right-2 bg-red-500 hover:bg-red-600"
+          >
             {discount}% OFF
           </Badge>
         )}
       </div>
       
-      {/* Image */}
-      <div className="relative h-48 w-full overflow-hidden">
-        <img
-          src={imageUrl}
-          alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-      </div>
-      
-      {/* Content */}
+      {/* Package Content */}
       <div className="p-4">
-        <div className="mb-2 flex items-center justify-between">
-          <div className="flex items-center gap-1 text-sm text-gray-500">
-            <MapPin className="h-4 w-4" />
+        <div className="flex flex-col space-y-3">
+          <h3 className="text-lg font-semibold line-clamp-1">{title}</h3>
+          
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            <MapPin className="h-4 w-4 text-gray-500" />
             <span>{location}</span>
           </div>
-          <div className="flex items-center gap-1 text-sm font-medium text-amber-500">
-            <Star className="h-4 w-4 fill-current" />
-            <span>{rating.toFixed(1)}</span>
-          </div>
-        </div>
-        
-        <h3 className="mb-1 line-clamp-1 text-lg font-semibold text-gray-900">
-          {title}
-        </h3>
-        
-        <p className="mb-3 line-clamp-2 text-sm text-gray-500">
-          {description}
-        </p>
-        
-        <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-gray-500">
-          <div className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
-            <span>{duration} days</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Users className="h-4 w-4" />
-            <span>Max {maxParticipants}</span>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div>
-            {discount ? (
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold text-gray-900">
-                  {formatCurrency(discountedPrice)}
-                </span>
-                <span className="text-sm text-gray-500 line-through">
-                  {formatCurrency(price)}
-                </span>
-              </div>
-            ) : (
-              <span className="text-lg font-bold text-gray-900">
-                {formatCurrency(price)}
-              </span>
-            )}
-            <p className="text-xs text-gray-500">per person</p>
+          
+          <p className="text-sm text-gray-600 line-clamp-2">{description}</p>
+          
+          <div className="flex flex-wrap gap-3 mt-1 text-sm text-gray-600">
+            <div className="flex items-center gap-1">
+              <Calendar className="h-4 w-4 text-gray-500" />
+              <span>{duration} days</span>
+            </div>
+            
+            <div className="flex items-center gap-1">
+              <Users className="h-4 w-4 text-gray-500" />
+              <span>Max {maxGroupSize}</span>
+            </div>
           </div>
           
-          <Link to={`/packages/${id}`}>
-            <Button 
-              variant="default" 
-              size="sm"
-              className="group flex items-center gap-1"
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            <Calendar className="h-4 w-4 text-gray-500" />
+            <span>Valid: {formatDate(validFrom)} - {formatDate(validTill)}</span>
+          </div>
+          
+          {showAgencyLink && (
+            <Link 
+              to={`/agency/${agencyId}`}
+              className="flex items-center gap-1 text-sm text-primary hover:underline"
             >
-              View Details
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </Link>
-        </div>
-        
-        <div className="mt-3 flex items-center gap-2 border-t border-gray-100 pt-3">
-          {agencyLogo ? (
-            <img 
-              src={agencyLogo} 
-              alt={agencyName} 
-              className="h-6 w-6 rounded-full object-cover"
-            />
-          ) : (
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-600">
-              {agencyName.charAt(0)}
-            </div>
+              <Building2 className="h-4 w-4" />
+              <span>View Agency</span>
+            </Link>
           )}
-          <span className="text-xs text-gray-500">by {agencyName}</span>
+          
+          <div className="flex justify-between items-center mt-2">
+            <div className="flex flex-col">
+              {discount && discount > 0 ? (
+                <>
+                  <span className="text-xs text-gray-500 line-through">
+                    {formatCurrency(price, 'USD')}
+                  </span>
+                  <span className="text-lg font-bold text-primary">
+                    {formatCurrency(discountedPrice || (price - (price * discount / 100)), 'USD')}
+                  </span>
+                </>
+              ) : (
+                <span className="text-lg font-bold text-primary">
+                  {formatCurrency(price, 'USD')}
+                </span>
+              )}
+            </div>
+            
+            <Button asChild>
+              <Link to={`/packages/${id}`}>View Details</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </motion.div>
