@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
@@ -44,7 +44,7 @@ export default function OnboardPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [tokenVerified, setTokenVerified] = useState(false);
   const [verifyingToken, setVerifyingToken] = useState(true);
-
+  const { user, isAuthenticated } = useAuth();
   // Initialize form with zod schema
   const form = useForm<z.infer<typeof onboardingFormSchema>>({
     resolver: zodResolver(onboardingFormSchema),
@@ -55,7 +55,13 @@ export default function OnboardPage() {
       confirmPassword: '',
     },
   });
-
+  useMemo(()=>{
+      if (isAuthenticated) {
+        user?.role=="CUSTOMER"?
+            navigate('/') : user?.role == "SAFARWAY_ADMIN" || user?.role =="SAFARWAY_USER" ? navigate('/admin') : navigate('/agency/dashboard')
+        
+      }
+    },[isAuthenticated, navigate])
   // Verify token on page load
   useEffect(() => {
     const verifyToken = async () => {

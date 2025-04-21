@@ -3,6 +3,7 @@ import { agencyService } from './agencyService';
 import { packageService } from './packageService';
 import { adminAPI } from './adminAPI';
 import * as customerAPIModule from './customerAPI';
+import { customerPackages } from './customerPackages';
 
 // Create a complete customerAPI object with all methods
 const customerAPI = {
@@ -38,5 +39,6 @@ export {
   agencyService,
   packageService,
   adminAPI,
-  customerAPI
+  customerAPI,
+  customerPackages,
 };

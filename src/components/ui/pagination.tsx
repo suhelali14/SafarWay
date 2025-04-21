@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Button } from "./button";
 import { cn } from "../../lib/utils";
 
@@ -8,113 +8,111 @@ interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  siblingCount?: number;
+  showControls?: boolean;
+  showEdges?: boolean;
 }
 
 export function Pagination({
   currentPage,
   totalPages,
   onPageChange,
-  siblingCount = 1,
+  showControls = true,
+  showEdges = false,
 }: PaginationProps) {
-  // Helper function to create an array of page numbers to display
-  const generatePagination = () => {
-    // Always show first and last page
-    const firstPage = 1;
-    const lastPage = totalPages;
-
-    // Create a range of sibling pages around the current page
-    const siblingStart = Math.max(firstPage, currentPage - siblingCount);
-    const siblingEnd = Math.min(lastPage, currentPage + siblingCount);
-
-    // Initialize our array with a reasonable initial capacity
-    const pages: (number | string)[] = [];
-
-    // Always add first page
-    pages.push(firstPage);
-
-    // Add ellipsis if there's a gap between first page and sibling start
-    if (siblingStart > firstPage + 1) {
-      pages.push("...");
-    } else if (siblingStart === firstPage + 1) {
-      // If the gap is just 1, show the page instead of ellipsis
-      pages.push(firstPage + 1);
-    }
-
-    // Add all pages in the sibling range, excluding first and last if they're in the range
-    for (let i = siblingStart; i <= siblingEnd; i++) {
-      if (i !== firstPage && i !== lastPage) {
-        pages.push(i);
+  // Generate page numbers to show
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    
+    if (totalPages <= 7) {
+      // If 7 or less pages, show all
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      // Always show first page
+      pageNumbers.push(1);
+      
+      if (currentPage <= 3) {
+        // Near the start
+        pageNumbers.push(2, 3, 4, '...', totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        // Near the end
+        pageNumbers.push('...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        // Middle - show current page, one before, and one after
+        pageNumbers.push('...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
       }
     }
-
-    // Add ellipsis if there's a gap between sibling end and last page
-    if (siblingEnd < lastPage - 1) {
-      pages.push("...");
-    } else if (siblingEnd === lastPage - 1) {
-      // If the gap is just 1, show the page instead of ellipsis
-      pages.push(lastPage - 1);
-    }
-
-    // Always add last page if it's different from first page
-    if (lastPage !== firstPage) {
-      pages.push(lastPage);
-    }
-
-    return pages;
+    
+    return pageNumbers;
   };
-
-  const pages = generatePagination();
-
+  
   if (totalPages <= 1) {
     return null;
   }
-
+  
   return (
-    <nav className="flex items-center justify-center space-x-1 mt-4">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-        disabled={currentPage === 1}
-        className="px-2"
-        aria-label="Previous page"
-      >
-        <ChevronLeftIcon className="h-4 w-4" />
-      </Button>
-
-      {pages.map((page, i) => {
-        if (page === "...") {
-          return (
-            <span key={`ellipsis-${i}`} className="px-3 py-2 text-sm text-gray-500">
-              ...
-            </span>
-          );
-        }
-
-        return (
-          <Button
-            key={`page-${page}`}
-            variant={currentPage === page ? "default" : "outline"}
-            size="sm"
-            onClick={() => onPageChange(Number(page))}
-            className="min-w-[2.5rem]"
-          >
-            {page}
-          </Button>
-        );
-      })}
-
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-        disabled={currentPage === totalPages}
-        className="px-2"
-        aria-label="Next page"
-      >
-        <ChevronRightIcon className="h-4 w-4" />
-      </Button>
+    <nav
+      role="navigation"
+      aria-label="pagination"
+      className="mx-auto flex w-full justify-center"
+    >
+      <ul className="flex flex-row items-center gap-1">
+        {/* Previous page button */}
+        {showControls && (
+          <li>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              disabled={currentPage === 1}
+              onClick={() => onPageChange(currentPage - 1)}
+              aria-label="Go to previous page"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </li>
+        )}
+        
+        {/* Page numbers */}
+        {getPageNumbers().map((page, index) => (
+          <li key={index}>
+            {page === '...' ? (
+              <span className="flex h-8 w-8 items-center justify-center">
+                <MoreHorizontal className="h-4 w-4" />
+              </span>
+            ) : (
+              <Button
+                variant={currentPage === page ? 'default' : 'outline'}
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => onPageChange(page as number)}
+                disabled={currentPage === page}
+                aria-label={`Go to page ${page}`}
+                aria-current={currentPage === page ? 'page' : undefined}
+              >
+                {page}
+              </Button>
+            )}
+          </li>
+        ))}
+        
+        {/* Next page button */}
+        {showControls && (
+          <li>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              disabled={currentPage === totalPages}
+              onClick={() => onPageChange(currentPage + 1)}
+              aria-label="Go to next page"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </li>
+        )}
+      </ul>
     </nav>
   );
 }
@@ -179,34 +177,34 @@ const PaginationLink = React.forwardRef<
 PaginationLink.displayName = "PaginationLink";
 
 const PaginationPrevious = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentPropsWithoutRef<typeof Button>
+  HTMLLIElement,
+  React.ComponentProps<typeof PaginationItem>
 >(({ className, ...props }, ref) => (
-  <Button
+  <PaginationItem
     ref={ref}
-    variant="outline"
-    size="icon"
-    className={cn("h-9 w-9", className)}
+    aria-label="Go to previous page"
+    className={cn("gap-1 pl-2.5", className)}
     {...props}
   >
-    <ChevronLeftIcon className="h-4 w-4" />
-  </Button>
+    <ChevronLeft className="h-4 w-4" />
+    <span>Previous</span>
+  </PaginationItem>
 ));
 PaginationPrevious.displayName = "PaginationPrevious";
 
 const PaginationNext = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentPropsWithoutRef<typeof Button>
+  HTMLLIElement,
+  React.ComponentProps<typeof PaginationItem>
 >(({ className, ...props }, ref) => (
-  <Button
+  <PaginationItem
     ref={ref}
-    variant="outline"
-    size="icon"
-    className={cn("h-9 w-9", className)}
+    aria-label="Go to next page"
+    className={cn("gap-1 pr-2.5", className)}
     {...props}
   >
-    <ChevronRightIcon className="h-4 w-4" />
-  </Button>
+    <span>Next</span>
+    <ChevronRight className="h-4 w-4" />
+  </PaginationItem>
 ));
 PaginationNext.displayName = "PaginationNext";
 
@@ -225,10 +223,8 @@ PaginationEllipsis.displayName = "PaginationEllipsis";
 
 export {
   PaginationRoot as Root,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
+  PaginationContent as Content,
+  PaginationItem as Item,
+  PaginationLink as Link,
+  PaginationEllipsis as Ellipsis,
 }; 

@@ -21,9 +21,14 @@ import { Calendar } from '../../../components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../../../components/ui/popover';
 import { format } from 'date-fns';
 import { packageService } from '../../../services/api/packageService';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../../../utils/firebaseConfig'; // Adjust the import path as needed
+import { getUserData } from '../../../utils/session';
+import { TourPackage } from '../../../services/api';
+ const userData = getUserData();
 
 interface PackageFormProps {
-  initialData?: Package;
+  initialData?: TourPackage;
   onSubmit?: (data: Partial<Package>) => Promise<void>;
   isLoading?: boolean;
   isEdit?: boolean;
@@ -33,16 +38,21 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
-  const [formData, setFormData] = useState<Partial<Package>>({
+  
+  // Define a combined type that includes both old and new field names for backward compatibility
+  interface FormData extends Partial<Package> {
+    maxPeople?: number; // Temporary field used in the form
+  }
+  
+  const [formData, setFormData] = useState<FormData>({
     title: '',
     description: '',
     price: 0,
     duration: 1,
-    
     destination: '',
     minCapacity: 1,
-    maxPeople: 10,
-    maxGroupSize: 10,
+    maxPeople: 10, // Used in the form only
+    maxGroupSize: 10, // Actual field used in the API
     tourType: 'ADVENTURE' as TourType,
     status: 'DRAFT' as PackageStatus,
     images: [],
@@ -191,43 +201,51 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
   const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-
+  
     const file = files[0];
-    
+  
     // Validate file type
     if (!file.type.includes('image/')) {
       toast({
         title: "Invalid file type",
         description: "Please upload an image file",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
-    
+  
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "File too large",
         description: "Image size should be less than 5MB",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
-
+  
     try {
       setUploadingImage(true);
-      // Convert to base64
-      const base64String = await convertFileToBase64(file);
-      
-      // Update form data
+  
+      // Create a reference to the storage location
+      const agencyNameForPath = userData?.agency?.name || 'agency';
+      const storageRef = ref(storage, `${agencyNameForPath}/coverImages/${Date.now()}_${file.name}`);
+  
+      // Upload the file to Firebase Storage
+      await uploadBytes(storageRef, file);
+  
+      // Get the download URL
+      const downloadURL = await getDownloadURL(storageRef);
+  
+      // Update form data with the download URL
       setFormData({
         ...formData,
-        coverImage: base64String,
+        coverImage: downloadURL,
       });
-      
+  
       // Set preview
-      setCoverImagePreview(base64String);
-      
+      setCoverImagePreview(downloadURL);
+  
       toast({
         title: "Image uploaded",
         description: "Cover image has been added successfully",
@@ -237,7 +255,7 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
       toast({
         title: "Upload failed",
         description: "Failed to upload image. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setUploadingImage(false);
@@ -247,43 +265,54 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
   const handleGalleryImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    
+  
     try {
       setUploadingImage(true);
       const filesArray = Array.from(files);
-      
+  
       // Validate file types and sizes
       for (const file of filesArray) {
         if (!file.type.includes('image/')) {
           toast({
             title: "Invalid file type",
             description: `${file.name} is not an image file`,
-            variant: "destructive"
+            variant: "destructive",
           });
+          setUploadingImage(false);
           return;
         }
-        
+  
         if (file.size > 5 * 1024 * 1024) {
           toast({
             title: "File too large",
             description: `${file.name} is larger than 5MB`,
-            variant: "destructive"
+            variant: "destructive",
           });
+          setUploadingImage(false);
           return;
         }
       }
-      
-      // Convert all files to base64
-      const base64Promises = filesArray.map(file => convertFileToBase64(file));
-      const base64Strings = await Promise.all(base64Promises);
-      
-      // Update form data
+  
+      // Upload files to Firebase Storage and get download URLs
+      const uploadPromises = filesArray.map(async (file) => {
+        const storageRef = ref(storage, `${userData?.agency?.name}/galleryImages/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        return getDownloadURL(storageRef);
+      });
+  
+      const downloadURLs = await Promise.all(uploadPromises);
+  
+      // Update form data with new image URLs
       const currentImages = formData.images || [];
+      const updatedImages = [...currentImages, ...downloadURLs];
+      
       setFormData({
         ...formData,
-        images: [...currentImages, ...base64Strings],
+        images: updatedImages,
+        // Update galleryImages as well to ensure both fields have the same data
+        galleryImages: updatedImages,
       });
-      
+  
       toast({
         title: "Images uploaded",
         description: `${filesArray.length} images have been added to the gallery`,
@@ -293,7 +322,7 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
       toast({
         title: "Upload failed",
         description: "Failed to upload images. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setUploadingImage(false);
@@ -307,6 +336,8 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
       setFormData({
         ...formData,
         images: updatedImages,
+        // Keep galleryImages in sync
+        galleryImages: updatedImages,
       });
     }
   };
@@ -432,10 +463,52 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
     return Object.keys(newErrors).length === 0;
   };
 
+  /**
+   * Prepare package data for submission, mapping all fields to the correct format
+   * for the backend API
+   */
+  const prepareSubmissionData = () => {
+    const data: any = { ...formData };
+    
+    // Format date fields
+    if (data.validFrom) data.validFrom = new Date(data.validFrom).toISOString();
+    if (data.validTill) data.validTill = new Date(data.validTill).toISOString();
+    if (data.startDate) data.startDate = new Date(data.startDate).toISOString();
+    if (data.endDate) data.endDate = new Date(data.endDate).toISOString();
+    
+    // Handle nested arrays and convert to JSON if needed
+    if (data.highlights && Array.isArray(data.highlights)) {
+      data.highlights = JSON.stringify(data.highlights);
+    }
+    
+    if (data.includedItems && Array.isArray(data.includedItems)) {
+      data.includedItems = JSON.stringify(data.includedItems);
+      data.inclusions = JSON.stringify(data.includedItems); // For backward compatibility
+    }
+    
+    if (data.excludedItems && Array.isArray(data.excludedItems)) {
+      data.excludedItems = JSON.stringify(data.excludedItems);
+      data.exclusions = JSON.stringify(data.excludedItems); // For backward compatibility
+    }
+    
+    // Handle gallery images
+    if (data.images && Array.isArray(data.images)) {
+      // Store the array directly without double-stringifying
+      data.galleryImages = data.images;
+    } else {
+      data.galleryImages = [];
+    }
+    
+    // Map fields for backward compatibility
+    data.minCapacity = data.minimumAge;
+    data.name = data.title;
+    
+    return data;
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form validation passed, agencyId:', agencyId);
     if (!validateForm()) {
       toast({
         title: "Validation Error",
@@ -457,83 +530,73 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
     console.log('Form validation passed, agencyId:', agencyId);
     setIsSubmitting(true);
 
-    // Prepare data for submission
-    const submissionData = { ...formData };
-    
-    // Map fields to match backend schema exactly
-    submissionData.maxGroupSize = formData.maxPeople || 10;
-    submissionData.minimumAge = formData.minCapacity || 1;
-    submissionData.pricePerPerson = formData.price || 0;
-    // Use price field for discount price (in backend price is optional and used for discount)
-    if (formData.discountPrice) {
-      submissionData.price = formData.discountPrice;
-    }
-    // Map inclusions/exclusions to includedItems/excludedItems
-    submissionData.includedItems = formData.inclusions;
-    submissionData.excludedItems = formData.exclusions;
-    // Handle cancellation policy field with different spelling
-    if (formData.cancellationPolicy) {
-      submissionData.cancelationPolicy = formData.cancellationPolicy;
-    }
-    
-    // Keep destination field for backward compatibility
-    // The backend will create and manage the destinations relation
-    if (formData.destination) {
-      submissionData.destination = formData.destination;
-    }
-    
-    // Remove validFrom and validTill fields as they're not in the database schema yet
-    delete submissionData.validFrom;
-    delete submissionData.validTill;
-    
-    console.log('Submitting package data:', submissionData);
-    
-    // For large image data, we might need to compress or limit the debugging output
-    if (submissionData.coverImage && submissionData.coverImage.length > 1000) {
-      console.log('Cover image size:', submissionData.coverImage.length, 'bytes');
-    }
-    
-    if (submissionData.images && submissionData.images.length > 0) {
-      // Map images to galleryImages
-      submissionData.galleryImages = submissionData.images;
-      console.log('Gallery images count:', submissionData.images.length);
-    }
-
     try {
-      if (onSubmit) {
-        // Use the provided onSubmit if available
-        await onSubmit(submissionData);
-      } else {
+      // Prepare data for submission
+      const submissionData = prepareSubmissionData();
+      
+      // Validate required fields before submitting
+      if (!submissionData.startDate || !submissionData.endDate) {
+        toast({
+          title: "Error",
+          description: "Start and end dates are required",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Debug output 
+      console.log('Submitting package data (redacted sensitive info)');
+      
+      try {
         // Handle directly in the form
         if (isEdit && initialData?.id) {
           // Update existing package
-          console.log('Updating existing package with ID:', initialData.id);
-          const result = await packageService.updatePackage(agencyId, initialData.id, submissionData);
-          console.log("Update API response:", result);
+          console.log('Updating package ID:', initialData.id);
+          // Create a new object to avoid type issues
+          const dataToSubmit = { ...submissionData };
+          const result = await packageService.updatePackage(agencyId, initialData.id, dataToSubmit);
+          console.log("Package updated successfully:", result.id);
           toast({
             title: "Success",
             description: "Package updated successfully"
           });
         } else {
           // Create new package
-          console.log('Creating new package for agency:', agencyId);
-          const result = await packageService.createPackage(agencyId, submissionData);
-          console.log("Create API response:", result);
+          console.log('Creating new package for agency ID:', agencyId);
+          // Create a new object to avoid type issues
+          const dataToSubmit = { ...submissionData };
+          const result = await packageService.createPackage(agencyId, dataToSubmit);
+          console.log("Package created successfully:", result.id);
           toast({
             title: "Success",
             description: "Package created successfully"
           });
         }
-        // Navigate back to packages list
+        
+        // Navigate back to packages list on success
         navigate('/agency/packages');
+      } catch (submitError) {
+        console.error('Error in package service call:', submitError);
+        throw submitError;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving package:', error);
+      
+      // Extract error message for better user feedback
+      let errorMessage = "There was an error saving the package. Please try again.";
+      
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: typeof error === 'string' 
-          ? error 
-          : "There was an error saving the package. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

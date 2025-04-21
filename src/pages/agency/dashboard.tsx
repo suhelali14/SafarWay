@@ -7,6 +7,9 @@ import { RecentPackages } from '../../components/agency/RecentPackages';
 import { RecentBookings } from '../../components/agency/RecentBookings';
 import { agencyService } from '../../services/agencyService';
 import { toast } from '../../components/ui/use-toast';
+import { agencyAPI } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { getUserData } from '../../utils/session';
 
 export default function AgencyDashboardPage() {
   const [chartData, setChartData] = useState([]);
@@ -14,22 +17,25 @@ export default function AgencyDashboardPage() {
   const [recentBookings, setRecentBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const userData = getUserData();
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       setIsLoading(true);
       try {
         // Fetch dashboard data
-        const dashboardData = await agencyService.getDashboardSummary('weekly');
+        const dashboardData = await agencyAPI.getDashboardSummary(`?agencyId=${userData?.agencyId}`);
         
         // Set chart data
-        if (dashboardData.bookingsChartData) {
-          setChartData(dashboardData.bookingsChartData);
+        if (dashboardData.data) {
+          setChartData(dashboardData.data);
         }
         
         // Fetch recent packages
-        const packagesData = await agencyService.getAllPackages();
+        const packagesData = await agencyAPI.getAllPackages(`?agencyId=${userData?.agencyId}`);
+        console.log("packagesData",packagesData)
         setRecentPackages(
-          packagesData.packages
+          packagesData.data.package
             .slice(0, 5)
             .map(pkg => ({
               id: pkg.id,

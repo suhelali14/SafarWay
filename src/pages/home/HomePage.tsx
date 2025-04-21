@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
-import { HeroSection } from '../../components/home/HeroSection';
-import { FeaturedPackages } from '../../components/home/FeaturedPackages';
+import { HeroSection, SpecialOffers, PopularDestinations, FeaturedAgencies, CustomerTestimonials } from '../../components/home';
 import { WhyChooseUs } from '../../components/home/WhyChooseUs';
 import { Testimonials } from '../../components/home/Testimonials';
 import { PartnerAgencies } from '../../components/home/PartnerAgencies';
@@ -108,10 +107,17 @@ export function HomePage() {
     if (!isAuthenticated && (location.pathname === '/dashboard' || location.pathname === '/bookings')) {
       navigate('/login');
     }
+   
   }, [isAuthenticated, navigate]);
-
+  useEffect(()=>{
+    if (isAuthenticated) {
+      user?.role=="CUSTOMER"?
+          navigate('/') : user?.role == "SAFARWAY_ADMIN" || user?.role =="SAFARWAY_USER" ? navigate('/admin') : navigate('/agency/dashboard')
+      
+    }
+  })
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen py-12">
       <Helmet>
         <title>
           {isAuthenticated 
@@ -196,51 +202,12 @@ export function HomePage() {
 
         {/* Featured Packages Section */}
         <section className="container mx-auto px-4">
-          <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Featured Travel Packages</h2>
-            <Link to="/packages">
-              <Button variant="ghost" className="gap-2">
-                View All
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {recommendedPackages.map((pkg) => (
-              <motion.div
-                key={pkg.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Card className="overflow-hidden">
-                  <div className="relative h-48">
-                    <img
-                      src={pkg.image}
-                      alt={pkg.title}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                    <div className="absolute right-2 top-2 rounded-full bg-white px-2 py-1 text-xs font-medium text-[#ff6200]">
-                      {pkg.rating} ★
-                    </div>
-                  </div>
-                  <CardHeader>
-                    <CardTitle>{pkg.title}</CardTitle>
-                    <CardDescription>{pkg.description}</CardDescription>
-                  </CardHeader>
-                  <CardFooter className="flex justify-between">
-                    <span className="text-lg font-bold">${pkg.price}</span>
-                    <Link to={`/packages/${pkg.id}`}>
-                      <Button size="sm" className="bg-[#ff6200] hover:bg-[#ff6200]/90">
-                        {isAuthenticated ? 'Book Now' : 'View Details'}
-                      </Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+          <PopularDestinations />
+        </section>
+
+        {/* Special Offers Section */}
+        <section className="container mx-auto px-4">
+          <SpecialOffers />
         </section>
 
         {/* Why Choose Us Section */}
@@ -257,13 +224,13 @@ export function HomePage() {
                 Discover why travelers love booking with SafarWay
               </p>
             </div>
-            <Testimonials testimonials={testimonials} />
+            <CustomerTestimonials />
           </div>
         </section>
 
         {/* Partner Agencies Section */}
         <section className="container mx-auto px-4">
-          <PartnerAgencies />
+          <FeaturedAgencies />
         </section>
 
         {/* CTA Section */}

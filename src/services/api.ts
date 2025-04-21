@@ -163,6 +163,24 @@ export interface RevenueData {
   currency: string;
 }
 
+// Define interface for package filters based on backend implementation
+export interface PackageFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  tourType?: TourType;
+  destination?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  status?: PackageStatus;
+  agencyId?: string;
+  duration?: number;
+  startDateFrom?: string;
+  startDateTo?: string;
+  isFlexible?: boolean;
+  difficultyLevel?: string;
+}
+
 // Create axios instance with default config
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
@@ -249,8 +267,8 @@ export const agencyAPI = {
   getDashboardSummary: (timeRange: string = 'week') => 
     api.get('/agency/dashboard/summary', { params: { timeRange } }),
   
-  getAllPackages: (filters: PackageFilters) => 
-    api.get('/agency/packages', { params: filters }),
+  getAllPackages: (filters: PackageFilters = {}) => 
+    api.get('/agency/packages/', { params: filters }),
   
   getPackageById: (id: string) => 
     api.get(`/agency/packages/${id}`),
@@ -268,8 +286,8 @@ export const agencyAPI = {
   deletePackage: (id: string) => 
     api.delete(`/agency/packages/${id}`),
   
-  getAllBookings: (status?: string) => 
-    api.get('/agency/bookings', { params: { status } }),
+  getAllBookings: (filters?: string) => 
+    api.get(`/agency/bookings/${filters}`),
   
   getBookingById: (id: string) => 
     api.get(`/agency/bookings/${id}`),
@@ -285,6 +303,8 @@ export const agencyAPI = {
 };
 
 // Admin API
+
+
 export const adminAPI = {
   getDashboardSummary: () => 
     api.get('/admin/dashboard/summary'),
@@ -339,6 +359,78 @@ export const adminAPI = {
   
   rejectRefund: (id: string, remarks?: string) => 
     api.patch(`/admin/refunds/${id}/reject`, { remarks }),
+
+  getReportsAdmin:(filters:string)=>
+    api.get(`/admin/reports/${filters}`),
+};
+
+
+// Customer API
+export const customerAPI = {
+  // Admin-level customer management routes
+  getAllCustomers: () => 
+    api.get<User[]>('/customers/all'),
+  
+  getCustomerById: (id: string) => 
+    api.get<User>(`/customers/details/${id}`),
+  
+  createCustomer: (customerData: Partial<User>) => 
+    api.post<User>('/customers', customerData),
+  
+  updateCustomer: (id: string, customerData: Partial<User>) => 
+    api.put<User>(`/customers/${id}`, customerData),
+  
+  deleteCustomer: (id: string) => 
+    api.delete(`/customers/${id}`),
+  
+  // Customer dashboard routes
+  getProfile: () => 
+    api.get<User>('/customers/profile'),
+  
+  getMyBookings: () => 
+    api.get<Booking[]>('/customers/bookings'),
+  
+  getOngoingTrips: () => 
+    api.get<Booking[]>('/customers/trips/ongoing'),
+  
+  getUpcomingTrips: () => 
+    api.get<Booking[]>('/customers/trips/upcoming'),
+  
+  // Package-related routes
+  getAllPackages: (filters: PackageFilters = {}) => 
+    api.get<{ success: boolean; data: TourPackage[]; pagination: any }>('/customers/packages', { params: filters }),
+  
+  getPackageById: (id: string) => {
+    try {
+      // Try the customer-specific endpoint first
+      return api.get<{ success: boolean; data: TourPackage }>(`/customers/packages/${id}`);
+    } catch (error) {
+      console.log('Customer package endpoint failed, falling back to general package endpoint');
+      // Fall back to the general package endpoint if customer-specific one fails
+      return api.get<{ success: boolean; data: TourPackage }>(`/packages/${id}`);
+    }
+  },
+  
+  getRecommendedPackages: () => 
+    api.get<TourPackage[]>('/customers/packages/recommended'),
+  
+  // Wishlist-related routes
+  getWishlist: () => 
+    api.get<TourPackage[]>('/customers/wishlist'),
+  
+  addToWishlist: (packageId: string) => 
+    api.post('/customers/wishlist', { packageId }),
+  
+  removeFromWishlist: (wishlistItemId: string) => 
+    api.delete(`/customers/wishlist/${wishlistItemId}`),
+  
+  // Offers-related routes
+  getValidOffers: () => 
+    api.get<any[]>('/customers/offers'),
+  
+  // Dashboard stats
+  getDashboardStats: () => 
+    api.get<DashboardStats>('/customers/dashboard/stats'),
 };
 
 export default api; 

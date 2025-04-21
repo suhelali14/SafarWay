@@ -11,6 +11,8 @@ import {
 } from '../../components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Download, Calendar, TrendingUp, Users, Building2, CreditCard } from 'lucide-react';
+import { adminAPI } from '../../services/api';
+import { Console } from 'console';
 
 interface ReportData {
   bookings: {
@@ -92,13 +94,10 @@ export const ReportsPage = () => {
 
   const fetchReportData = async () => {
     try {
-      const response = await fetch(`/api/admin/reports?timeRange=${timeRange}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setReportData(data);
+      console.log("IN Report");
+      const response = await adminAPI.getReportsAdmin(`?timeRange=${timeRange}`);
+      console.log("response Report",response);
+      setReportData(response.data);
     } catch (error) {
       console.error('Error fetching report data:', error);
     } finally {

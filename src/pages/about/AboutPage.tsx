@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 
 export function AboutPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-16">
       <Helmet>
         <title>About Us | SafarWay</title>
         <meta name="description" content="Learn about SafarWay's mission to make travel accessible and enjoyable for everyone." />

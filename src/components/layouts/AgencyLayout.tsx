@@ -82,7 +82,7 @@ export function AgencyLayout() {
         defaultCollapsed={false}
       />
       
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto m-10">
         <Outlet />
       </main>
     </div>

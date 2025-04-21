@@ -234,6 +234,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     console.log('Getting dashboard path for role:', role);
     switch (role) {
       case 'SAFARWAY_ADMIN':
+      case 'SAFARWAY_USER':
         return '/admin/dashboard';
       case 'AGENCY_ADMIN':
       case 'AGENCY_USER':

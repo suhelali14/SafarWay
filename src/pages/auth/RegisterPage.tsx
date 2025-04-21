@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -41,6 +41,7 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function RegisterPage() {
+  const { user, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
@@ -55,7 +56,13 @@ export function RegisterPage() {
       role: 'CUSTOMER',
     },
   });
-
+  useEffect(()=>{
+      if (isAuthenticated) {
+        user?.role=="CUSTOMER"?
+            navigate('/') : user?.role == "SAFARWAY_ADMIN" || user?.role =="SAFARWAY_USER" ? navigate('/admin') : navigate('/agency/dashboard')
+        
+      }
+    })
   const onSubmit = async (data: RegisterFormData) => {
     try {
       setIsLoading(true);

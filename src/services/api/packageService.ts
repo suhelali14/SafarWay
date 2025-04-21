@@ -164,11 +164,25 @@ export const createPackage = async (agencyId: string, packageData: Partial<Packa
     const token = getToken();
     console.log("Creating package with token:", token ? "Token exists" : "No token found");
     console.log("API URL:", `${API_URL}/agency/packages`);
-    console.log("Package data:", JSON.stringify(packageData).substring(0, 200) + "...");
+    
+    // Create a copy to avoid modifying the original data
+    const processedData = { ...packageData };
+    
+    // Ensure galleryImages is processed properly
+    if (typeof processedData.galleryImages === 'string') {
+      try {
+        // If it's a JSON string, parse it
+        processedData.galleryImages = JSON.parse(processedData.galleryImages);
+      } catch (e) {
+        console.warn("Failed to parse galleryImages string:", e);
+      }
+    }
+    
+    console.log("Processed package data:", JSON.stringify(processedData).substring(0, 200) + "...");
     
     const response = await axios.post(
       `${API_URL}/agency/packages`,
-      packageData,
+      processedData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -198,9 +212,23 @@ export const updatePackage = async (
 ): Promise<Package> => {
   try {
     const token = getToken();
+    
+    // Create a copy to avoid modifying the original data
+    const processedData = { ...packageData };
+    
+    // Ensure galleryImages is processed properly
+    if (typeof processedData.galleryImages === 'string') {
+      try {
+        // If it's a JSON string, parse it
+        processedData.galleryImages = JSON.parse(processedData.galleryImages);
+      } catch (e) {
+        console.warn("Failed to parse galleryImages string:", e);
+      }
+    }
+    
     const response = await axios.put(
       `${API_URL}/agency/packages/${packageId}`,
-      packageData,
+      processedData,
       {
         headers: {
           Authorization: `Bearer ${token}`,

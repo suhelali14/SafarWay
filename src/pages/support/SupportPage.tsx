@@ -57,7 +57,7 @@ export function SupportPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-16">
       <Helmet>
         <title>Support | SafarWay</title>
         <meta name="description" content="Get help and support for your SafarWay travel bookings." />
