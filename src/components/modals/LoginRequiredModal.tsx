@@ -6,7 +6,7 @@ import { Label } from '../ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { useToast } from '../../hooks/use-toast';
 import { useAuth } from '../../contexts/AuthContext';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { Mail, Lock, User, X } from 'lucide-react';
 
 type ActionType = 'subscribe' | 'book' | 'like' | 'review';

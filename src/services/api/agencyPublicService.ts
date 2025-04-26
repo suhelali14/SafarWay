@@ -4,16 +4,79 @@ import { Agency, TourPackage, PackageStatus } from '../api';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 // Types
-export interface AgencyPublicDetails extends Agency {
-  isSubscribed?: boolean;
-  foundedYear?: number;
-  serviceRegions?: string[];
-  license?: string;
-  verificationStatus: 'VERIFIED' | 'UNVERIFIED' | 'SUSPENDED';
-  totalReviews: number;
-  averageRating: number;
-}
 
+export interface AgencyPublicDetails extends Agency {
+  image?: string | null; // Alias for logo
+  website?: string; // Not in API response, kept as optional
+  socialLinks?: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    linkedin?: string;
+  }; // Not in API response, kept as optional
+  isVerified?: boolean; // Can be derived from verifiedAt
+  isFeatured?: boolean; // Not in API response, kept as optional
+  isFollowed?: boolean; // Not in API response, kept as optional
+  isSubscribed?: boolean; // Not in API response, kept as optional
+  foundedYear?: number; // Not in API response, kept as optional
+  serviceRegions?: string[]; // Not in API response, kept as optional
+  license?: string; // Not in API response, kept as optional
+  users?: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    role: string;
+    status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
+    profileImage?: string | null;
+    provider: string;
+    deviceTokens: string[];
+    agencyId: string;
+    inviteToken?: string | null;
+    invitedByUserId?: string;
+    invitedAt?: string;
+    completedAt?: string;
+    createdAt: string;
+    updatedAt: string;
+  }[]; // Added from API response
+  tourPackages?: {
+    id: string;
+    title: string;
+    subtitle?: string | null;
+    summary?: string | null;
+    duration: number;
+    maxGroupSize: number;
+    pricePerPerson: number;
+    price: number;
+    discountPrice?: number | null;
+    priceType?: string | null;
+    tourType: string;
+    description: string;
+    highlights: string[];
+    includedItems: string[];
+    excludedItems: string[];
+    minimumAge: number;
+    maximumPeople: number;
+    isFlexible: boolean;
+    difficultyLevel?: string | null;
+    startDate: string;
+    endDate: string;
+    validFrom: string;
+    validTill: string;
+    coverImage: string;
+    galleryImages: string[];
+    phoneNumber: string;
+    email: string;
+    whatsapp: string;
+    cancelationPolicy?: string | null;
+    additionalInfo: string;
+    status: 'PUBLISHED' | 'DRAFT' | 'ARCHIVED';
+    destination: string;
+    createdAt: string;
+    updatedAt: string;
+    agencyId: string;
+  }[]; // Added from API response
+}
 export interface PackageFilter {
   status?: PackageStatus;
   page?: number;
@@ -62,9 +125,11 @@ export interface ApiResponse<T> {
 const getAgencyDetails = async (agencyId: string): Promise<AgencyPublicDetails> => {
   try {
     const response = await axios.get<ApiResponse<AgencyPublicDetails>>(
-      `${API_URL}/agency-public/${agencyId}/details`
+      `${API_URL}/customers/agency-public/${agencyId}/details`
     );
-    return response.data.data;
+    const agencyDetails = response.data;
+    console.log("agencyDetails",agencyDetails,response.data);
+    return agencyDetails;
   } catch (error) {
     console.error('Error fetching agency details:', error);
     throw error;
@@ -85,7 +150,7 @@ const getAgencyPackages = async (
     if (filter.status) params.append('status', filter.status);
     
     const queryString = params.toString();
-    const url = `${API_URL}/agency-public/${agencyId}/packages${queryString ? `?${queryString}` : ''}`;
+    const url = `${API_URL}/customers/agency-public/${agencyId}/packages${queryString ? `?${queryString}` : ''}`;
     
     const response = await axios.get<ApiResponse<TourPackage[]>>(url);
     
@@ -121,7 +186,7 @@ const getAgencyReviews = async (
     }
     
     const response = await axios.get<ApiResponse<Review[]>>(
-      `${API_URL}/agency-public/${agencyId}/reviews?${params.toString()}`
+      `${API_URL}/customers/agency-public/${agencyId}/reviews?${params.toString()}`
     );
     
     return {
@@ -151,7 +216,7 @@ const getAgencyMedia = async (
     params.append('limit', limit.toString());
     
     const response = await axios.get<ApiResponse<MediaItem[]>>(
-      `${API_URL}/agency-public/${agencyId}/media?${params.toString()}`
+      `${API_URL}/customers/agency-public/${agencyId}/media?${params.toString()}`
     );
     
     return {
@@ -173,7 +238,7 @@ const getAgencyMedia = async (
 const subscribeToAgency = async (agencyId: string): Promise<{success: boolean; message: string}> => {
   try {
     const response = await axios.post<{success: boolean; message: string}>(
-      `${API_URL}/agency-public/${agencyId}/subscribe`
+      `${API_URL}/customers/agency-public/${agencyId}/subscribe`
     );
     
     return response.data;
@@ -187,7 +252,7 @@ const subscribeToAgency = async (agencyId: string): Promise<{success: boolean; m
 const unsubscribeFromAgency = async (agencyId: string): Promise<{success: boolean; message: string}> => {
   try {
     const response = await axios.post<{success: boolean; message: string}>(
-      `${API_URL}/agency-public/${agencyId}/unsubscribe`
+      `${API_URL}/customers/agency-public/${agencyId}/unsubscribe`
     );
     
     return response.data;
@@ -204,7 +269,7 @@ const likeMediaItem = async (
 ): Promise<{success: boolean; likes: number}> => {
   try {
     const response = await axios.post<{success: boolean; likes: number}>(
-      `${API_URL}/agency-public/${agencyId}/media/${mediaId}/like`
+      `${API_URL}/customers/agency-public/${agencyId}/media/${mediaId}/like`
     );
     
     return response.data;
@@ -221,7 +286,7 @@ const unlikeMediaItem = async (
 ): Promise<{success: boolean; likes: number}> => {
   try {
     const response = await axios.post<{success: boolean; likes: number}>(
-      `${API_URL}/agency-public/${agencyId}/media/${mediaId}/unlike`
+      `${API_URL}/customers/agency-public/${agencyId}/media/${mediaId}/unlike`
     );
     
     return response.data;

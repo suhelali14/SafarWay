@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DollarSign, Search } from 'lucide-react';
+import { IndianRupee, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
 import { Spinner } from '../ui/spinner';
-import { adminAPI } from '../../services/api/adminAPI';
+
 
 type PaymentType = {
   id: string;
@@ -159,7 +159,7 @@ export function AgencyPaymentsList({ agencyId }: AgencyPaymentsListProps) {
         <div className="flex justify-between items-center">
           <div>
             <CardTitle className="flex items-center">
-              <DollarSign className="w-5 h-5 mr-2" />
+              <IndianRupee className="w-5 h-5 mr-2" />
               Payments
             </CardTitle>
             <CardDescription>
@@ -249,7 +249,7 @@ export function AgencyPaymentsList({ agencyId }: AgencyPaymentsListProps) {
               </>
             ) : (
               <>
-                <DollarSign className="w-12 h-12 text-gray-300 mb-3" />
+                <IndianRupee className="w-12 h-12 text-gray-300 mb-3" />
                 <p className="text-gray-500 mb-4">This agency doesn't have any payments yet.</p>
               </>
             )}

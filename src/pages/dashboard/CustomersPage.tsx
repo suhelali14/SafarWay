@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Mail, Phone, MapPin, Calendar, UserPlus, Loader2 } from 'lucide-react';
+import { Search, Mail, Phone, MapPin, Calendar, UserPlus, Loader2 } from 'lucide-react';
 import { customerAPI } from '../../services/api';
 import { formatCurrency, formatDate, formatPhone } from '../../utils/formatters';
 import { Button } from '../../components/ui/button';

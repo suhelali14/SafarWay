@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Button } from "./button";
 import { cn } from "../../lib/utils";
 
+
 // Legacy pagination component
 interface PaginationProps {
   currentPage: number;
@@ -20,6 +21,8 @@ export function Pagination({
   showEdges = false,
 }: PaginationProps) {
   // Generate page numbers to show
+  console.log(showEdges);
+  
   const getPageNumbers = () => {
     const pageNumbers = [];
     

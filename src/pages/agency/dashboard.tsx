@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { AgencyLayout } from '../../components/layouts/AgencyLayout';
+
 import { AgencySummary } from '../../components/agency/AgencySummary';
 import { BookingChart } from '../../components/agency/BookingChart';
 import { RecentPackages } from '../../components/agency/RecentPackages';
@@ -8,14 +8,14 @@ import { RecentBookings } from '../../components/agency/RecentBookings';
 import { agencyService } from '../../services/agencyService';
 import { toast } from '../../components/ui/use-toast';
 import { agencyAPI } from '../../services/api';
-import { useAuth } from '../../context/AuthContext';
+
 import { getUserData } from '../../utils/session';
 
 export default function AgencyDashboardPage() {
   const [chartData, setChartData] = useState([]);
   const [recentPackages, setRecentPackages] = useState([]);
   const [recentBookings, setRecentBookings] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   const userData = getUserData();
 

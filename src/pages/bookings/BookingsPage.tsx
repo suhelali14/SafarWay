@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+
 import { Booking } from '../../types/Booking';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -8,7 +8,7 @@ import { Helmet } from 'react-helmet-async';
 
 export function BookingsPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 

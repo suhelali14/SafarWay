@@ -1,4 +1,4 @@
-import { DollarSign, ArrowLeft, Download, Printer } from 'lucide-react';
+import { IndianRupee, ArrowLeft, Download, Printer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../../ui/card';
 import { Button } from '../../ui/button';
@@ -111,7 +111,7 @@ export function PaymentDetailsCard({ payment, showBackButton = true }: PaymentDe
               </Button>
             )}
             <CardTitle className="flex items-center text-xl">
-              <DollarSign className="w-5 h-5 mr-2" />
+              <IndianRupee className="w-5 h-5 mr-2" />
               Payment Details
             </CardTitle>
             <CardDescription>

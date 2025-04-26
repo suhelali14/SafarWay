@@ -26,7 +26,7 @@ export default function OnboardingPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { toast } = useToast();
-  const { loading, error } = useSelector((state: RootState) => state.invite);
+  const { loading } = useSelector((state: RootState) => state.invite);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [token, setToken] = useState<string | null>(null);

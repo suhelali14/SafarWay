@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { Loader2, Upload, Building, MapPin, Mail, Phone, Globe, Info } from 'lucide-react';
+import { Loader2, Upload, Building,Info } from 'lucide-react';
 
 import {
   Card,

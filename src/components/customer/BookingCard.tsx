@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -42,7 +42,6 @@ const paymentStatusColors: Record<string, { color: string, bgColor: string }> = 
 };
 
 const BookingCard: React.FC<BookingCardProps> = ({
-  id,
   destination,
   startDate,
   endDate,

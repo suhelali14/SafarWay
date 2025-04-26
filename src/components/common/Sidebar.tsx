@@ -6,7 +6,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
-  X,
   LogOut,
 } from 'lucide-react';
 import { Button } from '../ui/button';

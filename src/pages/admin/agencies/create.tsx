@@ -97,7 +97,7 @@ export default function CreateAgencyPage() {
       // Create the agency
       const response = await adminAPI.createAgency(formData);
       
-      toast.success('Agency created successfully');
+      toast.success(`${response.statusText} Agency created successfully`);
       navigate(`/admin/agencies`);
     } catch (error) {
       console.error('Error creating agency:', error);

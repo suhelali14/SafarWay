@@ -6,8 +6,7 @@ import {
   MapPin, 
   Calendar, 
   Users, 
-  Star, 
-  Clock, 
+  
   Info, 
   AlertTriangle,
   ChevronLeft,
@@ -23,24 +22,25 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Skeleton } from '../../components/ui/skeleton';
-import { Separator } from '../../components/ui/separator';
-import { useToast } from '../../hooks/use-toast';
+
+
 import { customerPackages } from '../../services/api/customerPackages';
 import { TourPackage, TourType } from '../../services/api';
 import { formatDate, formatCurrency } from '../../utils/formatters';
+import BookPackageForm from './BookPackaForm';
 
 export function PackageDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { toast } = useToast();
-  
+  const [book, setBook] = useState(false);
   const [packageData, setPackageData] = useState<TourPackage | null>(null);
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [activeTab, setActiveTab] = useState('details');
+  const [_activeTab, setActiveTab] = useState('details');
 
   useEffect(() => {
     if (id) {
@@ -90,7 +90,8 @@ export function PackageDetailsPage() {
     }
     
     // Navigate to booking page with package ID
-    navigate(`/book/${id}`);
+    setBook(true);
+    
   };
 
   const toggleFavorite = async () => {
@@ -224,17 +225,35 @@ export function PackageDetailsPage() {
       <Button 
         variant="ghost" 
         className="mb-6" 
-        onClick={() => navigate('/packages')}
+        onClick={() => book ?
+        setBook(false)
+    :navigate('/packages')}
       >
         <ChevronLeft className="mr-2 h-4 w-4" />
-        Back to Packages
+        {book ? "Back" : "Back to Packages"}
       </Button>
-
+      {
+        book ? (
+          <BookPackageForm 
+            TourPackage={packageData} 
+           
+          />
+        ) :
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
+        transition={{ duration: 0.3 }}
+        className=""
+      >
       <div className="grid gap-8 md:grid-cols-3">
         {/* Main Content */}
         <div className="md:col-span-2">
-          {/* Tour Image */}
-          <div className="mb-6 overflow-hidden rounded-lg">
+          
+         
+              <div>
+{/* Tour Image */}
+<div className="mb-6 overflow-hidden rounded-lg">
             <img 
               src={packageData.coverImage || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop'} 
               alt={packageData.title} 
@@ -416,6 +435,8 @@ export function PackageDetailsPage() {
               </div>
             </div>
           )}
+              </div>
+           
         </div>
         
         {/* Sidebar */}
@@ -434,7 +455,7 @@ export function PackageDetailsPage() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="text-2xl font-bold text-primary">
-                        {formatCurrency(discountedPrice, 'USD')}
+                        {formatCurrency(discountedPrice, 'INR')}
                       </span>
                       <Badge className="bg-red-500 hover:bg-red-600">
                         {discountPercentage}% OFF
@@ -442,7 +463,7 @@ export function PackageDetailsPage() {
                     </div>
                     <div className="text-sm text-gray-500">
                       <span className="line-through">
-                        {formatCurrency(regularPrice, 'USD')}
+                        {formatCurrency(regularPrice, 'INR')}
                       </span>
                       {' '}per person
                     </div>
@@ -450,7 +471,7 @@ export function PackageDetailsPage() {
                 ) : (
                   <div className="space-y-1">
                     <div className="text-2xl font-bold text-primary">
-                      {formatCurrency(regularPrice, 'USD')}
+                      {formatCurrency(regularPrice, 'INR')}
                     </div>
                     <div className="text-sm text-gray-500">per person</div>
                   </div>
@@ -524,6 +545,9 @@ export function PackageDetailsPage() {
           
         </div>
       </div>
+      </motion.div>
+
+      }
     </div>
   );
 } 

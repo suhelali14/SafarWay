@@ -10,9 +10,9 @@ import {
   SelectValue,
 } from '../../components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import { Download, Calendar, TrendingUp, Users, Building2, CreditCard } from 'lucide-react';
+import { Download, Calendar, TrendingUp, Users, Building2 } from 'lucide-react';
 import { adminAPI } from '../../services/api';
-import { Console } from 'console';
+
 
 interface ReportData {
   bookings: {
@@ -67,7 +67,7 @@ export const ReportsPage = () => {
     },
     revenue: {
       total: 0,
-      currency: 'USD',
+      currency: 'INR',
       byMonth: [],
     },
     users: {

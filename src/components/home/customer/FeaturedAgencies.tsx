@@ -5,7 +5,7 @@ import { Star, MapPin, Award, Users, ChevronLeft, ChevronRight } from 'lucide-re
 import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
 import { Card, CardContent, CardFooter } from '../../ui/card';
-import { agencyPublicService } from '../../../services/api/agencyPublicService';
+
 import { Skeleton } from '../../ui/skeleton';
 
 // Animation variants

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin, ArrowRight, Users, Calendar, Star, ChevronRight } from 'lucide-react';
+import { MapPin, ArrowRight,  Calendar, Star, ChevronRight } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
 

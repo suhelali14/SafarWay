@@ -63,7 +63,7 @@ export const AnalyticsPage = () => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(value);
   };
 
@@ -163,7 +163,7 @@ export const AnalyticsPage = () => {
                       notation: 'compact',
                       compactDisplay: 'short',
                       style: 'currency',
-                      currency: 'USD',
+                      currency: 'INR',
                     }).format(value)
                   }
                 />

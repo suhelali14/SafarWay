@@ -119,7 +119,7 @@ export const getAgencyPackages = async (
     
     const url = `${API_URL}/agency/packages`;
     const queryString = params.toString();
-    
+    console.log('Agency ID:', agencyId);
     console.log('Fetching packages from:', url + (queryString ? `?${queryString}` : ''));
     
     const response = await axios.get(
@@ -150,7 +150,7 @@ export const getPackageById = async (agencyId: string, packageId: string): Promi
         },
       }
     );
-    
+    console.log('Agency ID:', agencyId);
     return response.data.data;
   } catch (error) {
     console.error('Error fetching package details:', error);
@@ -167,7 +167,7 @@ export const createPackage = async (agencyId: string, packageData: Partial<Packa
     
     // Create a copy to avoid modifying the original data
     const processedData = { ...packageData };
-    
+    console.log('Agency ID:', agencyId);
     // Ensure galleryImages is processed properly
     if (typeof processedData.galleryImages === 'string') {
       try {
@@ -212,7 +212,7 @@ export const updatePackage = async (
 ): Promise<Package> => {
   try {
     const token = getToken();
-    
+    console.log('Agency ID:', agencyId);
     // Create a copy to avoid modifying the original data
     const processedData = { ...packageData };
     
@@ -247,6 +247,7 @@ export const updatePackage = async (
 // Delete a package
 export const deletePackage = async (agencyId: string, packageId: string): Promise<void> => {
   try {
+    console.log('Agency ID:', agencyId);
     const token = getToken();
     await axios.delete(
       `${API_URL}/agency/packages/${packageId}`,
@@ -269,6 +270,7 @@ export const changePackageStatus = async (
   status: PackageStatus
 ): Promise<Package> => {
   try {
+    console.log('Agency ID:', agencyId);
     const token = getToken();
     const response = await axios.patch(
       `${API_URL}/agency/packages/${packageId}/status`,

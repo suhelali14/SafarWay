@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Card, Button, Modal, message } from 'antd';
 import { UserAddOutlined } from '@ant-design/icons';
-import { useAuth } from '../contexts/AuthContext';
+
 import UserInviteForm from '../components/UserInviteForm';
 import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
@@ -18,7 +18,7 @@ const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [isInviteModalVisible, setIsInviteModalVisible] = useState(false);
-  const { currentUser } = useAuth();
+ 
 
   const fetchUsers = async () => {
     try {

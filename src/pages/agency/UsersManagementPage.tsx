@@ -16,11 +16,11 @@ import { EditUserDialog } from "../../components/agency/EditUserDialog";
 import { ConfirmDeleteDialog } from "../../components/ui/confirm-delete-dialog";
 import { Pagination } from "../../components/ui/pagination";
 import { useToast } from "../../hooks/use-toast";
-import { MailIcon, PlusIcon, FilterIcon } from "lucide-react";
+import { MailIcon, FilterIcon } from "lucide-react";
 import { agencyUserService, UserFilters } from "../../services/api/agencyUserService";
 import { User } from "../../types/user";
 import * as z from "zod";
-import { Dialog, DialogTrigger } from "../../components/ui/dialog";
+
 
 interface PaginationMeta {
   total: number;
@@ -66,7 +66,7 @@ export default function UsersManagementPage() {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, _setSelectedUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [paginationMeta, setPaginationMeta] = useState<PaginationMeta>({

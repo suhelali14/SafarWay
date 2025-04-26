@@ -6,8 +6,8 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
 import { loginSchema } from '../../lib/validations/auth';
 import { useDispatch, useSelector } from 'react-redux';
-import { login, clearError } from '../../lib/store/slices/authSlice';
-import { RootState } from '../../lib/store';
+import { login } from '../../lib/store/slices/authSlice';
+import { RootState, AppDispatch } from '../../lib/store';
 import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -26,9 +26,9 @@ type LoginFormData = {
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { loading } = useSelector((state: RootState) => state.auth);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -205,4 +205,4 @@ export default function LoginPage() {
       </form>
     </AuthLayout>
   );
-} 
+}

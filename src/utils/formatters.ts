@@ -24,13 +24,13 @@ export const formatDate = (
 /**
  * Format a number as currency
  * @param amount The amount to format
- * @param currency Currency code (default: USD)
+ * @param currency Currency code (default: INR)
  * @param locale Locale for formatting (default: en-US)
  * @returns Formatted currency string
  */
 export const formatCurrency = (
   amount: number,
-  currency: string = 'USD',
+  currency: string = 'INR',
   locale: string = 'en-US'
 ): string => {
   try {

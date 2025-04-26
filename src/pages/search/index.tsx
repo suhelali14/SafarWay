@@ -8,14 +8,14 @@ import {
   Users, 
   Filter, 
   Star, 
-  ChevronDown, 
+  
   Loader 
 } from 'lucide-react';
 import { 
   Card, 
   CardContent, 
   CardDescription, 
-  CardFooter, 
+
   CardHeader, 
   CardTitle 
 } from '../../components/ui/card';
@@ -45,7 +45,7 @@ import { formatCurrency } from '../../utils/formatters';
 import { Package } from '../../services/api/customerAPI';
 import { customerAPI } from '../../services/api';
 import { toast } from 'react-hot-toast';
-import { generateMockPackages } from '../../utils/mockData';
+
 
 interface SearchFilters {
   destination: string;

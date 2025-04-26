@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
+
 import {
   Select,
   SelectContent,
@@ -117,7 +117,7 @@ export const AgencyPackagesPage = () => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'INR'
     }).format(amount);
   };
 

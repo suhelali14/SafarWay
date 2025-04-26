@@ -6,7 +6,7 @@ import {
   Calendar,
   MessageSquare,
   Star,
-  DollarSign,
+  IndianRupee,
   Settings,
   ChevronDown,
   Menu,
@@ -60,7 +60,7 @@ export function Sidebar({ isMobile, isOpen, onToggle }: SidebarProps) {
     },
     {
       title: 'Earnings',
-      icon: <DollarSign size={20} />,
+      icon: <IndianRupee size={20} />,
       path: '/dashboard/earnings',
       id: 'earnings'
     },

@@ -10,7 +10,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { adminAPI } from '../../services/api';
-import { getToken } from '../../utils/session';
+
 import { toast } from 'react-hot-toast';
 
 interface DashboardStats {
@@ -56,7 +56,7 @@ export const DashboardPage = () => {
     fetchDashboardStats();
   }, []);
 
-  const formatCurrency = (amount: number, currency: string = 'USD') => {
+  const formatCurrency = (amount: number, currency: string = 'INR') => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency,

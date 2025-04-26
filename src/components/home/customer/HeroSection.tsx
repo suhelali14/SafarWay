@@ -55,7 +55,7 @@ export function HeroSection() {
   
   // State for banner rotation
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-  const [isFading, setIsFading] = useState(false);
+  const [_, setIsFading] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Handle banner rotation

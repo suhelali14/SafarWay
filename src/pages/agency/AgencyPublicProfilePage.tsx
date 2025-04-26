@@ -34,8 +34,9 @@ export default function AgencyPublicProfilePage() {
 
       try {
         setIsLoading(true);
-        const data = await agencyPublicService.getAgencyDetails(agencyId);
-        setAgency(data);
+        const response = await agencyPublicService.getAgencyDetails(agencyId);
+        console.log("response",response);
+        setAgency(response);
         setError(null);
       } catch (err) {
         console.error('Error fetching agency details:', err);
@@ -47,7 +48,8 @@ export default function AgencyPublicProfilePage() {
 
     fetchAgencyData();
   }, [agencyId]);
-
+  console.log("error",error);
+  console.log("agency",agency);
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">

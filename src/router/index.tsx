@@ -1,5 +1,5 @@
-import { createBrowserRouter, Navigate, Outlet, RouterProvider, BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import {  Navigate, Outlet, BrowserRouter, Routes, Route } from 'react-router-dom';
+
 import { AuthProvider } from '../contexts/AuthContext';
 import { RouteGuard } from '../components/auth/RouteGuard';
 import { Navbar } from '../components/layout/Navbar';
@@ -44,6 +44,8 @@ import { PackageCreatePage } from '../pages/agency/packages/PackageCreatePage';
 import { PackageEditPage } from '../pages/agency/packages/PackageEditPage';
 import AgencyPublicProfilePage from '../pages/agency/AgencyPublicProfilePage';
 import { UserProfilePage } from '../pages/profile/UserProfilePage';
+import BookTour from '../pages/BookTour';
+
 
 // Layout with Navbar for public routes and regular users
 const MainLayout = () => {
@@ -125,6 +127,10 @@ export const routes = [
       {
         path: 'packages/:id',
         element: <PackageDetailsPage />,
+      },
+      {
+        path: 'book/:id',
+        element: <BookTour />,
       },
       {
         path: 'agency/:agencyId',
@@ -327,6 +333,8 @@ export function AppRouter() {
             <Route path="packages" element={<PackagesPage />} />
             
             <Route path="packages/:id" element={<PackageDetailsPage />} />
+            
+            <Route path="book/:id" element={<BookTour/>} />
             <Route path="agency/:agencyId" element={<AgencyPublicProfilePage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="contact" element={<ContactPage />} />

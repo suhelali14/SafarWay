@@ -16,10 +16,7 @@ import {
   Settings,
   ArrowRight,
   ChevronRight,
-  CalendarCheck,
-  DollarSign,
-  AlertTriangle,
-  Calendar
+
 } from 'lucide-react';
 import { 
   Card, 
@@ -37,8 +34,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { 
   agencyService, 
   DashboardSummary, 
-  Booking, 
-  AgencyProfile 
+ 
 } from '../../../services/api/agencyService';
 import {
   BarChart,
@@ -49,7 +45,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Line } from 'react-chartjs-2';
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -186,12 +182,12 @@ const ReviewCard = ({ review }: { review: ReviewProps }) => (
 
 // Main Dashboard Component
 export default function AgencyDashboardPage() {
-  const { toast } = useToast();
+  // const { _toast } = useToast();
   const { user } = useAuth();
-  const [refreshInterval, setRefreshInterval] = useState(600000); // 10 minutes
+  const [refreshInterval, _setRefreshInterval] = useState(60000); // 10 minutes
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState('week');
+  const [_loading, setLoading] = useState(true);
+  const [_timeRange, _setTimeRange] = useState('week');
 
   // Fetch dashboard summary
   const { 
@@ -203,13 +199,7 @@ export default function AgencyDashboardPage() {
     queryKey: ['agencyDashboard'],
     queryFn: () => agencyService.getDashboardSummary(),
     refetchInterval: refreshInterval,
-    onError: () => {
-      toast({
-        title: 'Error',
-        description: 'Failed to load dashboard data',
-        variant: 'destructive',
-      });
-    }
+    
   });
 
   // Fetch agency profile
@@ -219,13 +209,7 @@ export default function AgencyDashboardPage() {
   } = useQuery({
     queryKey: ['agencyProfile'],
     queryFn: () => agencyService.getProfile(),
-    onError: () => {
-      toast({
-        title: 'Error',
-        description: 'Failed to load agency profile',
-        variant: 'destructive',
-      });
-    }
+   
   });
 
   // Mock data for reviews - in a real application, you would fetch this from the API
@@ -282,7 +266,7 @@ export default function AgencyDashboardPage() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const data = await agencyService.getDashboardSummary(timeRange);
+        const data = await agencyService.getDashboardSummary();
         setSummary(data);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
@@ -292,10 +276,10 @@ export default function AgencyDashboardPage() {
     };
 
     fetchDashboardData();
-  }, [timeRange]);
+  }, []);
 
   const bookingsChartData = {
-    labels: summary?.bookingStats.labels || [],
+    labels: summary?.recentBookings || [],
     datasets: [
       {
         label: 'Bookings',
@@ -341,7 +325,7 @@ export default function AgencyDashboardPage() {
     };
     return statusMap[status] || 'default';
   };
-
+  console.log("summary",summary)
   return (
     <>
       <Helmet>
@@ -403,7 +387,7 @@ export default function AgencyDashboardPage() {
             <>
               <StatCard 
                 title="Total Customers" 
-                value={dashboardData?.totalCustomers || 0}
+                value={summary?.totalCustomers || 0}
                 icon={Users}
                 color="text-indigo-600"
                 bgColor="bg-indigo-100"
@@ -411,7 +395,7 @@ export default function AgencyDashboardPage() {
               
               <StatCard 
                 title="Active Packages" 
-                value={dashboardData?.activePackages || 0}
+                value={summary?.totalActivePackages || 0}
                 icon={Package}
                 color="text-emerald-600"
                 bgColor="bg-emerald-100"
@@ -419,7 +403,7 @@ export default function AgencyDashboardPage() {
               
               <StatCard 
                 title="Upcoming Trips" 
-                value={dashboardData?.upcomingPackages || 0}
+                value={summary?.upcomingPackages || 0}
                 icon={CalendarDays}
                 color="text-amber-600"
                 bgColor="bg-amber-100"
@@ -427,7 +411,7 @@ export default function AgencyDashboardPage() {
               
               <StatCard 
                 title="Completed Bookings" 
-                value={dashboardData?.completedBookings || 0}
+                value={summary?.completedBookings || 0}
                 icon={TrendingUp}
                 color="text-blue-600"
                 bgColor="bg-blue-100"
@@ -435,7 +419,7 @@ export default function AgencyDashboardPage() {
               
               <StatCard 
                 title="Total Revenue" 
-                value={formatCurrency(dashboardData?.totalRevenue || 0)}
+                value={formatCurrency(summary?.totalRevenue || 0)}
                 icon={CreditCard}
                 color="text-purple-600"
                 bgColor="bg-purple-100"

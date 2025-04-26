@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -10,7 +10,7 @@ import { PopularPackages } from '../../components/home/customer/PopularPackages'
 import { WhyChooseUs } from '../../components/home/customer/WhyChooseUs';
 import { MediaWall } from '../../components/home/customer/MediaWall';
 import { CustomerTestimonials } from '../../components/home/customer/CustomerTestimonials';
-import { Footer } from '../../components/layout/footer';
+
 
 // Animation variants
 const fadeInUp = {

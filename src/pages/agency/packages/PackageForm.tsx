@@ -25,7 +25,6 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../../utils/firebaseConfig'; // Adjust the import path as needed
 import { getUserData } from '../../../utils/session';
 import { TourPackage } from '../../../services/api';
- const userData = getUserData();
 
 interface PackageFormProps {
   initialData?: TourPackage;
@@ -37,7 +36,13 @@ interface PackageFormProps {
 export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit = false }: PackageFormProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user: contextUser } = useAuth();
+  
+  // Get user data from cookies only when needed
+  const userData = getUserData();
+  
+  // Use data from context first, then fallback to cookies
+  const user = contextUser || userData;
   
   // Define a combined type that includes both old and new field names for backward compatibility
   interface FormData extends Partial<Package> {
@@ -228,7 +233,8 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
       setUploadingImage(true);
   
       // Create a reference to the storage location
-      const agencyNameForPath = userData?.agency?.name || 'agency';
+      // Get agency name from user context or from form data
+      const agencyNameForPath = user?.agency?.name || 'agency';
       const storageRef = ref(storage, `${agencyNameForPath}/coverImages/${Date.now()}_${file.name}`);
   
       // Upload the file to Firebase Storage
@@ -295,7 +301,9 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
   
       // Upload files to Firebase Storage and get download URLs
       const uploadPromises = filesArray.map(async (file) => {
-        const storageRef = ref(storage, `${userData?.agency?.name}/galleryImages/${Date.now()}_${file.name}`);
+        // Get agency name from context or cookie
+        const agencyName = user?.agency?.name || 'agency';
+        const storageRef = ref(storage, `${agencyName}/galleryImages/${Date.now()}_${file.name}`);
         await uploadBytes(storageRef, file);
         return getDownloadURL(storageRef);
       });
@@ -505,7 +513,7 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
     
     return data;
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -531,7 +539,7 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
     setIsSubmitting(true);
 
     try {
-      // Prepare data for submission
+    // Prepare data for submission
       const submissionData = prepareSubmissionData();
       
       // Validate required fields before submitting

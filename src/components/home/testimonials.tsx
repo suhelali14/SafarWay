@@ -28,7 +28,7 @@ export function Testimonials({
   className = '',
 }: TestimonialsProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(autoPlay);
+  const [isAutoPlaying, _] = useState(autoPlay);
 
   useEffect(() => {
     if (!isAutoPlaying) return;

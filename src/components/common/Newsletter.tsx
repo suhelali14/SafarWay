@@ -37,7 +37,7 @@ export function Newsletter() {
   });
 
   // Handle form submission
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit = async (_: FormValues) => {
     setIsSubmitting(true);
     setSubmissionState('idle');
     

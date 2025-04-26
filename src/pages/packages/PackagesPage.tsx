@@ -1,27 +1,27 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, MapPin, Calendar, Users, Star } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
-import { useAuth } from '../../contexts/AuthContext';
+
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '../../components/ui/card';
 import { Skeleton } from '../../components/ui/skeleton';
-import { Badge } from '../../components/ui/badge';
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../../components/ui/sheet';
-import { Checkbox } from '../../components/ui/checkbox';
+
 import { Label } from '../../components/ui/label';
 import { Slider } from '../../components/ui/slider';
 import { TourPackage, TourType, PackageFilters } from '../../services/api';
 import { customerPackages } from '../../services/api/customerPackages';
 import { PackageCard } from '../../components/packages/PackageCard';
-import { useNavigate } from 'react-router-dom';
+
 import { useToast } from '../../hooks/use-toast';
 
 export function PackagesPage() {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  // const { isAuthenticated } = useAuth();
+  // const navigate = useNavigate();
   const { toast } = useToast();
   
   // State for packages data

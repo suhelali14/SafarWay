@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Calendar, User, DollarSign, Clock } from 'lucide-react';
-import { bookingAPI, tourAPI } from '../../services/api';
+import { Search } from 'lucide-react';
+import { bookingAPI } from '../../services/api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Select } from '../../components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
+import { Dialog } from '../../components/ui/dialog';
 import toast from 'react-hot-toast';
 
 interface Booking {

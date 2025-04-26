@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '../../components/ui/table';
 import { toast } from 'react-hot-toast';
-import { Search, Plus, Edit, Trash2, UserPlus } from 'lucide-react';
+import { Search, Edit, Trash2, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface User {

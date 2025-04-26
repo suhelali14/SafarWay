@@ -131,7 +131,7 @@ export function ViewPackagePage() {
     if (!amount && amount !== 0) return 'N/A';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);

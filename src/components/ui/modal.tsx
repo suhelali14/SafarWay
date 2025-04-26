@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { X } from 'lucide-react';
 import { Button } from './button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './card';
-import { cn } from '../../lib/utils';
+import { CardFooter } from './card';
+
 
 interface ModalProps {
   isOpen: boolean;
@@ -14,15 +14,15 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
 
-const sizeClasses = {
-  sm: 'max-w-sm',
-  md: 'max-w-md',
-  lg: 'max-w-lg',
-  xl: 'max-w-xl',
-  full: 'max-w-full mx-4',
-};
+// const sizeClasses = {
+//   sm: 'max-w-sm',
+//   md: 'max-w-md',
+//   lg: 'max-w-lg',
+//   xl: 'max-w-xl',
+//   full: 'max-w-full mx-4',
+// };
 
-export function Modal({ isOpen, onClose, title, children, className = '', footer, size = 'md' }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, className = '', footer  }: ModalProps) {
   // Handle ESC key to close modal
   React.useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {

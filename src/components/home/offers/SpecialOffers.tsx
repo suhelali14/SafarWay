@@ -121,21 +121,21 @@ export function SpecialOffers() {
     : offers.filter(offer => offer.category === activeTab && offer.featured);
 
   // Calculate days remaining for each offer
-  const calculateDaysRemaining = (expiresAt: string): number => {
-    const today = new Date();
-    const expiryDate = new Date(expiresAt);
-    const timeDiff = expiryDate.getTime() - today.getTime();
-    return Math.ceil(timeDiff / (1000 * 3600 * 24));
-  };
+  // const calculateDaysRemaining = (expiresAt: string): number => {
+  //   const today = new Date();
+  //   const expiryDate = new Date(expiresAt);
+  //   const timeDiff = expiryDate.getTime() - today.getTime();
+  //   return Math.ceil(timeDiff / (1000 * 3600 * 24));
+  // };
 
-  // Format date to be more readable
-  const formatExpiry = (expiresAt: string): string => {
-    return new Date(expiresAt).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+  // // Format date to be more readable
+  // const formatExpiry = (expiresAt: string): string => {
+  //   return new Date(expiresAt).toLocaleDateString('en-US', {
+  //     year: 'numeric',
+  //     month: 'long',
+  //     day: 'numeric'
+  //   });
+  // };
 
   return (
     <section className="py-24">

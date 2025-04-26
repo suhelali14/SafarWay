@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { CalendarCheck, Calendar, Compass, BadgeInfo, CircleDollarSign, Wallet, Clock3 } from 'lucide-react';
 import RecentBookings from '../../components/home/RecentBookings';
 import { bookingService } from '../../services/api/bookingService';
 import { Booking } from '../../components/home/RecentBookings';

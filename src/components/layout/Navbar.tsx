@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Menu, X, User, LogOut, Package, Calendar, Home, Info, Phone, HelpCircle, ChevronDown } from "lucide-react";
+import { Menu, X, User, LogOut, Package, Calendar, Home, HelpCircle, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function Navbar() {

@@ -64,7 +64,7 @@ export function SecurityPreferences({ data, isLoading }: SecurityPreferencesProp
     setNewPassword('');
     setConfirmPassword('');
     setPasswordError('');
-    
+    console.log(data)
     toast({
       title: "Password updated",
       description: "Your password has been changed successfully.",

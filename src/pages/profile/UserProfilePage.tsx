@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '../../hooks/use-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Card, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
-import { Switch } from '../../components/ui/switch';
-import { Separator } from '../../components/ui/separator';
-import { Skeleton } from '../../components/ui/skeleton';
+
 import { ProfileHeader } from '../../components/profile/ProfileHeader';
 import { AccountOverview } from '../../components/profile/AccountOverview';
 import { BookingsTimeline } from '../../components/profile/BookingsTimeline';
@@ -18,7 +15,7 @@ import { SecurityPreferences } from '../../components/profile/SecurityPreference
 import { EditProfileModal } from '../../components/profile/EditProfileModal';
 import { useQuery } from '@tanstack/react-query';
 import { customerAPI } from '../../services/api';
-import { Download, ArrowRight, Calendar, Building2, Star, Shield, Bell, Settings } from 'lucide-react';
+import {  ArrowRight, Calendar, Building2, Star, Shield } from 'lucide-react';
 
 export function UserProfilePage() {
   const { toast } = useToast();

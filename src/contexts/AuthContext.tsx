@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios, { AxiosError } from 'axios';
-import { API_URL } from '../config/constants';
+import  { AxiosError } from 'axios';
+
 import { authAPI } from '../services/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -14,9 +14,9 @@ import {
 } from '../utils/session';
 
 // Update User interface to match UserData
-interface User extends Omit<UserData, 'profileImage'> {
-  profilePicture?: string | undefined;
-}
+// interface User extends Omit<UserData, 'profileImage'> {
+//   profilePicture?: string | undefined;
+// }
 
 interface AuthContextType {
   user: UserData | null;
@@ -35,16 +35,16 @@ interface AuthProviderProps {
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 // Convert UserData to User
-const convertUserDataToUser = (userData: UserData | null): User | null => {
-  if (!userData) return null;
+// const convertUserDataToUser = (userData: UserData | null): User | null => {
+//   if (!userData) return null;
   
-  // Using optional chaining and nullish coalescing to handle missing property
-  const { profileImage, ...rest } = userData as any;
-  return {
-    ...rest,
-    profilePicture: profileImage ?? undefined
-  };
-};
+//   // Using optional chaining and nullish coalescing to handle missing property
+//   const { profileImage, ...rest } = userData as any;
+//   return {
+//     ...rest,
+//     profilePicture: profileImage ?? undefined
+//   };
+// };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserData | null>(null);
@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Check authentication status
+  // Check authentication status - optimized to use cached data first
   const checkAuth = async () => {
     try {
       setIsLoading(true);
@@ -86,9 +86,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
+      // Get user data from cookies first to avoid immediate API call
+      const cachedUserData = getUserData();
+      if (cachedUserData && cachedUserData.id) {
+        console.log('Using cached user data from cookies');
+        setUser(cachedUserData);
+        setIsAuthenticated(true);
+        
+        // Optionally refresh data in background after a delay
+        setTimeout(() => {
+          refreshUserDataInBackground(token);
+        }, 5000); // Delay background refresh to prioritize UI rendering
+        
+        return;
+      }
+
+      // If no cached data, fetch from API
       try {
         // Try to verify token with backend
-        console.log('Verifying token with backend...');
+        console.log('No cached data, verifying token with backend...');
         const response = await authAPI.getCurrentUser();
         console.log('getCurrentUser response full:', response);
         
@@ -151,6 +167,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // New function to refresh user data in background without blocking UI
+  const refreshUserDataInBackground = async (token: string) => {
+    try {
+      console.log('Refreshing user data in background...');
+      const response = await authAPI.getCurrentUser();
+      const userData = response.data.data;
+      
+      if (userData && userData.id) {
+        // Silently update the user data
+        setUser(userData);
+        // Re-initialize session with updated data
+        initializeSession(token, userData);
+        console.log('Background user data refresh successful');
+      }
+    } catch (error) {
+      // Don't disrupt user experience if background refresh fails
+      console.warn('Background user data refresh failed:', error);
     }
   };
 

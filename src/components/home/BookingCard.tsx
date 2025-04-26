@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Calendar, Users, Clock } from 'lucide-react';
+import { MapPin, Calendar, Users } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -29,7 +29,6 @@ const statusConfig = {
 };
 
 const BookingCard: React.FC<BookingCardProps> = ({
-  id,
   destination,
   startDate,
   endDate,

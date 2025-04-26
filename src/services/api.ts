@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { API_URL } from '../config/constants';
 import { getToken } from '../utils/session';
 import { toast } from 'react-hot-toast';
@@ -99,18 +99,21 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
-
 export interface Agency {
   id: string;
   name: string;
-  email: string;
-  phone: string;
+  email: string; // From contactEmail in API response
+  phone: string; // From contactPhone in API response
   address: string;
   status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
-  logo?: string;
-  description?: string;
+  logo?: string | null; // Updated to allow null as per API response
+  description?: string; // Can be empty string as per API response
   createdAt: string;
   updatedAt: string;
+  coverImage?: string | null; // Added from API response
+  verifiedBy?: string | null; // Added from API response
+  verifiedAt?: string | null; // Added from API response
+  media?: string[]; // Added from API response
 }
 
 export interface RefundRequest {
@@ -163,22 +166,13 @@ export interface RevenueData {
   currency: string;
 }
 
-// Define interface for package filters based on backend implementation
+// Define PackageFilters type
 export interface PackageFilters {
-  page?: number;
-  limit?: number;
-  search?: string;
-  tourType?: TourType;
+  status?: string;
   destination?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  status?: PackageStatus;
-  agencyId?: string;
+  priceRange?: [number, number];
   duration?: number;
-  startDateFrom?: string;
-  startDateTo?: string;
-  isFlexible?: boolean;
-  difficultyLevel?: string;
+  searchQuery?: string;
 }
 
 // Create axios instance with default config
@@ -251,7 +245,16 @@ export const authAPI = {
   
   verifyToken: () => 
     api.get('/auth/verify'),
-  
+
+  verifyTempPassword: (tempPassword: string) => 
+    api.post('/auth/verify-temp-password', { tempPassword }),
+
+  acceptInvitation: (inviteToken: string, password: string) => 
+    api.post('/auth/accept-invitation', { inviteToken, password }),
+
+  setNewPassword: (userId: string, password: string) => 
+    api.post(`/auth/users/${userId}/set-password`, { password }),
+
   updateProfile: (userData: any) => 
     api.patch('/auth/profile', userData),
 };
@@ -267,7 +270,7 @@ export const agencyAPI = {
   getDashboardSummary: (timeRange: string = 'week') => 
     api.get('/agency/dashboard/summary', { params: { timeRange } }),
   
-  getAllPackages: (filters: PackageFilters = {}) => 
+  getAllPackages: (filters: PackageFilters) => 
     api.get('/agency/packages/', { params: filters }),
   
   getPackageById: (id: string) => 
@@ -396,41 +399,23 @@ export const customerAPI = {
   getUpcomingTrips: () => 
     api.get<Booking[]>('/customers/trips/upcoming'),
   
-  // Package-related routes
-  getAllPackages: (filters: PackageFilters = {}) => 
-    api.get<{ success: boolean; data: TourPackage[]; pagination: any }>('/customers/packages', { params: filters }),
-  
-  getPackageById: (id: string) => {
-    try {
-      // Try the customer-specific endpoint first
-      return api.get<{ success: boolean; data: TourPackage }>(`/customers/packages/${id}`);
-    } catch (error) {
-      console.log('Customer package endpoint failed, falling back to general package endpoint');
-      // Fall back to the general package endpoint if customer-specific one fails
-      return api.get<{ success: boolean; data: TourPackage }>(`/packages/${id}`);
-    }
-  },
-  
   getRecommendedPackages: () => 
     api.get<TourPackage[]>('/customers/packages/recommended'),
   
-  // Wishlist-related routes
   getWishlist: () => 
     api.get<TourPackage[]>('/customers/wishlist'),
   
-  addToWishlist: (packageId: string) => 
-    api.post('/customers/wishlist', { packageId }),
-  
-  removeFromWishlist: (wishlistItemId: string) => 
-    api.delete(`/customers/wishlist/${wishlistItemId}`),
-  
-  // Offers-related routes
   getValidOffers: () => 
-    api.get<any[]>('/customers/offers'),
+    api.get<any[]>('/customers/offers'), // Replace 'any' with specific Offer type if defined
   
-  // Dashboard stats
   getDashboardStats: () => 
     api.get<DashboardStats>('/customers/dashboard/stats'),
+
+  getAllPackages: () => 
+    api.get<TourPackage[]>('/customers/packages'),
+
+  getPackageById: (id: string) => 
+    api.get(`/packages/${id}`),
 };
 
-export default api; 
+export default api;

@@ -52,7 +52,7 @@ export default function BookTour() {
           description: error?.response?.data?.message || "Failed to fetch tour details",
           variant: "destructive",
         });
-        navigate("/tours");
+        
       } finally {
         setLoading(false);
       }

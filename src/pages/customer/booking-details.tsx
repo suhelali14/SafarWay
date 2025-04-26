@@ -10,8 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
 import { 
-  Calendar, MapPin, Users, CreditCard, ChevronLeft, FileText, 
-  Clock, AlertCircle, Phone, Mail, Home, Building, CheckCircle
+  Calendar, Users, CreditCard, ChevronLeft, FileText, 
+  Clock, AlertCircle, Phone, Mail, Building, CheckCircle
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '../../components/ui/use-toast';
@@ -25,7 +25,7 @@ const mockBooking = {
   endDate: '2023-10-22',
   imageUrl: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4',
   price: 1299,
-  currency: 'USD',
+  currency: 'INR',
   travelers: 2,
   status: 'upcoming',
   agency: {

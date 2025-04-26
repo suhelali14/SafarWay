@@ -15,7 +15,7 @@ const OfferImage = styled(Box)(({ theme }) => ({
   position: 'relative',
 }));
 
-const DiscountBadge = styled(Box)(({ theme }) => ({
+const DiscountBadge = styled(Box)(() => ({
   position: 'absolute',
   top: 16,
   right: 16,
@@ -45,7 +45,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
   onCopyCode = () => {} 
 }) => {
   const {
-    id,
+ 
     title,
     description,
     code,

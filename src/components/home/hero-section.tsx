@@ -1,7 +1,7 @@
 "use client"
 import { SearchBar } from "./search-bar"
 import { motion } from "framer-motion"
-import { ArrowRight, ChevronDown, Plane, Building, Map, Car, Shield } from "lucide-react"
+import {Plane, Building, Map, Car, Shield } from "lucide-react"
 
 export function HeroSection() {
   return (

@@ -5,14 +5,11 @@ import { useToast } from '../../hooks/use-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
   Package, 
-  Users, 
+  
   CreditCard, 
   Calendar, 
   TrendingUp, 
-  MessageCircle,
-  Clock,
-  ArrowUp,
-  ArrowDown
+ 
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { agencyService } from '../../services/api/agencyService';
@@ -89,7 +86,7 @@ export const AgencyDashboardPage = () => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
     }).format(amount);
   };

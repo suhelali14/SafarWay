@@ -40,7 +40,7 @@ interface PaginationMeta {
 export default function UsersManagement() {
   const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [_addDialogOpen, setAddDialogOpen] = useState(false);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -48,7 +48,7 @@ export default function UsersManagement() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [agencies, setAgencies] = useState<Agency[]>([]);
-  const [loadingAgencies, setLoadingAgencies] = useState(false);
+  const [_loadingAgencies, setLoadingAgencies] = useState(false);
   const [paginationMeta, setPaginationMeta] = useState<PaginationMeta>({
     page: 1,
     pages: 1,

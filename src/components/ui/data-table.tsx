@@ -1,160 +1,294 @@
 import React, { useState } from 'react';
 import {
   ColumnDef,
+  SortingState,
   flexRender,
   getCoreRowModel,
-  useReactTable,
-  getPaginationRowModel,
   getSortedRowModel,
-  SortingState,
-  getFilteredRowModel,
-  ColumnFiltersState,
+  getPaginationRowModel,
+  useReactTable,
+  VisibilityState,
 } from '@tanstack/react-table';
+import { FixedSizeList as VirtualList } from 'react-window';
 
-import { Input } from './input';
-import { Table } from './table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from './table';
 import { Button } from './button';
-import { Spinner } from './spinner';
-import { Search } from 'lucide-react';
+import { Input } from './input';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from './dropdown-menu';
+import { ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  pagination?: boolean;
+  searchKey?: string;
   searchPlaceholder?: string;
-  searchColumn?: string;
-  isLoading?: boolean;
+  showColumnVisibility?: boolean;
+  virtualize?: boolean;
+  rowHeight?: number;
+  tableHeight?: number;
+  defaultSorting?: SortingState;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  pagination = true,
+  searchKey,
   searchPlaceholder = 'Search...',
-  searchColumn,
-  isLoading = false,
+  showColumnVisibility = true,
+  virtualize = false,
+  rowHeight = 48,
+  tableHeight = 500,
+  defaultSorting = [],
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = useState<string>('');
+  const [sorting, setSorting] = useState<SortingState>(defaultSorting);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter data based on search query if searchKey is provided
+  const filteredData = React.useMemo(() => {
+    if (!searchKey || !searchQuery.trim()) return data;
+
+    return data.filter((item) => {
+      const value = (item as any)[searchKey];
+      if (typeof value === 'string') {
+        return value.toLowerCase().includes(searchQuery.toLowerCase());
+      }
+      return String(value).toLowerCase().includes(searchQuery.toLowerCase());
+    });
+  }, [data, searchKey, searchQuery]);
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
     state: {
       sorting,
-      columnFilters,
-      globalFilter,
+      columnVisibility,
     },
+    onSortingChange: setSorting,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="flex flex-col items-center">
-          <Spinner size="lg" />
-          <span className="mt-4 text-sm text-gray-500">Loading data...</span>
+  // Virtualized row renderer for improved performance with large datasets
+  const VirtualRow = React.useCallback(
+    ({ index, style }: { index: number; style: React.CSSProperties }) => {
+      const row = table.getRowModel().rows[index];
+      
+      if (!row) return null;
+      
+      return (
+        <TableRow 
+          key={row.id}
+          data-state={row.getIsSelected() && "selected"}
+          style={{
+            ...style,
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          {row.getVisibleCells().map(cell => (
+            <TableCell 
+              key={cell.id}
+              style={{
+                flex: `${cell.column.getSize() === Number.MAX_SAFE_INTEGER ? 1 : 0} 0 ${cell.column.getSize() === Number.MAX_SAFE_INTEGER ? 'auto' : `${cell.column.getSize()}px`}`,
+                minWidth: `${cell.column.getSize() === Number.MAX_SAFE_INTEGER ? 0 : cell.column.getSize()}px`,
+              }}
+            >
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </TableCell>
+          ))}
+        </TableRow>
+      );
+    },
+    [table]
+  );
+
+  // Use virtualized rendering for large datasets
+  const renderVirtualizedTable = () => (
+    <>
+      <div className="rounded-md border">
+        <div>
+          <TableHeader>
+            {table.getHeaderGroups().map(headerGroup => (
+              <div key={headerGroup.id} className="flex px-4 py-3">
+                {headerGroup.headers.map(header => (
+                  <div
+                    key={header.id}
+                    className="text-sm font-medium"
+                    style={{
+                      flex: `${header.column.getSize() === Number.MAX_SAFE_INTEGER ? 1 : 0} 0 ${header.column.getSize() === Number.MAX_SAFE_INTEGER ? 'auto' : `${header.column.getSize()}px`}`,
+                      minWidth: `${header.column.getSize() === Number.MAX_SAFE_INTEGER ? 0 : header.column.getSize()}px`,
+                    }}
+                  >
+                    {header.isPlaceholder ? null : (
+                      <div
+                        {...{
+                          className: header.column.getCanSort()
+                            ? 'cursor-pointer select-none'
+                            : '',
+                          onClick: header.column.getToggleSortingHandler(),
+                        }}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </TableHeader>
         </div>
+
+        <VirtualList
+          height={tableHeight}
+          itemCount={table.getRowModel().rows.length}
+          itemSize={rowHeight}
+          width="100%"
+          overscanCount={5}
+        >
+          {VirtualRow}
+        </VirtualList>
       </div>
-    );
-  }
+    </>
+  );
+
+  // Regular table rendering for smaller datasets
+  const renderStandardTable = () => (
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results found.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
 
   return (
-    <div>
-      {searchColumn && (
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            placeholder={searchPlaceholder}
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      )}
-
-      <div className="rounded-md border">
-        <Table>
-          <Table.Header>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Table.Row key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Table.Head key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </Table.Head>
-                ))}
-              </Table.Row>
-            ))}
-          </Table.Header>
-          <Table.Body>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <Table.Row
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <Table.Cell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </Table.Cell>
-                  ))}
-                </Table.Row>
-              ))
-            ) : (
-              <Table.Row>
-                <Table.Cell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results found.
-                </Table.Cell>
-              </Table.Row>
-            )}
-          </Table.Body>
-        </Table>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        {searchKey ? (
+          <div className="flex items-center w-full max-w-sm gap-2">
+            <Input
+              placeholder={searchPlaceholder}
+              value={searchQuery}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+              className="h-9"
+            />
+          </div>
+        ) : (
+          <div />
+        )}
+        {showColumnVisibility && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="h-9 px-2 lg:px-3 ml-auto"
+              >
+                <SlidersHorizontal className="h-4 w-4 mr-2" />
+                View
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value: boolean) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
-      {pagination && (
-        <div className="flex items-center justify-between space-x-2 py-4">
-          <div className="text-sm text-gray-500">
-            Showing{' '}
-            <span className="font-medium">{table.getRowModel().rows.length}</span>{' '}
-            of{' '}
-            <span className="font-medium">{data.length}</span>{' '}
-            {data.length === 1 ? 'row' : 'rows'}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
-          </div>
+      {/* Render either virtualized or standard table based on the prop */}
+      {virtualize ? renderVirtualizedTable() : renderStandardTable()}
+
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          {table.getFilteredRowModel().rows.length} of {data.length} items
         </div>
-      )}
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            className="h-9 px-2 lg:px-3"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span className="hidden lg:inline ml-1">Previous</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="h-9 px-2 lg:px-3"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            <span className="hidden lg:inline mr-1">Next</span>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 } 

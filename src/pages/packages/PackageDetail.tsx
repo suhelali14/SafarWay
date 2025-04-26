@@ -3,12 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
   MapPin, 
-  Calendar, 
-  Users, 
-  ClipboardList, 
   Star, 
   Clock, 
-  Plane, 
   Check, 
   X, 
   Heart 
@@ -21,9 +17,9 @@ import {
 } from '../../components/ui/tabs';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
+
 import { 
-  Card, 
+
   CardContent, 
   CardDescription, 
   CardFooter, 
@@ -43,7 +39,6 @@ import { Package } from '../../services/api/customerAPI';
 import { customerAPI } from '../../services/api';
 import { bookingService } from '../../services/api/bookingService';
 import { toast } from 'react-hot-toast';
-import { generateMockPackage } from '../../utils/mockData';
 
 // Extended package details
 interface PackageDetail extends Package {
@@ -67,7 +62,7 @@ const PackageDetail: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
   
   // Booking form state
   const [selectedDate, setSelectedDate] = useState('');

@@ -1,8 +1,8 @@
 "use client"
 
-import { MapPin, Calendar, Users, Search, Repeat, ChevronDown, ArrowRight } from "lucide-react"
+import { MapPin, Calendar, Users,  Repeat,  ArrowRight } from "lucide-react"
 import { Button } from "../ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Calendar as CalendarComponent } from "../ui/calendar"
 import { format } from "date-fns"

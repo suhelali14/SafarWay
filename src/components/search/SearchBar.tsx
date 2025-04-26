@@ -22,7 +22,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+
 } from '../ui/select';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';

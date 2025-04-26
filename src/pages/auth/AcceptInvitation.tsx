@@ -11,8 +11,8 @@ export default function AcceptInvitation() {
   const location = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [userEmail, setUserEmail] = useState('');
-  const [userName, setUserName] = useState('');
+  const [_userEmail, setUserEmail] = useState('');
+  const [_userName, setUserName] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {

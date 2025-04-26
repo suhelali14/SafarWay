@@ -66,7 +66,7 @@ export const SettingsPage = () => {
       siteDescription: 'Your trusted travel companion',
       supportEmail: 'support@safarway.com',
       supportPhone: '+1 234 567 8900',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'INR',
       defaultLanguage: 'en',
       maintenanceMode: false,
     },
@@ -259,7 +259,7 @@ export const SettingsPage = () => {
                         <SelectValue placeholder="Select currency" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="USD">USD - US Dollar</SelectItem>
+                        <SelectItem value="INR">INR - US Dollar</SelectItem>
                         <SelectItem value="EUR">EUR - Euro</SelectItem>
                         <SelectItem value="GBP">GBP - British Pound</SelectItem>
                         <SelectItem value="INR">INR - Indian Rupee</SelectItem>

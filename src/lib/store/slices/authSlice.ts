@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { authApi } from '../../services/auth';
 import { LoginCredentials, CustomerRegistrationData, AgencyRegistrationData, AgencyUserRegistrationData, ProfileUpdateData, PasswordResetData } from '../../types/auth';
 import { STORAGE_KEYS } from '../../config';
+import { getUserData as getCookieUserData } from '../../cookies';
 
 export interface User {
   id: string;
@@ -87,10 +88,23 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   localStorage.removeItem(STORAGE_KEYS.TOKEN);
 });
 
-export const getCurrentUser = createAsyncThunk('auth/getCurrentUser', async () => {
-  const response = await authApi.getCurrentUser();
-  return response.data;
-});
+export const getCurrentUser = createAsyncThunk(
+  'auth/getCurrentUser', 
+  async (forceRefresh: boolean = false, { dispatch }) => {
+    // Try to get data from cookies first if not force refreshing
+    if (!forceRefresh) {
+      const cachedUser = getCookieUserData();
+      if (cachedUser) {
+        // Return cached data immediately for faster UI response
+        return cachedUser;
+      }
+    }
+    
+    // Otherwise fetch from API
+    const response = await authApi.getCurrentUser();
+    return response.data;
+  }
+);
 
 export const updateProfile = createAsyncThunk(
   'auth/updateProfile',

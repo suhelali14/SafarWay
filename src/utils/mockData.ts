@@ -20,7 +20,7 @@ export const generateMockPackage = (id?: string): Package => {
       'https://images.unsplash.com/photo-1539367628448-4bc5c9d171c8'
     ],
     price: 1299,
-    currency: 'USD',
+    currency: 'INR',
     rating: 4.8,
     reviews: [
       {

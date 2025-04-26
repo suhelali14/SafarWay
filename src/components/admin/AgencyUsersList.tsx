@@ -6,7 +6,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
 import { Spinner } from '../ui/spinner';
-import { adminAPI } from '../../services/api/adminAPI';
+
 import { InviteUserModal } from './InviteUserModal';
 
 type UserType = {
