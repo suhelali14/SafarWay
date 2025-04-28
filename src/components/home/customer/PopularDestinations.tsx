@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MapPin, TrendingUp, Package } from 'lucide-react';
+import { MapPin, Package } from 'lucide-react';
 import { Card, CardContent } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
@@ -187,17 +187,16 @@ export function PopularDestinations() {
                   
                   {/* Category badge */}
                   <div className="absolute left-3 top-3">
-                    <Badge className={categoryColors[destination.category]}>
-                      {destination.category}
+                    <Badge className={categoryColors[destination.category]} label={destination.category}>
+                      
                     </Badge>
                   </div>
                   
                   {/* Trending badge */}
                   {destination.trending && (
                     <div className="absolute right-3 top-3">
-                      <Badge variant="destructive" className="flex items-center gap-1">
-                        <TrendingUp className="h-3 w-3" />
-                        Trending
+                      <Badge variant="destructive" className="flex items-center gap-1" label="Trending">
+                       
                       </Badge>
                     </div>
                   )}

@@ -1,111 +1,113 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+// import { useState, useEffect } from 'react';
+// import { useSearchParams } from 'react-router-dom';
+// import { useInfiniteQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
-import { motion } from 'framer-motion';
-import { agencyApi, AgencyDetails } from '../../lib/api/agency';
-import { AgencyCard } from '../../components/agency/AgencyCard';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { Skeleton } from '../../components/ui/skeleton';
-import { Alert, AlertDescription, AlertTitle } from '../../components/ui/alert';
-import { AlertCircle, Search, SlidersHorizontal } from 'lucide-react';
+// import { motion } from 'framer-motion';
+// import { agencyApi, AgencyDetails } from '../../lib/api/agency';
+// import { AgencyCard } from '../../components/agency/AgencyCard';
+// import { Button } from '../../components/ui/button';
+// import { Input } from '../../components/ui/input';
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+// import { Skeleton } from '../../components/ui/skeleton';
+// import { Alert, AlertDescription, AlertTitle } from '../../components/ui/alert';
+// import { AlertCircle, Search, SlidersHorizontal } from 'lucide-react';
 
 export function AgencySearchPage() {
-  // Get search params from URL
-  const [searchParams, setSearchParams] = useSearchParams();
-  const initialQuery = searchParams.get('q') || '';
-  const initialSort = searchParams.get('sort') || 'rating';
+  // // Get search params from URL
+  // const [searchParams, setSearchParams] = useSearchParams();
+  // const initialQuery = searchParams.get('q') || '';
+  // const initialSort = searchParams.get('sort') || 'rating';
   
-  // Local state
-  const [searchQuery, setSearchQuery] = useState(initialQuery);
-  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
-  const [sortBy, setSortBy] = useState<string>(initialSort);
-  const [page, setPage] = useState(1);
-  const limit = 12;
+  // // Local state
+  // const [searchQuery, setSearchQuery] = useState(initialQuery);
+  // const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+  // const [sortBy, setSortBy] = useState<string>(initialSort);
+  // const [page, setPage] = useState(1);
+  // const limit = 12;
   
-  // Handle search query debounce
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-      // Update URL params
-      const newParams = new URLSearchParams(searchParams);
-      if (searchQuery) {
-        newParams.set('q', searchQuery);
-      } else {
-        newParams.delete('q');
-      }
-      setSearchParams(newParams);
-      // Reset to first page when search changes
-      setPage(1);
-    }, 500);
+  // // Handle search query debounce
+  // useEffect(() => {
+  //   const timerId = setTimeout(() => {
+  //     setDebouncedQuery(searchQuery);
+  //     // Update URL params
+  //     const newParams = new URLSearchParams(searchParams);
+  //     if (searchQuery) {
+  //       newParams.set('q', searchQuery);
+  //     } else {
+  //       newParams.delete('q');
+  //     }
+  //     setSearchParams(newParams);
+  //     // Reset to first page when search changes
+  //     setPage(1);
+  //   }, 500);
     
-    return () => clearTimeout(timerId);
-  }, [searchQuery, searchParams, setSearchParams]);
+  //   return () => clearTimeout(timerId);
+  // }, [searchQuery, searchParams, setSearchParams]);
   
-  // Handle sort change
-  const handleSortChange = (value: string) => {
-    setSortBy(value);
-    // Update URL params
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set('sort', value);
-    setSearchParams(newParams);
-    // Reset to first page when sort changes
-    setPage(1);
-  };
+  // // Handle sort change
+  // const handleSortChange = (value: string) => {
+  //   setSortBy(value);
+  //   // Update URL params
+  //   const newParams = new URLSearchParams(searchParams);
+  //   newParams.set('sort', value);
+  //   setSearchParams(newParams);
+  //   // Reset to first page when sort changes
+  //   setPage(1);
+  // };
   
-  // Fetch agencies
-  const { 
-    data, 
-    isLoading, 
-    error, 
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage
-  } = useQuery({
-    queryKey: ['agencies', debouncedQuery, sortBy, page],
-    queryFn: async () => {
-      if (debouncedQuery) {
-        // Search agencies by query
-        const response = await agencyApi.searchAgencies(debouncedQuery, page, limit);
-        return response.data;
-      } else {
-        // Get all agencies with sorting
-        const params = {
-          page,
-          limit,
-          sortBy: sortBy as 'rating' | 'packages' | 'founded',
-          sortOrder: 'desc' as 'asc' | 'desc'
-        };
-        const response = await agencyApi.getAllAgencies(params);
-        return response.data;
-      }
-    },
-    keepPreviousData: true
-  });
+  // // Fetch agencies
+  // const { 
+  //   data, 
+  //   isLoading, 
+  //   error, 
+  //   isFetchingNextPage,
+  //   hasNextPage,
+  //   fetchNextPage
+  // } = useInfiniteQuery({
+  //   queryKey: ['agencies', debouncedQuery, sortBy],
+  //   queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
+  //     if (debouncedQuery) {
+  //       // Search agencies by query
+  //       const response = await agencyApi.searchAgencies(debouncedQuery, pageParam, limit);
+  //       return response.data;
+  //     } else {
+  //       // Get all agencies with sorting
+  //       const params = {
+  //         page: pageParam as number,
+  //         limit,
+  //         sortBy: sortBy as 'rating' | 'packages' | 'founded',
+  //         sortOrder: 'desc' as 'asc' | 'desc'
+  //       };
+  //       const response = await agencyApi.getAllAgencies(params);
+  //       return response.data;
+  //     }
+  //   },
+  //   getNextPageParam: (lastPage: { nextPage?: number }, allPages: any[]) => {
+  //     return lastPage?.nextPage ?? false;
+  //   }
+  // });
   
-  // Handle load more
-  const handleLoadMore = () => {
-    setPage(prev => prev + 1);
-    fetchNextPage();
-  };
+  //   fetchNextPage();
+  // const handleLoadMore = () => {
+  //   setPage(prev => prev + 1);
+  //   fetchNextPage();
+  // };
   
-  // Generate container and item animations
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
+  // // Generate container and item animations
+  // const container = {
+  //   hidden: { opacity: 0 },
+  //   show: {
+  //     opacity: 1,
+  //     transition: {
+  //       staggerChildren: 0.1
+  //     }
+  //   }
+  // };
   
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
+  // const item = {
+  //   hidden: { opacity: 0, y: 20 },
+  //   show: { opacity: 1, y: 0 }
+  // };
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -125,7 +127,7 @@ export function AgencySearchPage() {
       </div>
       
       {/* Search and Filter Bar */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+      {/* <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="relative flex-grow">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
           <Input
@@ -150,20 +152,20 @@ export function AgencySearchPage() {
             </SelectContent>
           </Select>
         </div>
-      </div>
+      </div> */}
       
       {/* Results Count */}
-      {data && (
+      {/* {data && (
         <div className="mb-6">
           <p className="text-gray-600">
-            {data.total} {data.total === 1 ? 'agency' : 'agencies'} found
+            {data.pages.length} {data.pages.length === 1 ? 'agency' : 'agencies'} found
             {debouncedQuery ? ` for "${debouncedQuery}"` : ''}
           </p>
         </div>
-      )}
+      )} */}
       
       {/* Error State */}
-      {error && (
+      {/* {error && (
         <Alert variant="destructive" className="my-8">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
@@ -171,10 +173,10 @@ export function AgencySearchPage() {
             Failed to load agencies. Please try again later.
           </AlertDescription>
         </Alert>
-      )}
+      )} */}
       
       {/* Loading State */}
-      {isLoading && (
+      {/* {isLoading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="h-64">
@@ -182,10 +184,10 @@ export function AgencySearchPage() {
             </div>
           ))}
         </div>
-      )}
+      )} */}
       
       {/* No Results */}
-      {!isLoading && data?.data.length === 0 && (
+      {/* {!isLoading && data?.pages.length === 0 && (
         <div className="text-center py-16 bg-gray-50 rounded-lg">
           <h3 className="text-xl font-semibold mb-2">No agencies found</h3>
           <p className="text-gray-500 mb-6">
@@ -202,26 +204,26 @@ export function AgencySearchPage() {
             </Button>
           )}
         </div>
-      )}
+      )} */}
       
       {/* Agency Cards */}
-      {!isLoading && data?.data.length > 0 && (
+      {/* {!isLoading && data?.pages.length > 0 && (
         <motion.div 
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
           variants={container}
           initial="hidden"
           animate="show"
         >
-          {data.data.map((agency: AgencyDetails) => (
+          {data.pages.map((agency: AgencyDetails) => (
             <motion.div key={agency.id} variants={item}>
               <AgencyCard agency={agency} />
             </motion.div>
           ))}
         </motion.div>
-      )}
+      )} */}
       
       {/* Load More Button */}
-      {hasNextPage && (
+      {/* {hasNextPage && (
         <div className="flex justify-center mt-8">
           <Button 
             variant="outline" 
@@ -231,7 +233,7 @@ export function AgencySearchPage() {
             {isFetchingNextPage ? 'Loading...' : 'Load More'}
           </Button>
         </div>
-      )}
+      )} */}
     </div>
   );
 } 

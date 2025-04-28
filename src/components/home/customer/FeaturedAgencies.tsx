@@ -300,8 +300,8 @@ export function FeaturedAgencies() {
                       
                       <div className="mt-3 flex flex-wrap gap-1">
                         {agency.specialties.map((specialty, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {specialty}
+                          <Badge key={index} variant="secondary" className="text-xs" label={specialty}>
+                            
                           </Badge>
                         ))}
                       </div>

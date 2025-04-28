@@ -37,9 +37,7 @@ export function UserTable({
       CUSTOMER: "bg-gray-100 text-gray-800",
     };
     return (
-      <Badge className={roleColors[role] || "bg-gray-100 text-gray-800"}>
-        {role.replace(/_/g, " ")}
-      </Badge>
+      <Badge className={roleColors[role] || "bg-gray-100 text-gray-800"} label={role.replace(/_/g, " ")} />
     );
   };
 
@@ -51,9 +49,10 @@ export function UserTable({
       INACTIVE: "bg-gray-100 text-gray-800",
     };
     return (
-      <Badge className={statusColors[status] || "bg-gray-100 text-gray-800"}>
-        {status}
-      </Badge>
+      <Badge
+        className={statusColors[status] || "bg-gray-100 text-gray-800"}
+        label={status}
+      />
     );
   };
 

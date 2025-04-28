@@ -1,10 +1,20 @@
 import  { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Booking } from '../../types/Booking';
+
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Helmet } from 'react-helmet-async';
+
+interface Booking {
+  id: string;
+  date: string;
+  packageName: string;
+  customerName: string;
+  status: string;
+  totalAmount: number;
+  createdAt: string;
+}
 
 export function BookingsPage() {
   const navigate = useNavigate();

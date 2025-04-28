@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getToken } from '../../utils/session';
-import { isApiAvailable, safeApiCall } from '../../utils/apiUtils';
+import { isApiAvailable } from '../../utils/apiUtils';
 
 // Use environment variable if available, otherwise fallback to a hardcoded URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';

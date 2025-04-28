@@ -181,8 +181,8 @@ export function SearchBar({
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={startDate}
-                onSelect={setStartDate}
+                selected={startDate ?? undefined}
+                onSelect={(day) => setStartDate(day ?? null)}
                 initialFocus
                 disabled={(date) => date < new Date()}
               />
@@ -211,8 +211,8 @@ export function SearchBar({
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={endDate}
-                onSelect={setEndDate}
+                selected={endDate ?? undefined}
+                onSelect={(day) => setEndDate(day ?? null)}
                 initialFocus
                 disabled={(date) =>
                   startDate ? date < startDate : date < new Date()

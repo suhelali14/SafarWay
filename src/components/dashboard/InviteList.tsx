@@ -1,13 +1,17 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../lib/store';
 import { getInvites, cancelInvite } from '../../lib/store/slices/inviteSlice';
 import { RootState } from '../../lib/store';
-import { Button } from '../ui/button';
-import { useToast } from '../ui/use-toast';
-import { Loader2, X } from 'lucide-react';
 
-export function InviteList() {
-  const dispatch = useDispatch();
+import { useToast } from '../ui/use-toast';
+import { Button } from '../ui/button';
+import { Loader2, X } from 'lucide-react'; // Assuming Loader2 and X are from the 'lucide-react' library
+
+export const InviteList = () => {
+
+
+  const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
   const { loading, invites, error } = useSelector((state: RootState) => state.invite);
 
@@ -65,29 +69,29 @@ export function InviteList() {
   return (
     <div className="space-y-4">
       {invites.map((invite) => (
-        <div
-          key={invite.id}
-          className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
-        >
-          <div>
-            <p className="font-medium">{invite.email}</p>
-            <p className="text-sm text-gray-500">
-              Role: {invite.role}
-              {invite.agencyId && ` • Agency ID: ${invite.agencyId}`}
-            </p>
-            <p className="text-sm text-gray-500">
-              Invited: {new Date(invite.createdAt).toLocaleDateString()}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleCancelInvite(invite.id)}
-            className="text-red-500 hover:text-red-700 hover:bg-red-50"
-          >
-            <X className="h-5 w-5" />
-          </Button>
+      <div
+        key={invite.id}
+        className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
+      >
+        <div>
+        <p className="font-medium">{invite.email}</p>
+        <p className="text-sm text-gray-500">
+          Role: {invite.role}
+          {invite.agencyId && ` • Agency ID: ${invite.agencyId}`}
+        </p>
+        <p className="text-sm text-gray-500">
+          Invited: {new Date(invite.createdAt).toLocaleDateString()}
+        </p>
         </div>
+        <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => handleCancelInvite(invite.id)}
+        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+        >
+        <X className="h-5 w-5" />
+        </Button>
+      </div>
       ))}
     </div>
   );

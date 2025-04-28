@@ -140,7 +140,7 @@ export function CustomerTestimonials() {
     <section className="py-24 bg-gray-50">
       <div className="container px-4 mx-auto">
         <div className="text-center mb-12">
-          <Badge variant="outline" className="mb-3">Traveler Stories</Badge>
+          <Badge variant="outline" className="mb-3" label='Traveler Stories'></Badge>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
             What Our Customers Say
           </h2>
@@ -178,8 +178,8 @@ export function CustomerTestimonials() {
                           </div>
                           
                           {testimonial.verified && (
-                            <Badge variant="outline" className="text-green-600 border-green-600 bg-green-50">
-                              Verified Traveler
+                            <Badge variant="outline" className="text-green-600 border-green-600 bg-green-50" label='Verified Traveler'>
+                              
                             </Badge>
                           )}
                           
@@ -251,8 +251,8 @@ export function CustomerTestimonials() {
         </div>
         
         <div className="text-center mt-12">
-          <Badge className="mb-2">
-            4.8/5 Average Rating
+          <Badge className="mb-2" label=' 4.8/5 Average Rating'>
+           
           </Badge>
           <p className="text-sm text-gray-500">
             Based on 2,483 verified customer reviews

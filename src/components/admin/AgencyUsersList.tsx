@@ -222,10 +222,10 @@ export function AgencyUsersList({ agencyId }: AgencyUsersListProps) {
                       <span className="text-sm">{user.email}</span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <Badge className={getRoleBadgeClass(user.role)}>{user.role}</Badge>
+                      <Badge className={getRoleBadgeClass(user.role)} variant="outline" label={user.role} />
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <Badge className={getStatusBadgeClass(user.status)}>{user.status}</Badge>
+                      <Badge className={getStatusBadgeClass(user.status)} label={user.status} />
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className="text-sm">{formatDate(user.lastLoginAt)}</span>

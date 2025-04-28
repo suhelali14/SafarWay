@@ -29,7 +29,7 @@ export default function AcceptInvitation() {
         }
 
         // Verify the token with the API
-        const response = await authAPI.verifyInviteToken(token);
+        const response = await authAPI.verifyToken();
         
         if (response.data) {
           setUserEmail(response.data.email);
@@ -51,7 +51,7 @@ export default function AcceptInvitation() {
   }, [location, navigate, toast]);
 
   return (
-    <AuthLayout>
+    <AuthLayout title="Accept Invitation" subtitle="Join us and start your journey!">
       <div className="flex flex-col items-center justify-center space-y-4">
         {isLoading ? (
           <>

@@ -203,8 +203,9 @@ export function SpecialOffers() {
                   {/* Offer type badge */}
                   <Badge 
                     className={`absolute right-3 top-4 z-10 ${offerTypeColors[offer.type]}`}
+                    label= {offerTypeNames[offer.type]}
                   >
-                    {offerTypeNames[offer.type]}
+                   
                   </Badge>
                   
                   {/* Image */}

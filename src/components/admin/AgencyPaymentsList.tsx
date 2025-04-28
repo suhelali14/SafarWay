@@ -4,7 +4,6 @@ import { IndianRupee, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
 import { Spinner } from '../ui/spinner';
 
 
@@ -227,7 +226,10 @@ export function AgencyPaymentsList({ agencyId }: AgencyPaymentsListProps) {
                       <span className="text-sm font-medium">${payment.amount.toLocaleString()}</span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <Badge className={getStatusBadgeClass(payment.status)}>{payment.status}</Badge>
+                     
+                      <span className={`badge ${getStatusBadgeClass(payment.status)}`}>
+                        {payment.status}
+                      </span>
                     </td>
                   </tr>
                 ))}

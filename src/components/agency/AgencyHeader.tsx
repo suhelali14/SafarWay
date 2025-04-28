@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Globe, Mail, Phone, Facebook, Instagram, Twitter, Linkedin, MapPin, Calendar, CheckVerified } from 'lucide-react';
+import { Globe, Mail, Phone, Facebook, Instagram, Twitter, Linkedin, MapPin, Calendar } from 'lucide-react';
 import { AgencyDetails } from '../../lib/api/agency';
 import { Badge } from '../ui/badge';
 
@@ -61,15 +61,14 @@ export function AgencyHeader({ agency }: AgencyHeaderProps) {
                 <h1 className="text-2xl md:text-3xl font-bold">{name}</h1>
                 
                 {verificationStatus === 'VERIFIED' && (
-                  <Badge className="bg-blue-500 hover:bg-blue-600 flex items-center gap-1">
-                    <CheckVerified className="h-3 w-3" />
-                    <span>Verified</span>
+                  <Badge className="bg-blue-500 hover:bg-blue-600 flex items-center gap-1" label='VERIFIED'>
+                    
                   </Badge>
                 )}
                 
                 {badges && badges.map((badge) => (
-                  <Badge key={badge} variant="outline" className="capitalize">
-                    {badge}
+                  <Badge key={badge} variant="outline" className="capitalize" label={badge}>
+                   
                   </Badge>
                 ))}
               </div>

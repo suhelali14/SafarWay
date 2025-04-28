@@ -25,6 +25,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   register: (data: any) => Promise<void>;
+  inviteUser: (email: string, role: string) => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -316,13 +317,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Invite user function
+  const inviteUser = async (email: string, role: string) => {
+    try {
+      const response = await authAPI.inviteUser({ email, role });
+      console.log('User invited successfully:', response.data);
+      toast.success('User invited successfully!');
+    } catch (error: unknown) {
+      console.error('Failed to invite user:', error);
+      const errorMessage = error instanceof AxiosError && error.response?.data?.message
+        ? error.response.data.message
+        : error instanceof Error
+          ? error.message
+          : 'Failed to invite user. Please try again.';
+      toast.error(errorMessage);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     isLoading,
     isAuthenticated,
     login,
     logout,
-    register
+    register,
+    inviteUser
   };
 
   return (

@@ -3,9 +3,11 @@ import { Helmet } from 'react-helmet-async';
 import { AdminLayout } from '../../../components/layout/AdminLayout';
 import { 
   Card, 
-  Button,
-  Badge,
-} from '../../../components/ui';
+ 
+} from '../../../components/ui/card'; // Update the path to the correct module
+
+import { Button } from '../../../components/ui/button';
+import { Badge } from '../../../components/ui/badge';
 import { Link } from 'react-router-dom';
 import { Icons } from '../../../components/Icons';
 import { DataTable } from '../../../components/ui/data-table';
@@ -108,8 +110,8 @@ export default function AgenciesPage() {
         const badgeInfo = statusMap[status] || { label: status, variant: 'default' };
         
         return (
-          <Badge variant={badgeInfo.variant}>
-            {badgeInfo.label}
+          <Badge variant={badgeInfo.variant} label={badgeInfo.label}>
+            
           </Badge>
         );
       },
@@ -214,9 +216,9 @@ export default function AgenciesPage() {
             <DataTable
               columns={columns}
               data={agencies}
-              isLoading={isLoading}
+              showColumnVisibility={isLoading}
               searchPlaceholder="Search agencies..."
-              searchColumn="name"
+              searchKey="name"
             />
           </div>
         </Card>

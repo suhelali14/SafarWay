@@ -34,6 +34,7 @@ const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   role: z.enum(["SAFARWAY_ADMIN", "SAFARWAY_USER", "AGENCY_ADMIN", "AGENCY_USER"]),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -58,6 +59,7 @@ export function AddUserDialog({ onAdd }: AddUserDialogProps) {
       name: "",
       email: "",
       role: "AGENCY_USER",
+      password: "",
     },
   });
 
@@ -153,6 +155,19 @@ export function AddUserDialog({ onAdd }: AddUserDialogProps) {
                       ))}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Enter a password" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

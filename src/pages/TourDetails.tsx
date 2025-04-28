@@ -338,9 +338,9 @@ export default function TourDetailsPage() {
                             <div>
                               <h3 className="font-medium mb-2">Meals</h3>
                               <div className="flex gap-4">
-                                {day.meals.breakfast && <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200">Breakfast</Badge>}
-                                {day.meals.lunch && <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200">Lunch</Badge>}
-                                {day.meals.dinner && <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200">Dinner</Badge>}
+                                {day.meals.breakfast && <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200" label="Breakfast" ></Badge>}
+                                {day.meals.lunch && <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200" label="Lunch" ></Badge>}
+                                {day.meals.dinner && <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200" label="Dinner"></Badge>}
                               </div>
                             </div>
                             

@@ -504,13 +504,13 @@ const SearchPage: React.FC = () => {
                           className="w-full h-full object-cover"
                         />
                         {pkg.discount && (
-                          <Badge className="absolute top-2 right-2 bg-red-500">
-                            {pkg.discount}% OFF
+                          <Badge className="absolute top-2 right-2 bg-red-500" label={`-${pkg.discount}%`} 
+                            >
                           </Badge>
                         )}
                         {pkg.isPopular && (
-                          <Badge className="absolute top-2 left-2 bg-amber-500">
-                            Popular
+                          <Badge className="absolute top-2 left-2 bg-amber-500" label='Popular' >
+                            
                           </Badge>
                         )}
                       </div>
@@ -537,8 +537,8 @@ const SearchPage: React.FC = () => {
                           
                           <div className="flex flex-wrap gap-1 mb-4">
                             {pkg.features.map((feature, i) => (
-                              <Badge key={i} variant="outline" className="text-xs">
-                                {feature}
+                              <Badge key={i} variant="outline" className="text-xs" label={feature} >
+                                
                               </Badge>
                             ))}
                           </div>

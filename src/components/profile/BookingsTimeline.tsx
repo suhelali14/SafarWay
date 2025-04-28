@@ -181,8 +181,8 @@ export function BookingsTimeline({ data, isLoading, limit }: BookingsTimelinePro
                           {booking.agencyName || booking.tourPackage?.agency?.name}
                         </CardDescription>
                       </div>
-                      <Badge className={getStatusBadgeColor(booking.status)}>
-                        {formatStatus(booking.status)}
+                      <Badge className={getStatusBadgeColor(booking.status)} label= {formatStatus(booking.status)}>
+                       
                       </Badge>
                     </div>
                   </CardHeader>

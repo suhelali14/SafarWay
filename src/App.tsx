@@ -5,10 +5,10 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Pages
 import HomePage from './pages/HomePage';
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
+import { LoginPage } from './pages/auth/LoginPage';
+import {RegisterPage} from './pages/auth/RegisterPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
-import ToursPage from './pages/dashboard/ToursPage';
+import {ToursPage} from './pages/dashboard/ToursPage';
 import { BookingsPage } from './pages/dashboard/BookingsPage';
 import CustomersPage from './pages/dashboard/CustomersPage';
 import ProfilePage from './pages/dashboard/ProfilePage';

@@ -101,7 +101,7 @@ export function FeaturedDestinations() {
       <div className="container px-4 mx-auto">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
           <div className="mb-6 md:mb-0">
-            <Badge variant="outline" className="mb-3">Popular Destinations</Badge>
+            <Badge variant="outline" className="mb-3" label='Popular Destinations'></Badge>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
               Discover Dream Destinations
             </h2>
@@ -134,8 +134,8 @@ export function FeaturedDestinations() {
                   height={300}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
-                <Badge className="absolute left-4 top-4 bg-primary/90">
-                  Featured
+                <Badge className="absolute left-4 top-4 bg-primary/90" label='Featured'>
+                 
                 </Badge>
               </div>
 

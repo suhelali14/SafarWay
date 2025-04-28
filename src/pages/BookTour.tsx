@@ -44,6 +44,15 @@ export default function BookTour() {
     const fetchTour = async () => {
       try {
         setLoading(true);
+        if (!id) {
+          toast({
+            title: "Error",
+            description: "Tour ID is missing",
+            variant: "destructive",
+          });
+          navigate("/tours");
+          return;
+        }
         const response = await toursApi.getById(id);
         setTour(response.data);
       } catch (error: any) {

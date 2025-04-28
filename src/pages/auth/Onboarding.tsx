@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { onboardingSchema } from '../../lib/validations/invite';
 import { completeOnboarding } from '../../lib/store/slices/inviteSlice';
-import { RootState } from '../../lib/store';
+import { AppDispatch, RootState } from '../../lib/store';
 import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -24,7 +24,7 @@ type OnboardingFormData = {
 export default function OnboardingPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+ const dispatch: AppDispatch = useDispatch();
   const { toast } = useToast();
   const { loading } = useSelector((state: RootState) => state.invite);
   const [showPassword, setShowPassword] = useState(false);

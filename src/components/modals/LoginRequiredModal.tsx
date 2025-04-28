@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { useToast } from '../../hooks/use-toast';
 import { useAuth } from '../../contexts/AuthContext';
 
-import { Mail, Lock, User, X } from 'lucide-react';
+import { Mail, Lock, User } from 'lucide-react';
 
 type ActionType = 'subscribe' | 'book' | 'like' | 'review';
 
@@ -103,12 +103,12 @@ export function LoginRequiredModal({
 
     try {
       // Call your auth register function
-      await register(
-        registerCredentials.name,
-        registerCredentials.email,
-        registerCredentials.password,
-        'CUSTOMER'
-      );
+      await register({
+        name: registerCredentials.name,
+        email: registerCredentials.email,
+        password: registerCredentials.password,
+        role: 'CUSTOMER'
+      });
       toast({
         title: "Registration successful!",
         description: "Your account has been created.",

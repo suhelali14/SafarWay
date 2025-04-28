@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { StatCard } from './StatCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Card } from '../ui/card';
 import { PackageIcon, Users, CreditCard, TrendingUp } from 'lucide-react';
-import { agencyService } from '../../services/agencyService';
+
 import { toast } from '../ui/use-toast';
 import { agencyAPI } from '../../services/api';
 
@@ -43,10 +43,9 @@ export function AgencySummary() {
           revenueTrend: data.revenueTrend || 0,
         });
       } catch (error) {
-        toast({
+        toast.error({
           title: "Failed to fetch summary data",
           description: "Could not load dashboard statistics",
-          variant: "destructive",
         });
       } finally {
         setIsLoading(false);

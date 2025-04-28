@@ -6,6 +6,7 @@ import { Button } from '../ui/button';
 import { formatDate, formatCurrency } from '../../utils/formatters';
 
 interface PackageCardProps {
+
   packageData: {
     id: string;
     title: string;
@@ -70,8 +71,9 @@ export function PackageCard({
         {featured && (
           <Badge 
             className="absolute top-2 left-2 bg-amber-500 hover:bg-amber-600"
+            label='Featured'
           >
-            Featured
+            
           </Badge>
         )}
         
@@ -79,8 +81,9 @@ export function PackageCard({
         {discount && discount > 0 && (
           <Badge 
             className="absolute top-2 right-2 bg-red-500 hover:bg-red-600"
+            label={`${Math.round(discount)}% OFF`}
           >
-            {discount}% OFF
+            
           </Badge>
         )}
       </div>

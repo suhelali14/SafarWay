@@ -66,8 +66,9 @@ export const TourCard = ({
               ? 'secondary'
               : 'default'
           }
+          label={tourType.toLowerCase()}
         >
-          {tourType.toLowerCase()}
+          
         </Badge>
       </div>
 

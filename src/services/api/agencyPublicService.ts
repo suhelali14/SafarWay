@@ -6,6 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 // Types
 
 export interface AgencyPublicDetails extends Agency {
+  verificationStatus: 'VERIFIED' | 'UNVERIFIED' | 'PENDING';
   image?: string | null; // Alias for logo
   website?: string; // Not in API response, kept as optional
   socialLinks?: {
@@ -127,8 +128,8 @@ const getAgencyDetails = async (agencyId: string): Promise<AgencyPublicDetails> 
     const response = await axios.get<ApiResponse<AgencyPublicDetails>>(
       `${API_URL}/customers/agency-public/${agencyId}/details`
     );
-    const agencyDetails = response.data;
-    console.log("agencyDetails",agencyDetails,response.data);
+    const agencyDetails = response.data.data;
+    console.log("agencyDetails", agencyDetails);
     return agencyDetails;
   } catch (error) {
     console.error('Error fetching agency details:', error);

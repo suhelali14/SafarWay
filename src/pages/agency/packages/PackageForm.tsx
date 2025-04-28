@@ -28,12 +28,13 @@ import { TourPackage } from '../../../services/api';
 
 interface PackageFormProps {
   initialData?: TourPackage;
-  onSubmit?: (data: Partial<Package>) => Promise<void>;
+  // Removed unused onSubmit prop
   isLoading?: boolean;
   isEdit?: boolean;
+  onSubmit: (updatedData: Partial<TourPackage>) => Promise<void>;
 }
 
-export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit = false }: PackageFormProps) {
+export function PackageForm({ initialData, isLoading = false, isEdit = false }: PackageFormProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user: contextUser } = useAuth();
@@ -47,6 +48,7 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
   // Define a combined type that includes both old and new field names for backward compatibility
   interface FormData extends Partial<Package> {
     maxPeople?: number; // Temporary field used in the form
+    maxGroupSize?: number; // Added to fix the error
   }
   
   const [formData, setFormData] = useState<FormData>({
@@ -194,14 +196,14 @@ export function PackageForm({ initialData, onSubmit, isLoading = false, isEdit =
   };
 
   // Convert file to base64 string
-  const convertFileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
+  // const convertFileToBase64 = (file: File): Promise<string> => {
+  //   return new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
+  //     reader.readAsDataURL(file);
+  //     reader.onload = () => resolve(reader.result as string);
+  //     reader.onerror = (error) => reject(error);
+  //   });
+  // };
 
   const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;

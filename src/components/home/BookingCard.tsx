@@ -84,8 +84,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
             <span className="font-medium mb-2">
               {formatCurrency(price, currency)}
             </span>
-            <Badge variant="outline" className={`px-2 py-1 ${color}`}>
-              {status.charAt(0).toUpperCase() + status.slice(1)}
+            <Badge variant="outline" className={`px-2 py-1 ${color}`} label= {status.charAt(0).toUpperCase() + status.slice(1)}>
+             
             </Badge>
           </div>
         </div>

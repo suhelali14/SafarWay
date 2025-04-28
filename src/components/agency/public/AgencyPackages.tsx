@@ -7,7 +7,7 @@ import { Calendar, Clock, Users, Map, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { agencyPublicService } from '../../../services/api/agencyPublicService';
-import { TourPackage } from '../../../services/api/packageService';
+import { Package } from '../../../services/api/packageService';
 import { formatDate, formatCurrency } from '../../../utils/formatters';
 
 interface AgencyPackagesProps {
@@ -17,12 +17,12 @@ interface AgencyPackagesProps {
 const AgencyPackages = ({ agencyId }: AgencyPackagesProps) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('live');
-  const [packages, setPackages] = useState<TourPackage[]>([]);
+  const [packages, setPackages] = useState<Package[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalPackages, setTotalPackages] = useState(0);
+  const [_totalPackages, setTotalPackages] = useState(0);
 
   const PAGE_SIZE = 6;
 
@@ -36,8 +36,7 @@ const AgencyPackages = ({ agencyId }: AgencyPackagesProps) => {
       setError(null);
 
       // Determine status based on activeTab
-      let status;
-      const today = new Date().toISOString();
+      let status: 'PUBLISHED' | 'DRAFT' | 'ARCHIVED' | undefined;
 
       switch (activeTab) {
         case 'live':
@@ -59,7 +58,12 @@ const AgencyPackages = ({ agencyId }: AgencyPackagesProps) => {
         limit: PAGE_SIZE
       });
 
-      setPackages(response.packages);
+      setPackages(
+        response.packages.map((pkg) => ({
+          ...pkg,
+          maxGroupSize: pkg.maxGroupSize ?? 0, // Ensure maxGroupSize is a number
+        }))
+      );
       setTotalPages(response.pagination.pages);
       setTotalPackages(response.pagination.total);
     } catch (err) {
@@ -210,11 +214,11 @@ const AgencyPackages = ({ agencyId }: AgencyPackagesProps) => {
                           </div>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Calendar className="w-4 h-4 text-gray-400" />
-                            <span>{formatDate(pkg.startDate)}</span>
+                            <span>{formatDate(pkg.startDate || '')}</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Users className="w-4 h-4 text-gray-400" />
-                            <span>Max {pkg.maxGroupSize || pkg.maximumPeople || 'N/A'}</span>
+                            <span>Max {pkg.maxPeople || pkg.maximumPeople || 'N/A'}</span>
                           </div>
                         </div>
 

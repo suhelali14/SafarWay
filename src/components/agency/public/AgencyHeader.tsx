@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Bell, BellOff, BadgeCheck, AlertTriangle, Ban } from 'lucide-react';
+import { Check, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
@@ -13,7 +13,7 @@ interface AgencyHeaderProps {
 }
 
 const AgencyHeader = ({ agency, className = '' }: AgencyHeaderProps) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [isSubscribed, setIsSubscribed] = useState(agency.isSubscribed || false);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,25 +64,17 @@ const AgencyHeader = ({ agency, className = '' }: AgencyHeaderProps) => {
     switch (agency.verificationStatus) {
       case 'VERIFIED':
         return (
-          <Badge className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-200">
-            <BadgeCheck className="w-4 h-4" />
-            Verified
-          </Badge>
+          <Badge className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-200" label='VERIFIED'/>
+            
+          
         );
       case 'UNVERIFIED':
         return (
-          <Badge className="flex items-center gap-1 bg-amber-100 text-amber-800 hover:bg-amber-200">
-            <AlertTriangle className="w-4 h-4" />
-            Unverified
-          </Badge>
+          <Badge className="flex items-center gap-1 bg-amber-100 text-amber-800 hover:bg-amber-200" label='UNVERIFIED'/>
+           
+      
         );
-      case 'SUSPENDED':
-        return (
-          <Badge className="flex items-center gap-1 bg-red-100 text-red-800 hover:bg-red-200">
-            <Ban className="w-4 h-4" />
-            Suspended
-          </Badge>
-        );
+      
       default:
         return null;
     }

@@ -76,9 +76,10 @@ const BookingCard: React.FC<BookingCardProps> = ({
             className="w-full h-48 md:h-full object-cover"
           />
           <Badge 
-            className={`absolute top-3 left-3 ${statusColors[status]?.bgColor} ${statusColors[status]?.color}`}
+            className={`absolute top-3 left-3 ${statusColors[status]?.bgColor} ${statusColors[status]?.color}` }
+            label={status.charAt(0).toUpperCase() + status.slice(1)}
           >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+            
           </Badge>
         </div>
         
@@ -93,8 +94,9 @@ const BookingCard: React.FC<BookingCardProps> = ({
                 <Badge 
                   variant="outline" 
                   className={`${paymentStatusColors[paymentStatus]?.bgColor} ${paymentStatusColors[paymentStatus]?.color}`}
+                  label={paymentStatus.charAt(0).toUpperCase() + paymentStatus.slice(1)}
                 >
-                  {paymentStatus.charAt(0).toUpperCase() + paymentStatus.slice(1)}
+                  
                 </Badge>
               </div>
             </div>

@@ -66,8 +66,9 @@ export function RecentBookings({ bookings }: RecentBookingsProps) {
                     <Badge
                       variant="outline"
                       className={statusColor[booking.status]}
+                      label={booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                     >
-                      {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                      
                     </Badge>
                   </div>
                 </div>

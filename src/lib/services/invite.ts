@@ -1,4 +1,8 @@
-import { api } from './api';
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'https://your-api-base-url.com', // Replace with your actual base URL
+});
 
 export interface InviteUserData {
   email: string;

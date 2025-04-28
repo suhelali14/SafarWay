@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Helmet } from 'react-helmet-async';
 import { useToast } from '../../hooks/use-toast';
-import { useAuth } from '../../contexts/AuthContext';
+
 import { 
   Package, 
   
@@ -44,7 +44,7 @@ export const AgencyDashboardPage = () => {
     pendingApprovals: 0,
   });
   const { toast } = useToast();
-  const { user } = useAuth();
+
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -64,7 +64,7 @@ export const AgencyDashboardPage = () => {
           cancelledBookings: response.cancelledBookings || 0,
           totalRevenue: response.totalRevenue || 0,
           monthlyRevenue: response.monthlyRevenue || 0,
-          latestBookings: response.recentBookings || [],
+          latestBookings: (response.recentBookings as unknown as Booking[]) || [],
           pendingApprovals: 0, // Set default if not provided by API
         });
         

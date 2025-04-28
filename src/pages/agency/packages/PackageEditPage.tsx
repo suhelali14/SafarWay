@@ -13,7 +13,7 @@ import NewPackageForm from './NewPackageForm';
 export const PackageEditPage = () => {
   const { packageId } = useParams<{ packageId: string }>();
   const [loading, setLoading] = useState(true);
-  const [packageData, setPackageData] = useState(null);
+  const [packageData, setPackageData] = useState<{ name: string } | null>(null);
   const { session } = useSession();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -102,7 +102,7 @@ export const PackageEditPage = () => {
           </Button>
         </div>
 
-        <NewPackageForm editMode={true} packageData={packageData} />
+        <NewPackageForm  />
       </div>
     </>
   );

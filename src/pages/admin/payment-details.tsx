@@ -1,7 +1,7 @@
 import  { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { PaymentDetailsCard } from '../../components/admin/PaymentDetailsCard';
-import { Alert, AlertDescription } from '../../ui/alert';
+import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Loader2 } from 'lucide-react';
 
 

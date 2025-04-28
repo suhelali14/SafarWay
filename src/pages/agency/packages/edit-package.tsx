@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { PackageForm } from './PackageForm';
-import { packageService, Package } from '../../../services/api/packageService';
+import { packageService } from '../../../services/api/packageService';
 import { useToast } from '../../../hooks/use-toast';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Button } from '../../../components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Skeleton } from '../../../components/ui/skeleton';
+import { agencyAPI, TourPackage } from '../../../services/api';
 
 export function EditPackagePage() {
   const { id } = useParams<{ id: string }>();
@@ -15,7 +16,7 @@ export function EditPackagePage() {
   const { toast } = useToast();
   const { user } = useAuth();
   
-  const [packageData, setPackageData] = useState<Package | null>(null);
+  const [packageData, setPackageData] = useState<TourPackage | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,8 +36,8 @@ export function EditPackagePage() {
   const fetchPackageData = async () => {
     try {
       setIsLoading(true);
-      const response = await packageService.getPackageById(agencyId as string, id as string);
-      setPackageData(response);
+      const response = await agencyAPI.getPackageById(id as string);
+      setPackageData(response.data);
       setError(null);
     } catch (error) {
       console.error('Error fetching package:', error);
@@ -46,7 +47,7 @@ export function EditPackagePage() {
     }
   };
 
-  const handleSubmit = async (data: Partial<Package>) => {
+  const handleSubmit = async (data: Partial<TourPackage>) => {
     if (!id || !agencyId) {
       toast({
         title: "Error",

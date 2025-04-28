@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cn } from "../../utils/cn";
+
 
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
@@ -61,6 +61,17 @@ const TableCell = React.forwardRef<
 ));
 TableCell.displayName = "TableCell";
 
+interface TableComponent
+  extends React.ForwardRefExoticComponent<
+    React.HTMLAttributes<HTMLTableElement> & React.RefAttributes<HTMLTableElement>
+  > {
+  Header: typeof TableHeader;
+  Body: typeof TableBody;
+  Row: typeof TableRow;
+  Head: typeof TableHead;
+  Cell: typeof TableCell;
+}
+
 const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
@@ -70,7 +81,7 @@ const Table = React.forwardRef<
     className={`w-full text-sm text-left ${className}`}
     {...props}
   />
-));
+)) as TableComponent;
 Table.displayName = "Table";
 
 // Attach the subcomponents to the Table component

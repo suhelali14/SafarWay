@@ -20,6 +20,7 @@ import { Button } from '../../components/ui/button';
 
 import { 
 
+  Card,
   CardContent, 
   CardDescription, 
   CardFooter, 
@@ -282,8 +283,8 @@ const PackageDetail: React.FC = () => {
               {packageData.features.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {packageData.features.map((feature, index) => (
-                    <Badge key={index} variant="secondary" className="rounded-full px-3">
-                      {feature}
+                    <Badge key={index} variant="secondary" className="rounded-full px-3" label= {feature}>
+                     
                     </Badge>
                   ))}
                 </div>
@@ -298,8 +299,8 @@ const PackageDetail: React.FC = () => {
                 className="w-full h-full object-cover"
               />
               {packageData.discount && (
-                <Badge className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 text-sm">
-                  {packageData.discount}% OFF
+                <Badge className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 text-sm" label={`-${packageData.discount}%`} >
+                  
                 </Badge>
               )}
             </div>
@@ -438,7 +439,7 @@ const PackageDetail: React.FC = () => {
                           <span className="text-base line-through text-gray-500">
                             {formatCurrency(packageData.price, packageData.currency)}
                           </span>
-                          <Badge className="bg-red-500">{packageData.discount}% OFF</Badge>
+                          <Badge className="bg-red-500" label={`${packageData.discount}% OFF`}></Badge>
                         </div>
                       )}
                     </div>

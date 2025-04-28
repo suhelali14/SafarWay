@@ -162,22 +162,28 @@ export function PackageReviews({ packageId, totalReviews, avgRating }: PackageRe
       {/* Filter and sort controls */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex gap-2">
+          <div  onClick={() => handleRatingFilter(null)}>
           <Badge
             variant={filterRating === null ? 'default' : 'outline'}
             className="cursor-pointer"
-            onClick={() => handleRatingFilter(null)}
+            
+            label='All reviews'
           >
-            All
+            
           </Badge>
+          </div>
           {[5, 4, 3, 2, 1].map((rating) => (
+            <div key={rating} onClick={() => handleRatingFilter(rating)}>
             <Badge
               key={rating}
               variant={filterRating === rating ? 'default' : 'outline'}
               className="cursor-pointer"
-              onClick={() => handleRatingFilter(rating)}
+              
+              label={`${rating} ★`}
             >
-              {rating} ★
+              
             </Badge>
+            </div>
           ))}
         </div>
 

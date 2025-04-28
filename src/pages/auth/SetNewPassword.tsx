@@ -85,10 +85,10 @@ export default function SetNewPassword() {
     }
   }, [location, navigate, toast]);
 
-  const verifyInviteToken = async (token: string) => {
+  const verifyInviteToken = async (_token: string) => {
     try {
       setIsLoading(true);
-      const response = await authAPI.verifyInviteToken(token);
+      const response = await authAPI.verifyToken();
       // If verification successful, set user email for display
       if (response.data && response.data.email) {
         setUserEmail(response.data.email);
@@ -161,7 +161,7 @@ export default function SetNewPassword() {
   const passwordStrength = getPasswordStrength();
 
   return (
-    <AuthLayout>
+    <AuthLayout title='' >
       <div className="flex flex-col space-y-2 text-center mb-8">
         <h1 className="text-2xl font-bold">Set New Password</h1>
         <p className="text-muted-foreground">

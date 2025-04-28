@@ -70,13 +70,13 @@ export function AgencyLayout() {
       <Sidebar
         brandInfo={{
           name: user?.agency?.name || 'Agency Portal',
-          logo: user?.agency?.logo,
+          logo: user?.agency?.logo || '/default-logo.png',
         }}
         navigation={navigation}
         userInfo={{
           name: user?.name || 'Agency User',
           email: user?.email,
-          avatar: user?.profilePicture,
+          avatar: user?.profileImage || '/default-avatar.png',
         }}
         onLogout={handleLogout}
         defaultCollapsed={false}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
@@ -8,7 +8,13 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Edit, Download } from 'lucide-react';
 import { useSession } from '../../../hooks/use-session';
 import { useToast } from '../../../hooks/use-toast';
-import { agencyService, PackageExportData } from '../../../services/agencyService';
+import { agencyService } from '../../../services/agencyService';
+
+
+interface NewPackageFormProps {
+  editMode: boolean;
+  packageData: { name: string };
+}
 
 interface Package {
   id: string;
@@ -30,10 +36,10 @@ interface Package {
   updatedAt: string;
 }
 
-export const PackageDetailPage = () => {
+export const PackageDetailPage: React.FC<NewPackageFormProps> = () => {
   const { packageId } = useParams<{ packageId: string }>();
   const [loading, setLoading] = useState(true);
-  const [packageData, setPackageData] = useState<Package | null>(null);
+  const [currentPackageData, setCurrentPackageData] = useState<Package | null>(null);
   const [exporting, setExporting] = useState(false);
   const { session } = useSession();
   const { toast } = useToast();
@@ -47,7 +53,7 @@ export const PackageDetailPage = () => {
             Authorization: `Bearer ${session?.token}`
           }
         });
-        setPackageData(response.data);
+        setCurrentPackageData(response.data);
       } catch (error) {
         console.error('Error fetching package details:', error);
         toast({
@@ -137,7 +143,7 @@ export const PackageDetailPage = () => {
     );
   }
 
-  if (!packageData) {
+  if (!currentPackageData) {
     return (
       <div className="p-6">
         <h1 className="text-2xl font-bold mb-6">Package Details</h1>
@@ -161,12 +167,12 @@ export const PackageDetailPage = () => {
   return (
     <>
       <Helmet>
-        <title>{packageData.name} | SafarWay Agency</title>
+        <title>{currentPackageData.name} | SafarWay Agency</title>
       </Helmet>
       
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">{packageData.name}</h1>
+          <h1 className="text-2xl font-bold">{currentPackageData.name}</h1>
           <div className="flex gap-2">
             <Button variant="outline" asChild>
               <Link to="/agency/packages">
@@ -195,10 +201,10 @@ export const PackageDetailPage = () => {
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                {packageData.coverImage ? (
+                {currentPackageData.coverImage ? (
                   <img 
-                    src={packageData.coverImage} 
-                    alt={packageData.name} 
+                    src={currentPackageData.coverImage} 
+                    alt={currentPackageData.name} 
                     className="w-full h-64 object-cover rounded-lg"
                   />
                 ) : (
@@ -210,43 +216,43 @@ export const PackageDetailPage = () => {
                 <div className="mt-6 grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Price</h3>
-                    <p className="text-lg font-semibold">{formatCurrency(packageData.price)}</p>
+                    <p className="text-lg font-semibold">{formatCurrency(currentPackageData.price)}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Duration</h3>
-                    <p className="text-lg font-semibold">{packageData.duration} days</p>
+                    <p className="text-lg font-semibold">{currentPackageData.duration} days</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Destination</h3>
-                    <p className="text-lg font-semibold">{packageData.destination}</p>
+                    <p className="text-lg font-semibold">{currentPackageData.destination}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Status</h3>
-                    <p className="text-lg font-semibold">{packageData.status}</p>
+                    <p className="text-lg font-semibold">{currentPackageData.status}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Valid From</h3>
-                    <p className="text-lg font-semibold">{formatDate(packageData.validFrom)}</p>
+                    <p className="text-lg font-semibold">{formatDate(currentPackageData.validFrom)}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Valid Until</h3>
-                    <p className="text-lg font-semibold">{formatDate(packageData.validTill)}</p>
+                    <p className="text-lg font-semibold">{formatDate(currentPackageData.validTill)}</p>
                   </div>
                 </div>
               </div>
               
               <div>
                 <h2 className="text-xl font-semibold mb-2">Description</h2>
-                <p className="text-gray-700 mb-6">{packageData.description}</p>
+                <p className="text-gray-700 mb-6">{currentPackageData.description}</p>
                 
                 <h2 className="text-xl font-semibold mb-2">Capacity</h2>
-                <p className="text-gray-700 mb-6">Min: {packageData.minCapacity}, Max: {packageData.maxPeople} people</p>
+                <p className="text-gray-700 mb-6">Min: {currentPackageData.minCapacity}, Max: {currentPackageData.maxPeople} people</p>
                 
                 <h2 className="text-xl font-semibold mb-2">Package Type</h2>
-                <p className="text-gray-700 mb-6">{packageData.tourType}</p>
+                <p className="text-gray-700 mb-6">{currentPackageData.tourType}</p>
                 
                 <h2 className="text-xl font-semibold mb-2">Created</h2>
-                <p className="text-gray-700">{formatDate(packageData.createdAt)}</p>
+                <p className="text-gray-700">{formatDate(currentPackageData.createdAt)}</p>
               </div>
             </div>
           </CardContent>

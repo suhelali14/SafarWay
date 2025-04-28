@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { agencyApi, AgencyPackage } from '../../lib/api/agency';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
 import { Skeleton } from '../ui/skeleton';
@@ -29,46 +29,56 @@ export function AgencyPackages({ agencyId }: AgencyPackagesProps) {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage
-  } = useQuery({
-    queryKey: ['agencyPackages', agencyId, activeTab, page],
-    queryFn: async () => {
-      let status;
+  } = useInfiniteQuery<{
+    data: AgencyPackage[];
+    total: number;
+  }>({
+    initialPageParam: 1,
+    queryKey: ['agencyPackages', agencyId, activeTab],
+    queryFn: async ({ pageParam }: { pageParam: unknown }) => {
       
-      if (activeTab === 'live') {
-        status = 'PUBLISHED';
-      }
-      
-      const response = await agencyApi.getAgencyPackages(agencyId, status, page, limit);
-      
-      // Filter upcoming/past packages client-side
+      const response = await agencyApi.getAgencyPackages(
+        agencyId,
+        page.toString(),
+        (typeof pageParam === 'number' ? pageParam : 1),
+        limit
+      );
+
       if (activeTab === 'upcoming' || activeTab === 'past') {
-        const filtered = response.data.data.filter(pkg => {
+        const filtered = response.data.data.filter((pkg) => {
           if (activeTab === 'upcoming') {
             return new Date(pkg.validFrom) > new Date(currentDate);
           } else {
             return new Date(pkg.validTill) < new Date(currentDate);
           }
         });
-        
-        // Sort upcoming by soonest first
+
         if (activeTab === 'upcoming') {
-          filtered.sort((a, b) => new Date(a.validFrom).getTime() - new Date(b.validFrom).getTime());
+          filtered.sort(
+            (a, b) =>
+              new Date(a.validFrom).getTime() - new Date(b.validFrom).getTime()
+          );
         }
-        
-        // Sort past by most recent first
+
         if (activeTab === 'past') {
-          filtered.sort((a, b) => new Date(b.validTill).getTime() - new Date(a.validTill).getTime());
+          filtered.sort(
+            (a, b) =>
+              new Date(b.validTill).getTime() - new Date(a.validTill).getTime()
+          );
         }
-        
+
         return {
           ...response.data,
-          data: filtered
+          data: filtered,
         };
       }
-      
+
       return response.data;
     },
-    keepPreviousData: true
+    getNextPageParam: (lastPage, allPages) => {
+      const totalFetched = allPages.flatMap((page) => page.data).length;
+      return totalFetched < lastPage.total ? allPages.length + 1 : undefined;
+    },
   });
   
   // Handle tab change
@@ -79,7 +89,7 @@ export function AgencyPackages({ agencyId }: AgencyPackagesProps) {
   
   // Handle load more
   const handleLoadMore = () => {
-    setPage(prev => prev + 1);
+    fetchNextPage();
     fetchNextPage();
   };
   
@@ -121,7 +131,7 @@ export function AgencyPackages({ agencyId }: AgencyPackagesProps) {
               </div>
             ) : (
               <TabsContent value={activeTab} className="mt-0">
-                {data?.data.length === 0 ? (
+                {data?.pages.flatMap((page) => page.data).length === 0 ? (
                   <div className="text-center py-12 bg-gray-50 rounded-lg">
                     <p className="text-gray-500">
                       {activeTab === 'live' ? 'No live packages available.' : 
@@ -137,7 +147,7 @@ export function AgencyPackages({ agencyId }: AgencyPackagesProps) {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    {data?.data.map((pkg: AgencyPackage) => (
+                    {data?.pages.flatMap((page) => page.data).map((pkg: AgencyPackage) => (
                       <PackageCard
                         key={pkg.id}
                         packageData={{
@@ -180,4 +190,4 @@ export function AgencyPackages({ agencyId }: AgencyPackagesProps) {
       </Tabs>
     </div>
   );
-} 
+}

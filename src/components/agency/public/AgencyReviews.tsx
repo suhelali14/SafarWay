@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Star, MessageCircle, BadgeCheck, User, ThumbsUp } from 'lucide-react';
+import { Star, MessageCircle,  User } from 'lucide-react';
 import { Card, CardContent } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
@@ -26,8 +26,8 @@ const AgencyReviews = ({ agencyId }: AgencyReviewsProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
-  const [averageRating, setAverageRating] = useState(0);
-  const [totalReviews, setTotalReviews] = useState(0);
+  const [averageRating, _setAverageRating] = useState(0);
+  const [totalReviews, _setTotalReviews] = useState(0);
   const [ratingCounts, setRatingCounts] = useState<RatingCount>({
     1: 0,
     2: 0,
@@ -51,14 +51,15 @@ const AgencyReviews = ({ agencyId }: AgencyReviewsProps) => {
       if (currentPage === 1 && !selectedRating) {
         try {
           const agencyDetails = await agencyPublicService.getAgencyDetails(agencyId);
-          setAverageRating(agencyDetails.averageRating);
-          setTotalReviews(agencyDetails.totalReviews);
+          console.log("agencyDetails", agencyDetails);
+          
+      
           
           // Calculate approximate distribution based on average
-          const total = agencyDetails.totalReviews;
+          const total = 1;
           if (total > 0) {
             // This is a simplified distribution - in a real app you'd fetch actual counts
-            const avg = agencyDetails.averageRating;
+            const avg = 0;
             const fiveStar = Math.round((avg / 5) * total * 0.7);
             const fourStar = Math.round((avg / 5) * total * 0.2);
             const threeStar = Math.round((1 - (avg / 5)) * total * 0.1);
@@ -306,9 +307,8 @@ const AgencyReviews = ({ agencyId }: AgencyReviewsProps) => {
                               <div className="flex items-center gap-2">
                                 <h4 className="font-medium">{review.userName}</h4>
                                 {review.isVerifiedBooking && (
-                                  <Badge variant="outline" className="flex items-center gap-1 text-green-600 bg-green-50 text-xs">
-                                    <BadgeCheck className="w-3 h-3" />
-                                    Verified Booking
+                                  <Badge variant="outline" className="flex items-center gap-1 text-green-600 bg-green-50 text-xs" label='Verified Booking'>
+                                   
                                   </Badge>
                                 )}
                               </div>

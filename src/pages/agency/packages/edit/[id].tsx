@@ -3,9 +3,10 @@ import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PackageForm } from '../PackageForm';
 import { useToast } from '../../../../hooks/use-toast';
-import { packageService, Package } from '../../../../services/api/packageService';
+import { packageService } from '../../../../services/api/packageService';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { Skeleton } from '../../../../components/ui/skeleton';
+import { agencyAPI, TourPackage } from '../../../../services/api';
 
 export function EditPackagePage() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export function EditPackagePage() {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [packageData, setPackageData] = useState<Package | undefined>(undefined);
+  const [packageData, setPackageData] = useState<TourPackage | undefined>(undefined);
   
   const agencyId = user?.agencyId || '';
 
@@ -37,8 +38,8 @@ export function EditPackagePage() {
 
     try {
       setIsLoading(true);
-      const data = await packageService.getPackageById(agencyId, id);
-      setPackageData(data);
+      const response = await agencyAPI.getPackageById(id);
+      setPackageData(response.data);
     } catch (error) {
       console.error('Error fetching package details:', error);
       toast({
@@ -53,7 +54,7 @@ export function EditPackagePage() {
     }
   };
 
-  const handleSubmit = async (updatedData: Partial<Package>) => {
+  const handleSubmit = async (updatedData: Partial<TourPackage>) => {
     if (!agencyId || !id) {
       toast({
         title: "Error",

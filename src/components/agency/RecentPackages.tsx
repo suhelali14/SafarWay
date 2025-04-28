@@ -63,8 +63,9 @@ export function RecentPackages({ packages }: RecentPackagesProps) {
                     <h4 className="font-medium text-sm truncate">{pkg.title}</h4>
                     <Badge 
                       variant="outline" 
-                      className={statusColor[pkg.status]}>
-                      {pkg.status.charAt(0).toUpperCase() + pkg.status.slice(1)}
+                      className={statusColor[pkg.status]} 
+                      label= {pkg.status.charAt(0).toUpperCase() + pkg.status.slice(1)}>
+                      
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground truncate">

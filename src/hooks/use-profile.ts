@@ -50,7 +50,8 @@ export function useProfile() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (updatedData: any) => {
-      const response = await customerAPI.updateProfile(updatedData);
+            if (!user?.id) throw new Error("User ID is undefined");
+            const response = await customerAPI.updateCustomer(updatedData, { id: user.id });
       return response.data;
     },
     onSuccess: () => {
@@ -72,7 +73,7 @@ export function useProfile() {
 
   // Change password mutation
   const changePasswordMutation = useMutation({
-    mutationFn: async (passwords: {
+    mutationFn: async (_passwords: {
       currentPassword: string;
       newPassword: string;
     }) => {
@@ -124,13 +125,13 @@ export function useProfile() {
 
   // Subscribe/unsubscribe to agency mutation
   const toggleAgencySubscriptionMutation = useMutation({
-    mutationFn: async ({ agencyId, subscribed }: { agencyId: string; subscribed: boolean }) => {
+    mutationFn: async ({ subscribed }: { subscribed: boolean }) => {
       // This would call the API endpoint for agency subscription
       // For now, we'll simulate a successful response
       await new Promise(resolve => setTimeout(resolve, 700));
       return { success: true, subscribed };
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       toast({
         title: variables.subscribed ? "Subscribed" : "Unsubscribed",
         description: variables.subscribed
@@ -175,7 +176,7 @@ export function useProfile() {
   });
 
   const deleteReviewMutation = useMutation({
-    mutationFn: async (reviewId: string) => {
+    mutationFn: async (_reviewId: string) => {
       // This would call the API endpoint for review deletion
       // For now, we'll simulate a successful response
       await new Promise(resolve => setTimeout(resolve, 500));

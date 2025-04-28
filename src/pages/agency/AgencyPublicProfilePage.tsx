@@ -15,11 +15,11 @@ import AgencyFooter from '../../components/agency/public/AgencyFooter';
 
 // API services
 import { agencyPublicService } from '../../services/api/agencyPublicService';
-import { Agency } from '../../services/api/agencyService';
+import { AgencyPublicDetails } from '../../services/api/agencyPublicService';
 
 export default function AgencyPublicProfilePage() {
   const { agencyId } = useParams<{ agencyId: string }>();
-  const [agency, setAgency] = useState<Agency | null>(null);
+  const [agency, setAgency] = useState<AgencyPublicDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('about');
@@ -27,7 +27,7 @@ export default function AgencyPublicProfilePage() {
   useEffect(() => {
     const fetchAgencyData = async () => {
       if (!agencyId) {
-        setError('Agency ID is missing');
+        setError('AgencyPublicDetails ID is missing');
         setIsLoading(false);
         return;
       }
@@ -63,7 +63,7 @@ export default function AgencyPublicProfilePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <h1 className="text-2xl font-bold text-destructive mb-2">Error</h1>
-        <p className="text-lg text-muted-foreground">{error || 'Agency not found'}</p>
+        <p className="text-lg text-muted-foreground">{error || 'AgencyPublicDetails not found'}</p>
       </div>
     );
   }
@@ -72,16 +72,16 @@ export default function AgencyPublicProfilePage() {
     <div className='py-16'>
       <Helmet>
         <title>{agency.name} | SafarWay</title>
-        <meta name="description" content={agency.description || `${agency.name} - Travel Agency on SafarWay`} />
+        <meta name="description" content={agency.description || `${agency.name} - Travel AgencyPublicDetails on SafarWay`} />
         <meta property="og:title" content={`${agency.name} | SafarWay`} />
-        <meta property="og:description" content={agency.description || `${agency.name} - Travel Agency on SafarWay`} />
+        <meta property="og:description" content={agency.description || `${agency.name} - Travel AgencyPublicDetails on SafarWay`} />
         {agency.logo && <meta property="og:image" content={agency.logo} />}
         <meta property="og:type" content="business.business" />
         <meta property="og:url" content={window.location.href} />
       </Helmet>
 
       <main className="container mx-auto px-4 py-6 max-w-7xl">
-        {/* Agency Header */}
+        {/* AgencyPublicDetails Header */}
         <AgencyHeader 
           agency={agency} 
           className="mb-8"
@@ -116,7 +116,7 @@ export default function AgencyPublicProfilePage() {
             </TabsTrigger>
           </TabsList>
 
-          {/* About Agency Section */}
+          {/* About AgencyPublicDetails Section */}
           <TabsContent value="about" className="mt-6">
             <AgencyAbout agency={agency} />
           </TabsContent>

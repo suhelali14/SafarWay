@@ -63,8 +63,8 @@ export function AccountOverview({ data, isLoading }: AccountOverviewProps) {
     }
     
     return (
-      <Badge className={statusColor}>
-        {lastBooking.status.charAt(0).toUpperCase() + lastBooking.status.slice(1).toLowerCase()}
+      <Badge className={statusColor} label={lastBooking.status.charAt(0).toUpperCase() + lastBooking.status.slice(1).toLowerCase()}>
+        
       </Badge>
     );
   };

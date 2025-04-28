@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Check, X } from "lucide-react";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../ui/card";
 
 interface PackageInclusionsProps {
   inclusions: string[];

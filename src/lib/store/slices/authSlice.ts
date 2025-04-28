@@ -1,8 +1,29 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { authApi } from '../../services/auth';
-import { LoginCredentials, CustomerRegistrationData, AgencyRegistrationData, AgencyUserRegistrationData, ProfileUpdateData, PasswordResetData } from '../../types/auth';
+interface ProfileUpdateData {
+  id?: string;
+  name?: string;
+  email?: string;
+  password?: string;
+  profileImage?: File;
+}
+
+interface PasswordResetData {
+  id: string;
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+}
+
+interface AgencyUserRegistrationData {
+  name: string;
+  email: string;
+  role: 'AGENCY_ADMIN' | 'AGENCY_USER';
+  agencyId: string;
+}
 import { STORAGE_KEYS } from '../../config';
 import { getUserData as getCookieUserData } from '../../cookies';
+import { adminAPI } from '../../../services/api';
 
 export interface User {
   id: string;
@@ -75,7 +96,7 @@ export const registerAgencyUser = createAsyncThunk(
   'auth/registerAgencyUser',
   async (data: AgencyUserRegistrationData, { rejectWithValue }) => {
     try {
-      const response = await authApi.registerAgencyUser(data);
+      const response = await adminAPI.createUser(data);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Registration failed');
@@ -90,7 +111,7 @@ export const logout = createAsyncThunk('auth/logout', async () => {
 
 export const getCurrentUser = createAsyncThunk(
   'auth/getCurrentUser', 
-  async (forceRefresh: boolean = false, { dispatch }) => {
+  async (forceRefresh: boolean = false, { }) => {
     // Try to get data from cookies first if not force refreshing
     if (!forceRefresh) {
       const cachedUser = getCookieUserData();
@@ -110,7 +131,10 @@ export const updateProfile = createAsyncThunk(
   'auth/updateProfile',
   async (data: ProfileUpdateData, { rejectWithValue }) => {
     try {
-      const response = await authApi.updateProfile(data);
+      if (!data?.id) {
+        throw new Error('User ID is required for profile update');
+      }
+      const response = await adminAPI.updateUser(data.id, data);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Profile update failed');
@@ -122,7 +146,11 @@ export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async (data: PasswordResetData, { rejectWithValue }) => {
     try {
-      const response = await authApi.resetPassword(data);
+      if (!data.id) {
+        throw new Error('User ID is required for password reset');
+      }
+      
+      const response = await adminAPI.resetUserPassword(data.id, data);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Password reset failed');

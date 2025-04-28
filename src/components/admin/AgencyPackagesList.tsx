@@ -4,7 +4,7 @@ import { Package, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
+
 import { Spinner } from '../ui/spinner';
 
 
@@ -202,7 +202,10 @@ export function AgencyPackagesList({ agencyId }: AgencyPackagesListProps) {
                     <td className="px-4 py-3 whitespace-nowrap">{pkg.duration} days</td>
                     <td className="px-4 py-3 whitespace-nowrap">${pkg.price.toLocaleString()}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <Badge className={getStatusBadgeClass(pkg.status)}>{pkg.status}</Badge>
+                   
+                      <span className={`badge ${getStatusBadgeClass(pkg.status)}`}>
+                        {pkg.status}
+                      </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <Button

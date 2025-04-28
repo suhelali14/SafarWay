@@ -210,7 +210,7 @@ export function SimilarPackages({ packageId, limit = 4 }: SimilarPackagesProps) 
         </div>
       </div>
       
-      <style jsx>{`
+      <style>{`
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
         }

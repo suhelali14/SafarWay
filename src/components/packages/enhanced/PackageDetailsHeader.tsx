@@ -102,7 +102,7 @@ export function PackageDetailsHeader({
       >
         {/* Package type and share button */}
         <div className="mb-2 flex items-center justify-between">
-          <Badge className={getTourTypeColor(tourType)}>{formatTourType(tourType)}</Badge>
+          <Badge className={getTourTypeColor(tourType)} label={formatTourType(tourType)}></Badge>
           
           <Button
             variant="ghost"

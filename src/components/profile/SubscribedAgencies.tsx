@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { Building2, Bell, Eye, Calendar } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 interface SubscribedAgenciesProps {
   data: any[];
@@ -18,7 +19,7 @@ interface SubscribedAgenciesProps {
 export function SubscribedAgencies({ data, isLoading }: SubscribedAgenciesProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [subscribedAgencies, setSubscribedAgencies] = useState<any[]>(data || []);
+  const [subscribedAgencies, setSubscribedAgencies] = React.useState<any[]>(data || []);
   
   // Function to toggle notifications for an agency
   const toggleNotifications = (agencyId: string) => {

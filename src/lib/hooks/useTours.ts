@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
+import { AppDispatch, RootState } from '../store';
 import {
   fetchTours,
   fetchTourById,
@@ -14,7 +14,7 @@ import { useCallback } from 'react';
 import { TourPackage, TourPackageFilters } from '../api/tours';
 
 export const useTours = () => {
-  const dispatch = useDispatch();
+   const dispatch: AppDispatch = useDispatch();
   const { tours, selectedTour, loading, error, filters, totalPages, currentPage } = useSelector(
     (state: RootState) => state.tours
   );

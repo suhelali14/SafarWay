@@ -22,6 +22,7 @@ import {
 import { toast } from 'react-hot-toast';
 import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { agencyAPI, PackageFilters } from '../../services/api';
 
 interface Package {
   id: string;
@@ -48,12 +49,14 @@ export const AgencyPackagesPage = () => {
 
   const fetchPackages = async () => {
     try {
-      const response = await fetch('/api/agency/packages', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
+      const filters: PackageFilters = {
+        searchQuery: searchTerm,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        // Add other filters as needed
+      };
+
+      const response = await agencyAPI.getAllPackages(filters);
+      const data = await response.data;
       setPackages(data);
     } catch (error) {
       console.error('Error fetching packages:', error);
@@ -67,14 +70,9 @@ export const AgencyPackagesPage = () => {
     if (!window.confirm('Are you sure you want to delete this package?')) return;
 
     try {
-      const response = await fetch(`/api/agency/packages/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await agencyAPI.getPackageById(id);
 
-      if (!response.ok) throw new Error('Failed to delete package');
+      if (!response.status) throw new Error('Failed to delete package');
 
       setPackages(packages.filter(pkg => pkg.id !== id));
       toast.success('Package deleted successfully');
@@ -264,4 +262,4 @@ export const AgencyPackagesPage = () => {
       </div>
     </>
   );
-}; 
+};

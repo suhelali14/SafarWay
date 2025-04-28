@@ -24,10 +24,9 @@ export function ContactAgencyModal({
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     
-    toast({
+    toast.success({
       title: 'Copied to clipboard',
       description: `${field} has been copied to clipboard.`,
-      duration: 2000,
     });
     
     // Reset copied status after 2 seconds

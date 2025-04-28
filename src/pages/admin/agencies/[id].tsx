@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { AdminLayout } from '../../../components/layout/AdminLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
@@ -67,7 +67,7 @@ interface Agency {
 
 export default function AgencyDetailsPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  
   const [agency, setAgency] = useState<Agency | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -140,8 +140,8 @@ export default function AgencyDetailsPage() {
         const badgeInfo = statusMap[status] || { label: status, variant: 'default' };
         
         return (
-          <Badge variant={badgeInfo.variant}>
-            {badgeInfo.label}
+          <Badge variant={badgeInfo.variant} label= {badgeInfo.label}>
+           
           </Badge>
         );
       },
@@ -191,8 +191,8 @@ export default function AgencyDetailsPage() {
         const badgeInfo = statusMap[status] || { label: status, variant: 'default' };
         
         return (
-          <Badge variant={badgeInfo.variant}>
-            {badgeInfo.label}
+          <Badge variant={badgeInfo.variant} label= {badgeInfo.label}>
+           
           </Badge>
         );
       },
@@ -243,7 +243,7 @@ export default function AgencyDetailsPage() {
       header: 'Role',
       cell: ({ row }) => {
         const role = row.getValue('role') as string;
-        return <Badge variant="outline">{role}</Badge>;
+        return <Badge variant="outline" label={role}></Badge>;
       },
     },
     {
@@ -318,8 +318,10 @@ export default function AgencyDetailsPage() {
               agency.status === 'ACTIVE' ? 'success' : 
               agency.status === 'PENDING' ? 'secondary' : 
               agency.status === 'SUSPENDED' ? 'destructive' : 'outline'
-            }>
-              {agency.status}
+            }
+            label={agency.status}
+            >
+              
             </Badge>
           </div>
           
@@ -471,7 +473,6 @@ export default function AgencyDetailsPage() {
                   columns={packageColumns}
                   data={agency.packages}
                   searchPlaceholder="Search packages..."
-                  searchColumn="name"
                 />
               </CardContent>
             </Card>
@@ -489,7 +490,7 @@ export default function AgencyDetailsPage() {
                   columns={bookingColumns}
                   data={agency.bookings}
                   searchPlaceholder="Search bookings..."
-                  searchColumn="packageName"
+                 
                 />
               </CardContent>
             </Card>
@@ -507,7 +508,7 @@ export default function AgencyDetailsPage() {
                   columns={userColumns}
                   data={agency.users}
                   searchPlaceholder="Search team members..."
-                  searchColumn="name"
+                 
                 />
               </CardContent>
             </Card>

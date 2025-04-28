@@ -99,8 +99,8 @@ const BookingDetails: React.FC = () => {
                       <CardTitle className="text-2xl">{booking.destination}</CardTitle>
                       <CardDescription>Booking ID: {booking.id}</CardDescription>
                     </div>
-                    <Badge className={getStatusColor(booking.status)}>
-                      {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                    <Badge className={getStatusColor(booking.status)} label= {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}>
+                     
                     </Badge>
                   </div>
                 </CardHeader>

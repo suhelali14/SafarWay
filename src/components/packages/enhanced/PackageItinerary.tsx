@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, ChevronDown, ChevronUp, MapPin, Coffee, Utensils, Bed } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronUp, MapPin,  Bed } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '../../ui/badge';
 
@@ -108,21 +108,18 @@ export function PackageItinerary({ itinerary }: PackageItineraryProps) {
                 {/* Meals indicators */}
                 <div className="mr-4 flex gap-2">
                   {day.meals?.breakfast && (
-                    <Badge variant="outline" className="bg-green-50">
-                      <Coffee className="mr-1 h-3 w-3" />
-                      B
+                    <Badge variant="outline" className="bg-green-50" label="B">
+                      
                     </Badge>
                   )}
                   {day.meals?.lunch && (
-                    <Badge variant="outline" className="bg-amber-50">
-                      <Utensils className="mr-1 h-3 w-3" />
-                      L
+                    <Badge variant="outline" className="bg-amber-50" label="L">
+                      
                     </Badge>
                   )}
                   {day.meals?.dinner && (
-                    <Badge variant="outline" className="bg-red-50">
-                      <Utensils className="mr-1 h-3 w-3" />
-                      D
+                    <Badge variant="outline" className="bg-red-50" label="D">
+                      
                     </Badge>
                   )}
                 </div>

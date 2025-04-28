@@ -7,14 +7,14 @@ interface AgencyFooterProps {
 }
 
 const AgencyFooter = ({ agency }: AgencyFooterProps) => {
-  const { email, phone, website, address, city, country } = agency;
+  const { email, phone, website, address} = agency;
   
   // Social media links - these should come from the agency data in a real app
   const socialLinks = {
-    facebook: agency.socialMedia?.facebook || '',
-    instagram: agency.socialMedia?.instagram || '',
-    twitter: agency.socialMedia?.twitter || '',
-    linkedin: agency.socialMedia?.linkedin || '',
+    facebook: agency.socialLinks?.facebook || '',
+    instagram: agency.socialLinks?.instagram || '',
+    twitter: agency.socialLinks?.twitter || '',
+    linkedin: agency.socialLinks?.linkedin || '',
     youtube: '' // Not in the current model, but could be added later
   };
 
@@ -106,16 +106,14 @@ const AgencyFooter = ({ agency }: AgencyFooterProps) => {
         </div>
         
         {/* Address */}
-        {(address || city || country) && (
+        {(address ) && (
           <div>
             <h3 className="text-lg font-semibold mb-4">Office Location</h3>
             <div className="flex items-start gap-3">
               <MapPin className="w-5 h-5 text-primary mt-0.5" />
               <address className="not-italic">
                 {address && <p>{address}</p>}
-                {(city || country) && (
-                  <p>{[city, country].filter(Boolean).join(', ')}</p>
-                )}
+                
               </address>
             </div>
           </div>

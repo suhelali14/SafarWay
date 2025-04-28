@@ -44,7 +44,52 @@ export const bookingService = {
       throw error;
     }
   },
+  async initiatePayment(bookingId: string): Promise<{ paymentUrl: string }> {
+    try {
+      const token = getToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
 
+      const response = await axios.post(
+        `${API_URL}/bookings/${bookingId}/initiate-payment`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          }
+        }
+      )
+      return response.data;
+    }
+    catch (error) {
+      console.error('Error initiating payment:', error);
+      throw error;
+    }
+  },
+  async requestPartialPaymentApproval(bookingId: string): Promise<{ message: string }> {
+    try {
+      const token = getToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const response = await axios.post(
+        `${API_URL}/bookings/${bookingId}/request-partial-payment-approval`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      )
+      return response.data;
+    }
+    catch (error) {
+      console.error('Error requesting partial payment approval:', error);
+      throw error;
+    }
+  },
   async getRecentBookings(limit = 5): Promise<Booking[]> {
     try {
       const token = getToken();

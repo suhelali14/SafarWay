@@ -17,7 +17,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
     <div className={className} role="radiogroup">
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
-          ? React.cloneElement(child, { selectedValue: value, onValueChange })
+          ? React.cloneElement(child as React.ReactElement<RadioGroupItemProps>, { selectedValue: value, onValueChange })
           : child
       )}
     </div>

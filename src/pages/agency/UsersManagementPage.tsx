@@ -410,6 +410,7 @@ export default function UsersManagementPage() {
             onUpdate={(data: any) => {
               return handleUpdateUser(selectedUser.id, data);
             }}
+            isLoading={actionLoading}
           />
         )}
 

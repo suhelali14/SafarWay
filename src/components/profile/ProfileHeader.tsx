@@ -88,8 +88,8 @@ export function ProfileHeader({ user, isLoading, onEdit }: ProfileHeaderProps) {
         <div className="flex-1 text-center md:text-left">
           <div className="flex flex-col md:flex-row md:items-center gap-2">
             <h1 className="text-2xl font-bold">{user?.name}</h1>
-            <Badge className={`${badgeColor} ml-0 md:ml-2`}>
-              {userLevel} Member
+            <Badge className={`${badgeColor} ml-0 md:ml-2`} label={`${userLevel} Member`}>
+              
             </Badge>
           </div>
           

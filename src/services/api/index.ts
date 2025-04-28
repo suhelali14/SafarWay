@@ -27,10 +27,10 @@ export const tourAPI = {
 // Create a bookingAPI for backward compatibility
 export const bookingAPI = {
   getAll: () => Promise.resolve({ data: { items: [] } }),
-  getById: (id: string) => Promise.resolve({ data: {} }),
-  create: (data: any) => Promise.resolve({ data: {} }),
-  update: (id: string, data: any) => Promise.resolve({ data: {} }),
-  delete: (id: string) => Promise.resolve({ data: {} }),
+  getById: (_dataid: string) => Promise.resolve({ data: {} }),
+  create: (_data: any) => Promise.resolve({ data: {} }),
+  update: (_id: string, _data: any) => Promise.resolve({ data: {} }),
+  delete: (_id: string) => Promise.resolve({ data: {} }),
 };
 
 // Export all services

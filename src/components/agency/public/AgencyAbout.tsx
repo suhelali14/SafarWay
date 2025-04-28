@@ -13,8 +13,7 @@ const AgencyAbout = ({ agency }: AgencyAboutProps) => {
     name,
     description,
     address,
-    city,
-    country,
+   
     phone,
     email,
     website,
@@ -64,9 +63,8 @@ const AgencyAbout = ({ agency }: AgencyAboutProps) => {
                 <h3 className="font-medium text-sm text-gray-500 mb-2">Service Regions</h3>
                 <div className="flex flex-wrap gap-2">
                   {serviceRegions.map((region, index) => (
-                    <Badge key={index} variant="outline" className="bg-gray-50">
-                      {region}
-                    </Badge>
+                    <Badge key={index} variant="outline" className="bg-gray-50" label={region}/>
+
                   ))}
                 </div>
               </div>
@@ -104,13 +102,13 @@ const AgencyAbout = ({ agency }: AgencyAboutProps) => {
               )}
               
               {/* Address */}
-              {(address || city || country) && (
+              {(address) && (
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
                   <div>
                     <h4 className="font-medium">Head Office Location</h4>
                     <p className="text-gray-600">
-                      {[address, city, country]
+                      {[address]
                         .filter(Boolean)
                         .join(', ') || 'Not provided'}
                     </p>

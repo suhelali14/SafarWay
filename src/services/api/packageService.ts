@@ -34,7 +34,7 @@ export interface Package {
   endDate?: string;
   minCapacity?: number;
   minimumAge?: number;
-  maxGroupSize: number;
+  maxPeople: number;
   maximumPeople?: number;
   tourType: TourType;
   packageType?: string; // Kept for backward compatibility
@@ -60,6 +60,7 @@ export interface Package {
   createdBy?: string;
   agencyId: string;
   itinerary?: any[];
+
 }
 
 export interface PaginatedResponse<T> {

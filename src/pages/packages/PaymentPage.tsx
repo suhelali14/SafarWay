@@ -21,16 +21,19 @@ import {
   TooltipTrigger,
 } from "../../components/ui/tooltip";
 import {
-  initiatePayment,
-  processRazorpayPayment,
-  requestPartialPaymentApproval,
-} from "../../services/bookingService";
+  bookingService
+} from "../../services/api/bookingService";
 
 // Define the PaymentMethod type
 export type PaymentMethod = "ONLINE" | "PARTIAL";
-
+export interface PaymentResult {
+  success: boolean;
+  bookingId?: string;
+  message?: string;
+}
 // Define the BookingDetails type
 export interface BookingDetails {
+  id: string;
   totalPrice: number;
   tourPackage: {
     title: string;
@@ -97,7 +100,7 @@ export default function PaymentPage() {
 
       if (paymentMethod === "PARTIAL") {
         // Request partial payment approval
-        await requestPartialPaymentApproval(updatedBookingDetails);
+        await bookingService.requestPartialPaymentApproval(updatedBookingDetails.id);
         navigate("/booking-confirmation", {
           state: {
             bookingDetails: updatedBookingDetails,
@@ -107,33 +110,11 @@ export default function PaymentPage() {
         });
       } else {
         // Initialize Razorpay payment
-        const { success, orderId } = await initiatePayment(updatedBookingDetails);
+        const { paymentUrl } = await bookingService.initiatePayment(updatedBookingDetails.id);
 
-        if (success && orderId) {
-          // Simulate payment flow
-          setTimeout(() => {
-            const paymentResult = {
-              razorpay_payment_id: "pay_" + Math.random().toString(36).substring(2, 15),
-              razorpay_order_id: orderId,
-              razorpay_signature: Math.random().toString(36).substring(2, 15),
-            };
-
-            // Process the payment result
-            processRazorpayPayment(paymentResult).then((result) => {
-              if (result.success) {
-                navigate("/booking-confirmation", {
-                  state: {
-                    bookingDetails: updatedBookingDetails,
-                    bookingId: result.bookingId,
-                    fullPayment: true,
-                  },
-                });
-              } else {
-                toast.error(result.message || "Payment failed");
-                setIsProcessing(false);
-              }
-            });
-          }, 2000);
+        if (paymentUrl) {
+          // Redirect to the payment URL
+          window.location.href = paymentUrl;
         } else {
           toast.error("Failed to initiate payment");
           setIsProcessing(false);

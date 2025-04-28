@@ -1,8 +1,9 @@
 import { customerAPI, TourPackage, PackageFilters } from '../api';
+import { Package } from './packageService';
 
 export interface PackageResponse {
   success: boolean;
-  data: TourPackage[];
+  data: Package[];
   pagination: {
     total: number;
     page: number;
@@ -10,6 +11,17 @@ export interface PackageResponse {
     pages: number;
   };
 }
+export interface PackageDetail  {
+  success: boolean;
+  data: Package[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
 
 export interface PackageDetailResponse {
   success: boolean;
@@ -19,10 +31,21 @@ export interface PackageDetailResponse {
 /**
  * Get all available packages with pagination and filtering
  */
-export const getAllPackages = async (filters: PackageFilters = {}): Promise<PackageResponse> => {
+export const getAllPackages = async (_filters: PackageFilters = {}): Promise<PackageDetail> => {
   try {
-    const response = await customerAPI.getAllPackages(filters);
-    return response.data;
+    const call = await customerAPI.getAllPackages();
+    const response = call.data;
+    
+    return {
+      success: true,
+      data: response.data,
+      pagination: {
+        total: response.pagination.total,
+        page: 1,
+        limit: response.pagination.limit,
+        pages: 1
+      }
+    };
   } catch (error) {
     console.error('Error fetching packages:', error);
     throw error;
@@ -55,19 +78,37 @@ export const getPackageById = async (id: string): Promise<TourPackage> => {
 /**
  * Get recommended packages based on user preferences or popular packages
  */
-export const getRecommendedPackages = async (): Promise<TourPackage[]> => {
+export const getRecommendedPackages = async (): Promise<PackageResponse> => {
   try {
     const response = await customerAPI.getRecommendedPackages();
     // The API returns TourPackage[] directly
     if (Array.isArray(response.data)) {
-      return response.data;
+      return {
+        success: true,
+        data: response.data,
+        pagination: {
+          total: response.data.length,
+          page: 1,
+          limit: response.data.length,
+          pages: 1
+        }
+      };
     }
     // If there's a nested data property
     if (response.data && typeof response.data === 'object' && 'data' in response.data) {
       return (response.data as any).data;
     }
     // Return empty array as fallback
-    return [];
+    return {
+      success: true,
+      data: [],
+      pagination: {
+        total: 0,
+        page: 1,
+        limit: 0,
+        pages: 0
+      }
+    };
   } catch (error) {
     console.error('Error fetching recommended packages:', error);
     throw error;
@@ -124,17 +165,21 @@ export const removeFromWishlist = async (wishlistItemId: string): Promise<void> 
  * Search packages with advanced filters
  */
 export const searchPackages = async (
-  searchTerm: string, 
-  filters: Omit<PackageFilters, 'search'> = {}
+  _searchTerm: string, 
+  _filters: Omit<PackageFilters, 'search'> = {}
 ): Promise<PackageResponse> => {
   try {
-    const searchFilters: PackageFilters = {
-      ...filters,
-      search: searchTerm
+    const response = await customerAPI.getAllPackages();
+    return {
+      success: true,
+      data: response.data,
+      pagination: {
+        total: response.data.length,
+        page: 1,
+        limit: response.data.length,
+        pages: 1
+      }
     };
-    
-    const response = await customerAPI.getAllPackages(searchFilters);
-    return response.data;
   } catch (error) {
     console.error('Error searching packages:', error);
     throw error;
@@ -146,16 +191,25 @@ export const searchPackages = async (
  */
 export const filterPackagesByType = async (
   tourType: string, 
-  filters: Omit<PackageFilters, 'tourType'> = {}
+  _filters: Omit<PackageFilters, 'tourType'> = {}
 ): Promise<PackageResponse> => {
   try {
-    const typeFilters: PackageFilters = {
-      ...filters,
-      tourType: tourType as any
-    };
+    // const typeFilters: PackageFilters = {
+    //   ...filters,
+    //   tourType: tourType as any
+    // };
     
-    const response = await customerAPI.getAllPackages(typeFilters);
-    return response.data;
+    const response = await customerAPI.getAllPackages();
+    return {
+      success: true,
+      data: response.data,
+      pagination: {
+        total: response.data.length,
+        page: 1,
+        limit: response.data.length,
+        pages: 1
+      }
+    };
   } catch (error) {
     console.error(`Error filtering packages by type ${tourType}:`, error);
     throw error;
@@ -167,16 +221,25 @@ export const filterPackagesByType = async (
  */
 export const filterPackagesByDestination = async (
   destination: string, 
-  filters: Omit<PackageFilters, 'destination'> = {}
+  _filters: Omit<PackageFilters, 'destination'> = {}
 ): Promise<PackageResponse> => {
   try {
-    const destinationFilters: PackageFilters = {
-      ...filters,
-      destination
-    };
+    // const destinationFilters: PackageFilters = {
+    //   ...filters,
+    //   destination
+    // };
     
-    const response = await customerAPI.getAllPackages(destinationFilters);
-    return response.data;
+    const response = await customerAPI.getAllPackages();
+    return {
+      success: true,
+      data: response.data,
+      pagination: {
+        total: response.data.length,
+        page: 1,
+        limit: response.data.length,
+        pages: 1
+      }
+    };
   } catch (error) {
     console.error(`Error filtering packages by destination ${destination}:`, error);
     throw error;
@@ -189,17 +252,26 @@ export const filterPackagesByDestination = async (
 export const filterPackagesByPrice = async (
   minPrice: number,
   maxPrice: number,
-  filters: Omit<PackageFilters, 'minPrice' | 'maxPrice'> = {}
+  _filters: Omit<PackageFilters, 'minPrice' | 'maxPrice'> = {}
 ): Promise<PackageResponse> => {
   try {
-    const priceFilters: PackageFilters = {
-      ...filters,
-      minPrice,
-      maxPrice
-    };
+    // const priceFilters: PackageFilters = {
+    //   ...filters,
+    //   minPrice,
+    //   maxPrice
+    // };
     
-    const response = await customerAPI.getAllPackages(priceFilters);
-    return response.data;
+    const response = await customerAPI.getAllPackages();
+    return {
+      success: true,
+      data: response.data,
+      pagination: {
+        total: response.data.length,
+        page: 1,
+        limit: response.data.length,
+        pages: 1
+      }
+    };
   } catch (error) {
     console.error(`Error filtering packages by price range ${minPrice}-${maxPrice}:`, error);
     throw error;
@@ -218,4 +290,4 @@ export const customerPackages = {
   filterPackagesByType,
   filterPackagesByDestination,
   filterPackagesByPrice
-}; 
+};

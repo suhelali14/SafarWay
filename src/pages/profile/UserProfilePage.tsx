@@ -178,7 +178,7 @@ export function UserProfilePage() {
                   <div className="mt-8">
                     <h2 className="text-2xl font-bold mb-4">Recent Bookings</h2>
                     <BookingsTimeline 
-                      data={profileData?.recentBookings} 
+                      data={profileData?.recentBookings || []} 
                       isLoading={isLoading} 
                       limit={3}
                     />
@@ -196,7 +196,7 @@ export function UserProfilePage() {
               {activeTab === "bookings" && (
                 <motion.div variants={itemVariants}>
                   <h2 className="text-2xl font-bold mb-4">My Bookings</h2>
-                  <BookingsTimeline data={profileData?.bookings} isLoading={isLoading} />
+                  <BookingsTimeline data={profileData?.bookings  || []} isLoading={isLoading} />
                 </motion.div>
               )}
 
@@ -204,7 +204,7 @@ export function UserProfilePage() {
               {activeTab === "agencies" && (
                 <motion.div variants={itemVariants}>
                   <h2 className="text-2xl font-bold mb-4">Subscribed Agencies</h2>
-                  <SubscribedAgencies data={profileData?.subscribedAgencies} isLoading={isLoading} />
+                  <SubscribedAgencies data={profileData?.subscribedAgencies || []} isLoading={isLoading} />
                 </motion.div>
               )}
 
@@ -212,7 +212,7 @@ export function UserProfilePage() {
               {activeTab === "reviews" && (
                 <motion.div variants={itemVariants}>
                   <h2 className="text-2xl font-bold mb-4">My Reviews & Ratings</h2>
-                  <UserReviews data={profileData?.reviews} isLoading={isLoading} />
+                  <UserReviews data={profileData?.reviews || []} isLoading={isLoading} />
                 </motion.div>
               )}
 

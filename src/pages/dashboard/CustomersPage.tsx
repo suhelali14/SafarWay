@@ -1,45 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Mail, Phone, MapPin, Calendar, UserPlus, Loader2 } from 'lucide-react';
-import { customerAPI } from '../../services/api';
+import { customerAPI, User } from '../../services/api';
 import { formatCurrency, formatDate, formatPhone } from '../../utils/formatters';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import { Select } from '../../components/ui/select';
+
 import { Dialog } from '../../components/ui/dialog';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
 
-interface Customer {
-  id: string;
-  userId: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  status: string;
-  profileImage: string | null;
-  joinDate: string;
-  totalBookings: number;
-  totalSpent: number;
-  lastBooking: {
-    id: string;
-    tourId: string;
-    tourName: string;
-    date: string;
-    amount: number;
-    status: string;
-  } | null;
-  bookings: {
-    id: string;
-    tourId: string;
-    tourName: string;
-    agencyName: string;
-    date: string;
-    amount: number;
-    status: string;
-  }[];
-}
+
 
 interface PaginationInfo {
   total: number;
@@ -50,12 +21,12 @@ interface PaginationInfo {
 
 export default function CustomersPage() {
   const { user } = useAuth();
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [statusFilter, _setStatusFilter] = useState('all');
+  const [selectedCustomer, _setSelectedCustomer] = useState<User | null>(null);
+  const [isDetailsModalOpen, _setIsDetailsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [pagination, setPagination] = useState<PaginationInfo>({
     total: 0,
@@ -70,7 +41,7 @@ export default function CustomersPage() {
     phone: '',
     address: '',
   });
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [_formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -93,15 +64,11 @@ export default function CustomersPage() {
         params.status = statusFilter;
       }
       
-      const response = await customerAPI.getAll(params);
-      setCustomers(response.data.data);
-      setPagination(response.data.pagination);
+      const response = await customerAPI.getAllCustomers();
+      setCustomers(response.data);
+      
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.response?.data?.message || 'Failed to fetch customers',
-        variant: 'destructive',
-      });
+      toast.error(error.response?.data?.message || 'Failed to fetch customers');
     } finally {
       setLoading(false);
     }
@@ -113,22 +80,15 @@ export default function CustomersPage() {
     fetchCustomers();
   };
 
-  const handleStatusUpdate = async (customerId: string, newStatus: string) => {
-    try {
-      await customerAPI.update(customerId, { status: newStatus });
-      toast({
-        title: 'Success',
-        description: 'Customer status updated successfully',
-      });
-      fetchCustomers();
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.response?.data?.message || 'Failed to update customer status',
-        variant: 'destructive',
-      });
-    }
-  };
+  // const handleStatusUpdate = async (customerId: string,customerData: Partial<User>) => {
+  //   try {
+  //     await customerAPI.updateCustomer(customerId,customerData);
+  //     toast.success('Customer created successfully');
+  //     fetchCustomers();
+  //   } catch (error: any) {
+  //     toast.error(error.response?.data?.message || 'Failed to create customer');
+  //   }
+  // };
 
   const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,11 +109,8 @@ export default function CustomersPage() {
     
     try {
       setIsSubmitting(true);
-      await customerAPI.create(formData);
-      toast({
-        title: 'Success',
-        description: 'Customer created successfully',
-      });
+      await customerAPI.createCustomer(formData);
+      toast.success('Customer created successfully');
       setIsCreateModalOpen(false);
       setFormData({
         name: '',
@@ -164,11 +121,7 @@ export default function CustomersPage() {
       });
       fetchCustomers();
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.response?.data?.message || 'Failed to create customer',
-        variant: 'destructive',
-      });
+      toast.error(error.response?.data?.message || 'Failed to create customer');
     } finally {
       setIsSubmitting(false);
     }
@@ -178,9 +131,9 @@ export default function CustomersPage() {
     setPagination(prev => ({ ...prev, page: newPage }));
   };
 
-  const handleLimitChange = (newLimit: number) => {
-    setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }));
-  };
+  // const handleLimitChange = (newLimit: number) => {
+  //   setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }));
+  // };
 
   return (
     <div className="p-6">
@@ -196,23 +149,24 @@ export default function CustomersPage() {
 
       <form onSubmit={handleSearch} className="flex gap-4 mb-6">
         <div className="flex-1">
+        <Search className="w-4 h-4" />
               <Input
                 placeholder="Search customers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            icon={<Search className="w-4 h-4" />}
+           
               />
             </div>
-        <Select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          options={[
-            { value: 'all', label: 'All Status' },
-            { value: 'ACTIVE', label: 'Active' },
-            { value: 'INACTIVE', label: 'Inactive' },
-            { value: 'SUSPENDED', label: 'Suspended' },
-          ]}
-        />
+            {/* <Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'ACTIVE', label: 'Active' },
+                { value: 'INACTIVE', label: 'Inactive' },
+                { value: 'SUSPENDED', label: 'Suspended' },
+              ]}
+            /> */}
         <Button type="submit">Search</Button>
       </form>
 
@@ -275,21 +229,25 @@ export default function CustomersPage() {
                   </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">{customer.email}</div>
-                          <div className="text-sm text-gray-500">{formatPhone(customer.phone)}</div>
+                          <div className="text-sm text-gray-500">{formatPhone(customer.phone || "")}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{formatDate(customer.joinDate)}</div>
+                          <div className="text-sm text-gray-900">{formatDate(customer.createdAt)}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{customer.totalBookings}</div>
-                          {customer.lastBooking && (
+                          <div className="text-sm font-medium text-gray-900">{customer.bookings?.length}</div>
+                          {customer.recentBookings && (
                             <div className="text-sm text-gray-500">
-                              Last: {formatDate(customer.lastBooking.date)}
+                              Last: {formatDate(customer.recentBookings.map(b => formatDate(b.createdAt)).slice(-1)[0])}
                     </div>
                           )}
                   </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{formatCurrency(customer.totalSpent)}</div>
+                          <div className="text-sm font-medium text-gray-900">{formatCurrency(customer.bookings?.map(
+                            b => b.totalAmount).reduce((acc, curr) => acc + curr, 0) || 0)}
+                           
+                            </div>
+                          
                   </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -307,10 +265,10 @@ export default function CustomersPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => {
-                                setSelectedCustomer(customer);
-                                setIsDetailsModalOpen(true);
-                              }}
+                              // onClick={() => {
+                              //   setSelectedCustomer(customer);
+                              //   setIsDetailsModalOpen(true);
+                              // }}
                             >
                               View Details
                             </Button>
@@ -318,10 +276,10 @@ export default function CustomersPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleStatusUpdate(
-                                  customer.id,
-                                  customer.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
-                                )}
+                                // onClick={() => handleStatusUpdate(
+                                //   customer.id,
+                                //   customer.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
+                                // )}
                               >
                                 {customer.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
                     </Button>
@@ -343,7 +301,7 @@ export default function CustomersPage() {
                 <span className="text-sm text-gray-700 mr-2">
                   Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
                 </span>
-                <Select
+                {/* <Select
                   value={pagination.limit.toString()}
                   onChange={(e) => handleLimitChange(parseInt(e.target.value))}
                   options={[
@@ -351,7 +309,7 @@ export default function CustomersPage() {
                     { value: '25', label: '25 per page' },
                     { value: '50', label: '50 per page' },
                   ]}
-                />
+                /> */}
               </div>
               <div className="flex gap-1">
                 {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((page) => (
@@ -373,8 +331,7 @@ export default function CustomersPage() {
       {/* Customer Details Modal */}
       <Dialog
         open={isDetailsModalOpen}
-        onClose={() => setIsDetailsModalOpen(false)}
-        title="Customer Details"
+       
       >
         {selectedCustomer && (
           <div className="space-y-6">
@@ -388,7 +345,7 @@ export default function CustomersPage() {
                   </p>
                   <p className="flex items-center gap-2">
                     <Phone className="w-4 h-4" />
-                    {formatPhone(selectedCustomer.phone)}
+                    {formatPhone(selectedCustomer.phone || "")}
                   </p>
                   <p className="flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
@@ -396,17 +353,20 @@ export default function CustomersPage() {
                   </p>
                   <p className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    Joined: {formatDate(selectedCustomer.joinDate)}
+                    Joined: {formatDate(selectedCustomer.createdAt)}
                   </p>
                 </div>
               </div>
               <div>
                 <h3 className="font-medium mb-2">Booking Summary</h3>
                 <div className="space-y-2">
-                  <p>Total Bookings: {selectedCustomer.totalBookings}</p>
-                  <p>Total Spent: {formatCurrency(selectedCustomer.totalSpent)}</p>
-                  {selectedCustomer.lastBooking && (
-                    <p>Last Booking: {formatDate(selectedCustomer.lastBooking.date)}</p>
+                  <p>Total Bookings: {selectedCustomer.bookings?.length}</p>
+                  <p>Total Spent: {formatCurrency(selectedCustomer.bookings?.map(
+                    b => b.totalAmount).reduce((acc, curr) => acc + curr, 0) || 0)}
+                  </p>
+                  {selectedCustomer.recentBookings && (
+                    // <p>Last Booking: {formatDate(selectedCustomer.date)}</p>
+                    <p>Last Booking: {formatDate(selectedCustomer.recentBookings.map(b => formatDate(b.createdAt)).slice(-1)[0])}</p>
                   )}
                 </div>
               </div>
@@ -415,25 +375,25 @@ export default function CustomersPage() {
             <div>
               <h3 className="font-medium mb-2">Recent Bookings</h3>
               <div className="space-y-2 max-h-60 overflow-y-auto">
-                {selectedCustomer.bookings.length === 0 ? (
+                {selectedCustomer && selectedCustomer.bookings && selectedCustomer.bookings.length === 0  ? (
                   <p className="text-gray-500">No bookings found</p>
                 ) : (
-                  selectedCustomer.bookings.map((booking) => (
+                  selectedCustomer?.bookings?.map((booking) => (
                     <div
                       key={booking.id}
                       className="flex items-center justify-between p-2 bg-gray-50 rounded"
                     >
                       <div>
-                        <p className="font-medium">{booking.tourName}</p>
+                        <p className="font-medium">{booking.tour.name}</p>
                         <p className="text-sm text-gray-500">
-                          {formatDate(booking.date)}
+                          {formatDate(booking.bookingDate)}
                         </p>
                         <p className="text-xs text-gray-500">
-                          Agency: {booking.agencyName}
+                          Agency: {booking.tour.name}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{formatCurrency(booking.amount)}</p>
+                        <p className="font-medium">{formatCurrency(booking.totalAmount)}</p>
                         <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           booking.status === 'CONFIRMED' 
                             ? 'bg-green-100 text-green-800' 
@@ -456,8 +416,7 @@ export default function CustomersPage() {
       {/* Create Customer Modal */}
       <Dialog
         open={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Create New Customer"
+       
       >
         <form onSubmit={handleCreateCustomer} className="space-y-4">
           <div>
@@ -466,7 +425,7 @@ export default function CustomersPage() {
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              error={formErrors.name}
+              
             />
           </div>
           <div>
@@ -476,7 +435,7 @@ export default function CustomersPage() {
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              error={formErrors.email}
+              
             />
           </div>
           <div>
@@ -486,7 +445,7 @@ export default function CustomersPage() {
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              error={formErrors.password}
+            
             />
           </div>
           <div>
@@ -495,7 +454,7 @@ export default function CustomersPage() {
               id="phone"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              error={formErrors.phone}
+             
             />
           </div>
           <div>
@@ -504,7 +463,7 @@ export default function CustomersPage() {
               id="address"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              error={formErrors.address}
+            
             />
           </div>
           <div className="flex justify-end gap-2">

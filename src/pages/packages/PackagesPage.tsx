@@ -18,6 +18,7 @@ import { customerPackages } from '../../services/api/customerPackages';
 import { PackageCard } from '../../components/packages/PackageCard';
 
 import { useToast } from '../../hooks/use-toast';
+import { Package } from '../../services/api/packageService';
 
 export function PackagesPage() {
   // const { isAuthenticated } = useAuth();
@@ -25,7 +26,7 @@ export function PackagesPage() {
   const { toast } = useToast();
   
   // State for packages data
-  const [packages, setPackages] = useState<TourPackage[]>([]);
+  const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPackages, setTotalPackages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,15 +60,12 @@ export function PackagesPage() {
       
       // Add search query if available
       if (searchQuery.trim()) {
-        filters.search = searchQuery;
+        filters.searchQuery = searchQuery;
       }
       
       // Add price filters if changed from default
-      if (priceRange[0] > 0) {
-        filters.minPrice = priceRange[0];
-      }
-      if (priceRange[1] < 5000) {
-        filters.maxPrice = priceRange[1];
+      if (priceRange[0] > 0 || priceRange[1] < 5000) {
+        filters.priceRange = [priceRange[0], priceRange[1]]; // Ensure it's a tuple
       }
       
       // Add tour type if selected
@@ -83,12 +81,12 @@ export function PackagesPage() {
       // Add duration filters
       if (selectedDuration !== 'all') {
         if (selectedDuration === 'short') {
-          filters.durationMax = 3;
+          filters.duration = 3;
         } else if (selectedDuration === 'medium') {
-          filters.durationMin = 4;
-          filters.durationMax = 7;
+          filters.duration = 4;
+          filters.duration = 7;
         } else if (selectedDuration === 'long') {
-          filters.durationMin = 8;
+          filters.duration = 8;
         }
       }
       
@@ -96,6 +94,7 @@ export function PackagesPage() {
       
       const response = await customerPackages.getAllPackages(filters);
       
+      console.log('Received packages:', response.pagination);
       // Update state with response data
       if (response && response.data) {
         setPackages(response.data);
@@ -184,7 +183,8 @@ export function PackagesPage() {
       agencyId: pkg.agencyId
     };
   };
-
+  console.log('Packages:', packages);
+  // console.log('Packages mapped:', packages.map(mapPackageToCardProps));
   return (
     <div className="container mx-auto px-4 py-16">
       <Helmet>
@@ -360,7 +360,7 @@ export function PackagesPage() {
             >
               {packages.map((pkg) => (
                 <motion.div key={pkg.id} variants={item}>
-                  <PackageCard packageData={mapPackageToCardProps(pkg)} />
+                  <PackageCard packageData={mapPackageToCardProps(pkg as TourPackage)} />
                 </motion.div>
               ))}
             </motion.div>

@@ -26,13 +26,13 @@ export function ReportAgencyModal({
   const [details, setDetails] = useState<string>('');
   
   // Report submission mutation
-  const { mutate: submitReport, isLoading } = useMutation({
+  const { mutate: submitReport, status } = useMutation({
     mutationFn: () => agencyApi.reportAgency(agencyId, reason, details),
     onSuccess: () => {
-      toast({
+      toast.success({
         title: 'Report submitted',
         description: 'Thank you for your report. We will review it shortly.',
-        variant: 'default',
+      
       });
       
       // Reset form and close modal
@@ -41,10 +41,10 @@ export function ReportAgencyModal({
       onOpenChange(false);
     },
     onError: () => {
-      toast({
+      toast.error({
         title: 'Submission failed',
         description: 'Failed to submit your report. Please try again.',
-        variant: 'destructive',
+       
       });
     }
   });
@@ -54,10 +54,10 @@ export function ReportAgencyModal({
     e.preventDefault();
     
     if (!reason) {
-      toast({
+      toast.error({
         title: 'Missing information',
         description: 'Please select a reason for reporting.',
-        variant: 'destructive',
+        
       });
       return;
     }
@@ -131,16 +131,16 @@ export function ReportAgencyModal({
               type="button" 
               variant="outline" 
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={status === 'pending'}
             >
               Cancel
             </Button>
             <Button 
               type="submit"
-              disabled={isLoading || !reason}
+              disabled={status === 'pending' || !reason}
               className="gap-2"
             >
-              {isLoading ? 'Submitting...' : 'Submit Report'}
+              {status === 'pending' ? 'Submitting...' : 'Submit Report'}
             </Button>
           </DialogFooter>
         </form>

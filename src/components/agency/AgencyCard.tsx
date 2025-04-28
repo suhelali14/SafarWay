@@ -46,8 +46,9 @@ export function AgencyCard({ agency }: AgencyCardProps) {
         {isVerified && (
           <Badge 
             className="absolute top-2 right-2 bg-green-500 hover:bg-green-600"
+            label='VERIFIED'
           >
-            Verified
+            
           </Badge>
         )}
       </div>

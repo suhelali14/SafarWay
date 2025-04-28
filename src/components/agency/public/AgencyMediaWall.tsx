@@ -22,7 +22,7 @@ const AgencyMediaWall = ({ agencyId }: AgencyMediaWallProps) => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [totalItems, setTotalItems] = useState(0);
+  const [_totalItems, setTotalItems] = useState(0);
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -238,9 +238,10 @@ const AgencyMediaWall = ({ agencyId }: AgencyMediaWallProps) => {
                 <Badge 
                   variant="outline" 
                   className="absolute top-2 left-2 bg-white/80 flex items-center gap-1"
+                  label={`${getMediaTypeIcon(item.type)} ${item.type}`}
+      
                 >
-                  {getMediaTypeIcon(item.type)}
-                  {item.type}
+                  
                 </Badge>
               </div>
               

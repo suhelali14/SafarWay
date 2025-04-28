@@ -33,7 +33,7 @@ import { Label } from '../../components/ui/label';
 import { Skeleton } from '../../components/ui/skeleton';
 import { Badge } from '../../components/ui/badge';
 import { Alert, AlertDescription } from '../../components/ui/alert';
-import { api } from '../../services/api';
+
 
 // Form schema for agency profile
 const profileFormSchema = z.object({
@@ -232,8 +232,8 @@ const AgencyProfilePage = () => {
             <p className="text-gray-500">Manage your agency information and settings</p>
           </div>
           
-          <Badge variant={agency.status === 'approved' ? 'success' : 'warning'}>
-            {agency.status === 'approved' ? 'Approved' : 'Pending Approval'}
+          <Badge variant={agency.status === 'approved' ? 'success' : 'warning'} label={agency.status === 'approved' ? 'Approved' : 'Pending Approval'}>
+            
           </Badge>
         </div>
         
@@ -649,4 +649,4 @@ const AgencyProfilePage = () => {
   );
 };
 
-export default AgencyProfilePage; 
+export default AgencyProfilePage;

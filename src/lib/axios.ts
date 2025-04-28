@@ -58,7 +58,7 @@ axiosInstance.interceptors.response.use(
           
         case 422:
           // Validation error
-          const validationErrors = response.data?.errors;
+            const validationErrors = (response.data as any)?.errors;
           if (validationErrors) {
             // Handle validation errors
             Object.values(validationErrors).forEach((error: any) => {
@@ -69,7 +69,7 @@ axiosInstance.interceptors.response.use(
               }
             });
           } else {
-            toast.error(response.data?.message || 'Validation failed.');
+            toast.error((response.data as { message?: string })?.message || 'Validation failed.');
           }
           break;
           
@@ -80,7 +80,7 @@ axiosInstance.interceptors.response.use(
           
         default:
           // Other errors
-          toast.error(response.data?.message || 'An error occurred. Please try again.');
+          toast.error((response.data as { message?: string })?.message || 'An error occurred. Please try again.');
       }
     } else {
       // Network error

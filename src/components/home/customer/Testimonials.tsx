@@ -122,7 +122,7 @@ export function Testimonials() {
     <section className="bg-gradient-to-b from-slate-50 to-white py-20">
       <div className="container mx-auto px-4">
         <div className="mb-12 text-center">
-          <Badge variant="outline" className="mb-3">Trusted by Thousands</Badge>
+          <Badge variant="outline" className="mb-3" label='Trusted by Thousands'></Badge>
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
             What Our Travelers Say
           </h2>
@@ -155,8 +155,8 @@ export function Testimonials() {
               >
                 <div className="flex flex-col">
                   <div className="mb-6">
-                    <Badge variant="secondary" className="mb-3">
-                      {testimonials[activeIndex].tripType}
+                    <Badge variant="secondary" className="mb-3" label={testimonials[activeIndex].tripType}>
+                      
                     </Badge>
                     <div className="mb-2 flex items-center">
                       {renderStars(testimonials[activeIndex].rating)}

@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import { API_URL } from '../config/constants';
 import { getToken } from '../utils/session';
 import { toast } from 'react-hot-toast';
+import { Package } from './api/packageService';
 
 // Types
 
@@ -13,6 +14,13 @@ export interface LoginCredentials {
   password: string;
 }
 
+
+interface PasswordResetData {
+  id: string;
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+}
 export interface RegisterData {
   name: string;
   email: string;
@@ -20,8 +28,20 @@ export interface RegisterData {
   role: 'CUSTOMER' | 'AGENCY_ADMIN' | 'AGENCY_USER';
   agencyId?: string;
 }
-
+export interface PackageDetail  {
+  success: boolean;
+  data: {
+    data:Package[];
+  };
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
 export interface TourPackage {
+  location: string;
   id: string;
   title: string;
   name?: string;
@@ -87,7 +107,16 @@ export interface Booking {
   createdAt: string;
   updatedAt: string;
 }
-
+export interface Review {
+  id: string;
+  userId: string;
+  tourId: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+  tour: TourPackage;
+}
 export interface User {
   id: string;
   name: string;
@@ -98,7 +127,14 @@ export interface User {
   profileImage?: string;
   createdAt: string;
   updatedAt: string;
+  agency?: Agency;
+  bookings?: Booking[];
+  recentBookings?: Booking[];
+  subscribedAgencies?: Agency[];
+  reviews?: Review[];
+  address?: string;
 }
+
 export interface Agency {
   id: string;
   name: string;
@@ -168,6 +204,11 @@ export interface RevenueData {
 
 // Define PackageFilters type
 export interface PackageFilters {
+  page?: number; // Add page property if 
+  limit?: number; // Add limit property if needed
+  agencyId?: string;
+  tourType?: TourType;
+  specialties?: string[];
   status?: string;
   destination?: string;
   priceRange?: [number, number];
@@ -222,6 +263,9 @@ export const authAPI = {
   login: (email: string, password: string) => 
     api.post('/auth/login', { email, password }),
   
+
+  inviteUser: (data: { email: string; role: string }) => api.post('/auth/invite', data),
+
   registerCustomer: (userData: any) => 
     api.post('/auth/register/customer', userData),
   
@@ -271,7 +315,7 @@ export const agencyAPI = {
     api.get('/agency/dashboard/summary', { params: { timeRange } }),
   
   getAllPackages: (filters: PackageFilters) => 
-    api.get('/agency/packages/', { params: filters }),
+    api.get(`/agency/packages/`, { params: filters }),
   
   getPackageById: (id: string) => 
     api.get(`/agency/packages/${id}`),
@@ -324,6 +368,9 @@ export const adminAPI = {
   updateUser: (id: string, userData: any) => 
     api.put(`/admin/users/${id}`, userData),
   
+  resetUserPassword: (id: string, data:PasswordResetData) =>
+    api.post(`/admin/users/${id}/reset-password`, { data }),
+  
   deleteUser: (id: string) => 
     api.delete(`/admin/users/${id}`),
   
@@ -365,6 +412,9 @@ export const adminAPI = {
 
   getReportsAdmin:(filters:string)=>
     api.get(`/admin/reports/${filters}`),
+
+  rejectAgency: (id: string) =>
+    api.patch(`/admin/agencies/${id}/reject`),
 };
 
 
@@ -412,10 +462,22 @@ export const customerAPI = {
     api.get<DashboardStats>('/customers/dashboard/stats'),
 
   getAllPackages: () => 
-    api.get<TourPackage[]>('/customers/packages'),
+    api.get('/customers/packages'),
 
   getPackageById: (id: string) => 
     api.get(`/packages/${id}`),
+
+  addToWishlist: (packageId: string) => api.post(`/wishlist/${packageId}`),
+  removeFromWishlist: (wishlistItemId: string) => api.delete(`/wishlist/${wishlistItemId}`),
+  getFeaturedPackages: () => api.get('/packages/featured'),
+};
+
+// Tour API
+export const tourAPI = {
+  getAll: () => api.get('/tours'),
+  create: (tourData: any) => api.post('/tours', tourData),
+  update: (id: string, tourData: any) => api.put(`/tours/${id}`, tourData),
+  delete: (id: string) => api.delete(`/tours/${id}`),
 };
 
 export default api;

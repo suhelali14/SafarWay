@@ -30,6 +30,7 @@ import { customerPackages } from '../../services/api/customerPackages';
 import { TourPackage, TourType } from '../../services/api';
 import { formatDate, formatCurrency } from '../../utils/formatters';
 import BookPackageForm from './BookPackaForm';
+import { useToast } from '../../components/ui/toast';
 
 export function PackageDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -299,8 +300,8 @@ export function PackageDetailsPage() {
               </div>
             </div>
             
-            <Badge className={`mb-4 ${getTourTypeColor(packageData.tourType)}`}>
-              {formatTourType(packageData.tourType)}
+            <Badge className={`mb-4 ${getTourTypeColor(packageData.tourType)}`} label=   {formatTourType(packageData.tourType)}>
+           
             </Badge>
           </div>
 
@@ -457,8 +458,8 @@ export function PackageDetailsPage() {
                       <span className="text-2xl font-bold text-primary">
                         {formatCurrency(discountedPrice, 'INR')}
                       </span>
-                      <Badge className="bg-red-500 hover:bg-red-600">
-                        {discountPercentage}% OFF
+                      <Badge className="bg-red-500 hover:bg-red-600" label={`${discountPercentage}% OFF`}>
+                       
                       </Badge>
                     </div>
                     <div className="text-sm text-gray-500">
@@ -505,8 +506,8 @@ export function PackageDetailsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                {packageData.agencyName && (
-                  <div className="font-medium">{packageData.agencyName}</div>
+                {packageData.name && (
+                  <div className="font-medium">{packageData.name}</div>
                 )}
                 
                 {packageData.email && (

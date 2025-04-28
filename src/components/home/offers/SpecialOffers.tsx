@@ -141,7 +141,7 @@ export function SpecialOffers() {
     <section className="py-24">
       <div className="container px-4 mx-auto">
         <div className="text-center mb-12">
-          <Badge variant="outline" className="mb-3">Limited Time Offers</Badge>
+          <Badge variant="outline" className="mb-3" label='Limited Time Offers'></Badge>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
             Special Deals & Promotions
           </h2>
@@ -237,8 +237,8 @@ function OfferCard({ offer }: { offer: Offer }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-60" />
         </div>
         
-        <Badge className="absolute right-3 top-3 bg-red-500">
-          {discountLabel}
+        <Badge className="absolute right-3 top-3 bg-red-500" label={discountLabel}>
+          
         </Badge>
         
         {offer.code && (

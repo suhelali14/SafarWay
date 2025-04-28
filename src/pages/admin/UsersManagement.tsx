@@ -193,7 +193,7 @@ export default function UsersManagement() {
   const handleInviteUser = async (data: any) => {
     try {
       setActionLoading(true);
-      await inviteAgencyUser(data.email, data.role, data.agencyId);
+      await inviteAgencyUser({ email: data.email, name: data.name, role: data.role, agencyId: data.agencyId });
       toast({
         title: "Success",
         description: "Invitation sent successfully",
@@ -380,6 +380,7 @@ export default function UsersManagement() {
             onClose={() => setEditDialogOpen(false)}
             onUpdate={(data) => handleUpdateUser(selectedUser.id, data)}
             user={selectedUser}
+            isLoading={actionLoading}
           />
         )}
 
