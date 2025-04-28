@@ -1,7 +1,8 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { API_URL } from '../config/constants';
 import { getToken } from '../utils/session';
 import { toast } from 'react-hot-toast';
+import { Package } from './api/packageService';
 
 // Types
 
@@ -13,6 +14,13 @@ export interface LoginCredentials {
   password: string;
 }
 
+
+interface PasswordResetData {
+  id: string;
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+}
 export interface RegisterData {
   name: string;
   email: string;
@@ -20,8 +28,20 @@ export interface RegisterData {
   role: 'CUSTOMER' | 'AGENCY_ADMIN' | 'AGENCY_USER';
   agencyId?: string;
 }
-
+export interface PackageDetail  {
+  success: boolean;
+  data: {
+    data:Package[];
+  };
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
 export interface TourPackage {
+  location: string;
   id: string;
   title: string;
   name?: string;
@@ -87,7 +107,16 @@ export interface Booking {
   createdAt: string;
   updatedAt: string;
 }
-
+export interface Review {
+  id: string;
+  userId: string;
+  tourId: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+  tour: TourPackage;
+}
 export interface User {
   id: string;
   name: string;
@@ -98,19 +127,29 @@ export interface User {
   profileImage?: string;
   createdAt: string;
   updatedAt: string;
+  agency?: Agency;
+  bookings?: Booking[];
+  recentBookings?: Booking[];
+  subscribedAgencies?: Agency[];
+  reviews?: Review[];
+  address?: string;
 }
 
 export interface Agency {
   id: string;
   name: string;
-  email: string;
-  phone: string;
+  email: string; // From contactEmail in API response
+  phone: string; // From contactPhone in API response
   address: string;
   status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
-  logo?: string;
-  description?: string;
+  logo?: string | null; // Updated to allow null as per API response
+  description?: string; // Can be empty string as per API response
   createdAt: string;
   updatedAt: string;
+  coverImage?: string | null; // Added from API response
+  verifiedBy?: string | null; // Added from API response
+  verifiedAt?: string | null; // Added from API response
+  media?: string[]; // Added from API response
 }
 
 export interface RefundRequest {
@@ -163,6 +202,20 @@ export interface RevenueData {
   currency: string;
 }
 
+// Define PackageFilters type
+export interface PackageFilters {
+  page?: number; // Add page property if 
+  limit?: number; // Add limit property if needed
+  agencyId?: string;
+  tourType?: TourType;
+  specialties?: string[];
+  status?: string;
+  destination?: string;
+  priceRange?: [number, number];
+  duration?: number;
+  searchQuery?: string;
+}
+
 // Create axios instance with default config
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
@@ -210,6 +263,9 @@ export const authAPI = {
   login: (email: string, password: string) => 
     api.post('/auth/login', { email, password }),
   
+
+  inviteUser: (data: { email: string; role: string }) => api.post('/auth/invite', data),
+
   registerCustomer: (userData: any) => 
     api.post('/auth/register/customer', userData),
   
@@ -233,7 +289,16 @@ export const authAPI = {
   
   verifyToken: () => 
     api.get('/auth/verify'),
-  
+
+  verifyTempPassword: (tempPassword: string) => 
+    api.post('/auth/verify-temp-password', { tempPassword }),
+
+  acceptInvitation: (inviteToken: string, password: string) => 
+    api.post('/auth/accept-invitation', { inviteToken, password }),
+
+  setNewPassword: (userId: string, password: string) => 
+    api.post(`/auth/users/${userId}/set-password`, { password }),
+
   updateProfile: (userData: any) => 
     api.patch('/auth/profile', userData),
 };
@@ -250,7 +315,7 @@ export const agencyAPI = {
     api.get('/agency/dashboard/summary', { params: { timeRange } }),
   
   getAllPackages: (filters: PackageFilters) => 
-    api.get('/agency/packages', { params: filters }),
+    api.get(`/agency/packages/`, { params: filters }),
   
   getPackageById: (id: string) => 
     api.get(`/agency/packages/${id}`),
@@ -268,8 +333,8 @@ export const agencyAPI = {
   deletePackage: (id: string) => 
     api.delete(`/agency/packages/${id}`),
   
-  getAllBookings: (status?: string) => 
-    api.get('/agency/bookings', { params: { status } }),
+  getAllBookings: (filters?: string) => 
+    api.get(`/agency/bookings/${filters}`),
   
   getBookingById: (id: string) => 
     api.get(`/agency/bookings/${id}`),
@@ -285,6 +350,8 @@ export const agencyAPI = {
 };
 
 // Admin API
+
+
 export const adminAPI = {
   getDashboardSummary: () => 
     api.get('/admin/dashboard/summary'),
@@ -300,6 +367,9 @@ export const adminAPI = {
   
   updateUser: (id: string, userData: any) => 
     api.put(`/admin/users/${id}`, userData),
+  
+  resetUserPassword: (id: string, data:PasswordResetData) =>
+    api.post(`/admin/users/${id}/reset-password`, { data }),
   
   deleteUser: (id: string) => 
     api.delete(`/admin/users/${id}`),
@@ -339,6 +409,75 @@ export const adminAPI = {
   
   rejectRefund: (id: string, remarks?: string) => 
     api.patch(`/admin/refunds/${id}/reject`, { remarks }),
+
+  getReportsAdmin:(filters:string)=>
+    api.get(`/admin/reports/${filters}`),
+
+  rejectAgency: (id: string) =>
+    api.patch(`/admin/agencies/${id}/reject`),
 };
 
-export default api; 
+
+// Customer API
+export const customerAPI = {
+  // Admin-level customer management routes
+  getAllCustomers: () => 
+    api.get<User[]>('/customers/all'),
+  
+  getCustomerById: (id: string) => 
+    api.get<User>(`/customers/details/${id}`),
+  
+  createCustomer: (customerData: Partial<User>) => 
+    api.post<User>('/customers', customerData),
+  
+  updateCustomer: (id: string, customerData: Partial<User>) => 
+    api.put<User>(`/customers/${id}`, customerData),
+  
+  deleteCustomer: (id: string) => 
+    api.delete(`/customers/${id}`),
+  
+  // Customer dashboard routes
+  getProfile: () => 
+    api.get<User>('/customers/profile'),
+  
+  getMyBookings: () => 
+    api.get<Booking[]>('/customers/bookings'),
+  
+  getOngoingTrips: () => 
+    api.get<Booking[]>('/customers/trips/ongoing'),
+  
+  getUpcomingTrips: () => 
+    api.get<Booking[]>('/customers/trips/upcoming'),
+  
+  getRecommendedPackages: () => 
+    api.get<TourPackage[]>('/customers/packages/recommended'),
+  
+  getWishlist: () => 
+    api.get<TourPackage[]>('/customers/wishlist'),
+  
+  getValidOffers: () => 
+    api.get<any[]>('/customers/offers'), // Replace 'any' with specific Offer type if defined
+  
+  getDashboardStats: () => 
+    api.get<DashboardStats>('/customers/dashboard/stats'),
+
+  getAllPackages: () => 
+    api.get('/customers/packages'),
+
+  getPackageById: (id: string) => 
+    api.get(`/packages/${id}`),
+
+  addToWishlist: (packageId: string) => api.post(`/wishlist/${packageId}`),
+  removeFromWishlist: (wishlistItemId: string) => api.delete(`/wishlist/${wishlistItemId}`),
+  getFeaturedPackages: () => api.get('/packages/featured'),
+};
+
+// Tour API
+export const tourAPI = {
+  getAll: () => api.get('/tours'),
+  create: (tourData: any) => api.post('/tours', tourData),
+  update: (id: string, tourData: any) => api.put(`/tours/${id}`, tourData),
+  delete: (id: string) => api.delete(`/tours/${id}`),
+};
+
+export default api;

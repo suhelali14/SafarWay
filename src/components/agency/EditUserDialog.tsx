@@ -26,6 +26,12 @@ import {
   SelectValue,
 } from "../ui/select";
 
+interface UpdateUserRequest {
+  name: string;
+  email: string;
+  role: "SAFARWAY_ADMIN" | "SAFARWAY_USER" | "AGENCY_ADMIN" | "AGENCY_USER";
+}
+
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
@@ -46,6 +52,7 @@ interface EditUserDialogProps {
   open: boolean;
   onClose: () => void;
   onUpdate: (id: string, data: FormData) => Promise<void>;
+  isLoading: boolean; // Added isLoading property
 }
 
 export function EditUserDialog({
@@ -69,7 +76,12 @@ export function EditUserDialog({
     if (!user) return;
     try {
       setLoading(true);
-      await onUpdate(user.id, data);
+      const updateData: UpdateUserRequest = {
+        name: data.name,
+        email: data.email,
+        role: data.role,
+      };
+      await onUpdate(user.id, updateData);
       onClose();
     } catch (error) {
       console.error("Error updating user:", error);
@@ -155,4 +167,4 @@ export function EditUserDialog({
       </DialogContent>
     </Dialog>
   );
-} 
+}

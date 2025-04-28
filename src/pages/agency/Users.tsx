@@ -16,10 +16,10 @@ import {
   resendInvitation,
   suspendUser,
   activateUser,
-  User,
   AddUserRequest,
   UpdateUserRequest 
 } from "../../services/api/userService";
+import { User } from "../../types/user";
 
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
@@ -29,7 +29,7 @@ export default function Users() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, _setSelectedUser] = useState<User | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function Users() {
     try {
       setLoading(true);
       const data = await getAgencyUsers();
-      setUsers(data);
+      setUsers(data.data);
     } catch (error) {
       toast({
         title: "Error",
@@ -72,10 +72,13 @@ export default function Users() {
     }
   };
 
-  const handleInviteUser = async (formData: { email: string; role: string }) => {
+  const handleInviteUser = async (formData: { email: string;
+    name: string;
+    role: string;
+    agencyId?: string; }) => {
     try {
       setActionLoading(true);
-      await inviteAgencyUser(formData.email, formData.role);
+      await inviteAgencyUser(formData);
       toast({
         title: "Success",
         description: "Invitation sent successfully",
@@ -198,15 +201,15 @@ export default function Users() {
     }
   };
 
-  const handleEditClick = (user: User) => {
-    setSelectedUser(user);
-    setEditDialogOpen(true);
-  };
+  // const handleEditClick = (user: User) => {
+  //   setSelectedUser(user);
+  //   setEditDialogOpen(true);
+  // };
 
-  const handleDeleteClick = (user: User) => {
-    setSelectedUser(user);
-    setDeleteDialogOpen(true);
-  };
+  // const handleDeleteClick = (user: User) => {
+  //   setSelectedUser(user);
+  //   setDeleteDialogOpen(true);
+  // };
 
   return (
     <div className="container mx-auto py-8">
@@ -226,12 +229,19 @@ export default function Users() {
 
       <UserTable
         users={users}
-        onEdit={handleEditClick}
-        onDelete={handleDeleteClick}
+        // onEdit={handleEditClick}
+        // onDelete={handleDeleteClick}
+        onAddUser={handleAddUser}
+        onUpdateUser={(_id: string, data: any) => handleUpdateUser(data)}
+        onDeleteUser={handleDeleteUser}
+
         onResendInvite={handleResendInvite}
         onSuspend={handleSuspendUser}
         onActivate={handleActivateUser}
-        loading={loading}
+        // loading={loading}
+        isLoading={loading}
+       
+   
       />
 
       <AddUserDialog
@@ -250,11 +260,12 @@ export default function Users() {
 
       {selectedUser && (
         <EditUserDialog
+          isLoading={actionLoading}
           open={editDialogOpen}
           onClose={() => setEditDialogOpen(false)}
-          onUpdate={handleUpdateUser}
+          onUpdate={(_id, data) => handleUpdateUser(data)}
           user={selectedUser}
-          isLoading={actionLoading}
+          
         />
       )}
 

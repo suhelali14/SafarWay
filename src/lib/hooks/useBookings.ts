@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
+import { AppDispatch, RootState } from '../store';
 import {
   createBooking,
   fetchBookingById,
@@ -12,9 +12,9 @@ import { useCallback } from 'react';
 import { Booking, CreateBookingData } from '../api/bookings';
 
 export const useBookings = () => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const { bookings, selectedBooking, loading, error } = useSelector(
-    (state: RootState) => state.bookings
+    (state: RootState) => state.bookings 
   );
 
   const handleCreateBooking = useCallback(

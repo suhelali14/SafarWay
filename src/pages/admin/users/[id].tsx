@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 import { Button } from '../../../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '../../../components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Badge } from '../../../components/ui/badge';
 import { Spinner } from '../../../components/ui/spinner';
 import { Alert, AlertDescription } from '../../../components/ui/alert';
@@ -118,26 +118,26 @@ export default function UserDetailsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
-        return <Badge className="bg-green-100 text-green-800">{status}</Badge>;
+        return <Badge className="bg-green-100 text-green-800" label={status} ></Badge>;
       case 'INACTIVE':
-        return <Badge className="bg-yellow-100 text-yellow-800">{status}</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800" label={status}></Badge>;
       case 'SUSPENDED':
-        return <Badge className="bg-red-100 text-red-800">{status}</Badge>;
+        return <Badge className="bg-red-100 text-red-800" label={status}></Badge>;
       case 'INVITED':
-        return <Badge className="bg-blue-100 text-blue-800">{status}</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800" label={status}></Badge>;
       default:
-        return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800" label={status}></Badge>;
     }
   };
   
   // Get role badge color
   const getRoleBadge = (role: string) => {
     if (role.includes('ADMIN')) {
-      return <Badge className="bg-blue-100 text-blue-800">{formatRole(role)}</Badge>;
+      return <Badge className="bg-blue-100 text-blue-800" label={formatRole(role)}></Badge>;
     } else if (role.includes('USER')) {
-      return <Badge className="bg-indigo-100 text-indigo-800">{formatRole(role)}</Badge>;
+      return <Badge className="bg-indigo-100 text-indigo-800" label={formatRole(role)} ></Badge>;
     } else {
-      return <Badge className="bg-gray-100 text-gray-800">{formatRole(role)}</Badge>;
+      return <Badge className="bg-gray-100 text-gray-800" label={formatRole(role)}></Badge>;
     }
   };
   
@@ -206,9 +206,9 @@ export default function UserDetailsPage() {
             <div>
               <h1 className="text-2xl font-bold">{user.name || 'No Name'}</h1>
               <div className="flex items-center gap-2 mt-1">
-                <Badge variant="outline">
-                  <User className="h-3 w-3 mr-1" />
-                  ID: {user.id.substring(0, 8)}
+                <Badge variant="outline"  label={` ID: ${user.id.substring(0, 8)}`}>
+                  
+                 
                 </Badge>
                 {getRoleBadge(user.role)}
                 {getStatusBadge(user.status)}

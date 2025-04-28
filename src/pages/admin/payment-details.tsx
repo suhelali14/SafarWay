@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import  { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { PaymentDetailsCard } from '../../components/admin/PaymentDetailsCard';
-import { Alert, AlertDescription } from '../../ui/alert';
+import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Loader2 } from 'lucide-react';
-import { adminAPI } from '../../services/api';
+
 
 // Mock payment data (remove in production)
 const mockPayment = {
@@ -39,7 +39,7 @@ const mockPayment = {
 
 export default function PaymentDetailsPage() {
   const { paymentId } = useParams<{ paymentId: string }>();
-  const navigate = useNavigate();
+  
   const [payment, setPayment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

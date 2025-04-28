@@ -9,6 +9,7 @@ const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || true;
 
 // Types
 export interface DashboardSummary {
+  totalActivePackages:number;
   totalBookings: number;
   totalRevenue: number;
   totalPackages: number;

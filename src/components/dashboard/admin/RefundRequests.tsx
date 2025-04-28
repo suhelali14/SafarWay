@@ -18,7 +18,7 @@ import {
 } from '../../ui/select';
 import { Input } from '../../ui/input';
 import { toast } from 'react-hot-toast';
-import { Search, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 interface RefundRequest {
   id: string;

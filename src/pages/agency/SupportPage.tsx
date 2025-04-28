@@ -20,8 +20,8 @@ import {
   TableRow,
 } from '../../components/ui/table';
 import { toast } from 'react-hot-toast';
-import { Search, Eye, MessageSquare, CheckCircle, XCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Search, MessageSquare, XCircle } from 'lucide-react';
+
 
 interface Ticket {
   id: string;
@@ -122,28 +122,28 @@ export const AgencySupportPage = () => {
     }
   };
 
-  const handleAssignTicket = async (id: string, agentId: string) => {
-    try {
-      const response = await fetch(`/api/agency/support/tickets/${id}/assign`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ agentId })
-      });
+  // const _handleAssignTicket = async (id: string, agentId: string) => {
+  //   try {
+  //     const response = await fetch(`/api/agency/support/tickets/${id}/assign`, {
+  //       method: 'PATCH',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${localStorage.getItem('token')}`
+  //       },
+  //       body: JSON.stringify({ agentId })
+  //     });
 
-      if (!response.ok) throw new Error('Failed to assign ticket');
+  //     if (!response.ok) throw new Error('Failed to assign ticket');
 
-      setTickets(tickets.map(ticket => 
-        ticket.id === id ? { ...ticket, assignedTo: agentId } : ticket
-      ));
-      toast.success('Ticket assigned successfully');
-    } catch (error) {
-      console.error('Error assigning ticket:', error);
-      toast.error('Failed to assign ticket');
-    }
-  };
+  //     setTickets(tickets.map(ticket => 
+  //       ticket.id === id ? { ...ticket, assignedTo: agentId } : ticket
+  //     ));
+  //     toast.success('Ticket assigned successfully');
+  //   } catch (error) {
+  //     console.error('Error assigning ticket:', error);
+  //     toast.error('Failed to assign ticket');
+  //   }
+  // };
 
   const handleSendReply = async (ticketId: string) => {
     if (!replyMessage.trim()) {

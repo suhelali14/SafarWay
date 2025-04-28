@@ -1,5 +1,6 @@
 import { useToast } from "./use-toast";
-import { Toast } from "./toast";
+import { Toast } from "./toastComponent";
+
 
 export function ToastProvider() {
   const { toasts } = useToast();
@@ -22,4 +23,4 @@ export function ToastProvider() {
       ))}
     </div>
   );
-} 
+}

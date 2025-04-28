@@ -3,8 +3,7 @@ import {
   RecentBooking, 
   PackagePerformance,
   ChartDataPoint,
-  Booking,
-  Payment,
+  
   AgencyProfile,
   Review
 } from './agencyService';
@@ -140,7 +139,8 @@ export const mockDashboardSummary = (): DashboardSummary => {
     totalCustomers: 85,
     recentBookings,
     packages,
-    chartData
+    chartData,
+    totalActivePackages: 4 // Add the missing property
   };
 };
 

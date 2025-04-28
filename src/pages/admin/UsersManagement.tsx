@@ -40,7 +40,7 @@ interface PaginationMeta {
 export default function UsersManagement() {
   const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [_addDialogOpen, setAddDialogOpen] = useState(false);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -48,7 +48,7 @@ export default function UsersManagement() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [agencies, setAgencies] = useState<Agency[]>([]);
-  const [loadingAgencies, setLoadingAgencies] = useState(false);
+  const [_loadingAgencies, setLoadingAgencies] = useState(false);
   const [paginationMeta, setPaginationMeta] = useState<PaginationMeta>({
     page: 1,
     pages: 1,
@@ -193,7 +193,7 @@ export default function UsersManagement() {
   const handleInviteUser = async (data: any) => {
     try {
       setActionLoading(true);
-      await inviteAgencyUser(data.email, data.role, data.agencyId);
+      await inviteAgencyUser({ email: data.email, name: data.name, role: data.role, agencyId: data.agencyId });
       toast({
         title: "Success",
         description: "Invitation sent successfully",
@@ -380,6 +380,7 @@ export default function UsersManagement() {
             onClose={() => setEditDialogOpen(false)}
             onUpdate={(data) => handleUpdateUser(selectedUser.id, data)}
             user={selectedUser}
+            isLoading={actionLoading}
           />
         )}
 

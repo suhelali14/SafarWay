@@ -7,4 +7,5 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   agencyId?: string;
+  phone: string;
 } 

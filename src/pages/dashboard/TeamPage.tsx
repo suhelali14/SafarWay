@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Mail, MoreVertical } from 'lucide-react';
+import { Plus, Search, MoreVertical } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface TeamMember {
@@ -42,7 +42,7 @@ const mockTeamMembers: TeamMember[] = [
 export const TeamPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(mockTeamMembers);
+  const [teamMembers, _setTeamMembers] = useState<TeamMember[]>(mockTeamMembers);
 
   const filteredMembers = teamMembers.filter((member) => {
     const matchesSearch =

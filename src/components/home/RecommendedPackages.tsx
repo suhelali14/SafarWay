@@ -127,7 +127,7 @@ export const RecommendedPackages: React.FC<RecommendedPackagesProps> = ({
             <div className="p-4">
               <div className="flex items-center mb-1">
                 <MapPin className="h-4 w-4 text-gray-500 mr-1" />
-                <span className="text-sm text-gray-600">{pkg.location}</span>
+                <span className="text-sm text-gray-600">{pkg.destination}</span>
               </div>
               <h3 className="font-semibold text-lg mb-1 line-clamp-1">{pkg.title}</h3>
               
@@ -150,7 +150,7 @@ export const RecommendedPackages: React.FC<RecommendedPackagesProps> = ({
         ))}
       </div>
       
-      <style jsx>{`
+      <style>{`
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
         }

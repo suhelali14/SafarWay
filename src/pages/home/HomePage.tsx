@@ -1,76 +1,75 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
-import { HeroSection } from '../../components/home/HeroSection';
-import { FeaturedPackages } from '../../components/home/FeaturedPackages';
+import { HeroSection, SpecialOffers, PopularDestinations, FeaturedAgencies, CustomerTestimonials } from '../../components/home';
 import { WhyChooseUs } from '../../components/home/WhyChooseUs';
-import { Testimonials } from '../../components/home/Testimonials';
-import { PartnerAgencies } from '../../components/home/PartnerAgencies';
+
 import { Button } from '../../components/ui/button';
 import { Link } from 'react-router-dom';
-import { Package, Calendar, Star, ArrowRight } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
-import { Skeleton } from '../../components/ui/skeleton';
+import {  ArrowRight } from 'lucide-react';
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
+
 import { Helmet } from 'react-helmet-async';
 
-const testimonials = [
-  {
-    id: 1,
-    name: 'Sarah Johnson',
-    role: 'Adventure Enthusiast',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
-    rating: 5,
-    text: 'SafarWay made planning our family vacation a breeze. The packages were well-organized and the local guides were exceptional.',
-    location: 'New York, USA',
-  },
-  {
-    id: 2,
-    name: 'Michael Chen',
-    role: 'Business Traveler',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
-    rating: 5,
-    text: 'As a frequent traveler, I appreciate the attention to detail and personalized service SafarWay provides. Highly recommended!',
-    location: 'Singapore',
-  },
-  {
-    id: 3,
-    name: 'Emma Rodriguez',
-    role: 'Travel Blogger',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80',
-    rating: 5,
-    text: 'The cultural experiences and hidden gems SafarWay introduced me to were truly unforgettable. A must-try for authentic travel!',
-    location: 'Barcelona, Spain',
-  },
-];
 
-// Mock data for customer dashboard
-const recommendedPackages = [
-  {
-    id: '1',
-    title: 'Bali Paradise',
-    description: '7 days of sun, surf, and culture in the Indonesian paradise.',
-    price: 1299,
-    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-    rating: 4.8,
-  },
-  {
-    id: '2',
-    title: 'Tokyo Explorer',
-    description: 'Discover the vibrant culture and cuisine of Japan\'s capital.',
-    price: 1499,
-    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80',
-    rating: 4.9,
-  },
-  {
-    id: '3',
-    title: 'Paris Romance',
-    description: 'Experience the city of love with this romantic getaway package.',
-    price: 1799,
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80',
-    rating: 4.7,
-  },
-];
+// const testimonials = [
+//   {
+//     id: 1,
+//     name: 'Sarah Johnson',
+//     role: 'Adventure Enthusiast',
+//     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
+//     rating: 5,
+//     text: 'SafarWay made planning our family vacation a breeze. The packages were well-organized and the local guides were exceptional.',
+//     location: 'New York, USA',
+//   },
+//   {
+//     id: 2,
+//     name: 'Michael Chen',
+//     role: 'Business Traveler',
+//     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
+//     rating: 5,
+//     text: 'As a frequent traveler, I appreciate the attention to detail and personalized service SafarWay provides. Highly recommended!',
+//     location: 'Singapore',
+//   },
+//   {
+//     id: 3,
+//     name: 'Emma Rodriguez',
+//     role: 'Travel Blogger',
+//     image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80',
+//     rating: 5,
+//     text: 'The cultural experiences and hidden gems SafarWay introduced me to were truly unforgettable. A must-try for authentic travel!',
+//     location: 'Barcelona, Spain',
+//   },
+// ];
+
+// // Mock data for customer dashboard
+// const recommendedPackages = [
+//   {
+//     id: '1',
+//     title: 'Bali Paradise',
+//     description: '7 days of sun, surf, and culture in the Indonesian paradise.',
+//     price: 1299,
+//     image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+//     rating: 4.8,
+//   },
+//   {
+//     id: '2',
+//     title: 'Tokyo Explorer',
+//     description: 'Discover the vibrant culture and cuisine of Japan\'s capital.',
+//     price: 1499,
+//     image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80',
+//     rating: 4.9,
+//   },
+//   {
+//     id: '3',
+//     title: 'Paris Romance',
+//     description: 'Experience the city of love with this romantic getaway package.',
+//     price: 1799,
+//     image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80',
+//     rating: 4.7,
+//   },
+// ];
 
 // Mock data for active bookings
 const activeBookings = [
@@ -93,29 +92,47 @@ const activeBookings = [
 ];
 
 // Mock data for agency dashboard
-const agencyStats = [
-  { title: 'Total Packages', value: 24, icon: Package },
-  { title: 'Active Bookings', value: 18, icon: Calendar },
-  { title: 'Average Rating', value: 4.8, icon: Star },
-];
+// const agencyStats = [
+//   { title: 'Total Packages', value: 24, icon: Package },
+//   { title: 'Active Bookings', value: 18, icon: Calendar },
+//   { title: 'Average Rating', value: 4.8, icon: Star },
+// ];
 
 export function HomePage() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
-  // Redirect to login if trying to access protected routes
+  
+  // Handle routing logic based on authentication and user role
+  // This was causing infinite re-renders because it had no dependency array
   useEffect(() => {
-    if (!isAuthenticated && (location.pathname === '/dashboard' || location.pathname === '/bookings')) {
+    // First, handle protected route access for unauthenticated users
+    if (!isAuthenticated && (location.pathname === '/agency/dashboard' || location.pathname === '/bookings')) {
       navigate('/login');
+      return;
     }
-  }, [isAuthenticated, navigate]);
+    
+    // Then, handle redirection for authenticated users based on role
+    // Only run this redirection logic on initial mount
+    if (isAuthenticated && location.pathname === '/') {
+      // Check user role and redirect accordingly
+      if (user?.role === "SAFARWAY_ADMIN" || user?.role === "SAFARWAY_USER") {
+        navigate('/admin');
+      } else if (user?.role === "AGENCY_ADMIN" || user?.role === "AGENCY_USER") {
+        navigate('/agency/dashboard');
+      }
+      // No need to navigate customer role users as they should stay on home page
+    }
+  }, [isAuthenticated, user, navigate]); // Proper dependency array
+  
+  // Use a memoized value for user name to prevent unnecessary re-renders
+  const userName = useMemo(() => user?.name || 'Guest', [user?.name]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen py-12">
       <Helmet>
         <title>
           {isAuthenticated 
-            ? `SafarWay - Welcome back, ${user?.name}` 
+            ? `SafarWay - Welcome back, ${userName}` 
             : 'SafarWay - Your Gateway to Unforgettable Travel Experiences'}
         </title>
         <meta
@@ -136,7 +153,7 @@ export function HomePage() {
               transition={{ duration: 0.5 }}
               className="rounded-xl bg-gradient-to-r from-[#ff6200] to-amber-600 p-8 text-white shadow-lg"
             >
-              <h1 className="mb-2 text-3xl font-bold">Welcome back, {user?.name}!</h1>
+              <h1 className="mb-2 text-3xl font-bold">Welcome back, {userName}!</h1>
               <p className="text-lg text-white/90">Ready for your next adventure?</p>
             </motion.div>
           </section>
@@ -196,51 +213,12 @@ export function HomePage() {
 
         {/* Featured Packages Section */}
         <section className="container mx-auto px-4">
-          <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Featured Travel Packages</h2>
-            <Link to="/packages">
-              <Button variant="ghost" className="gap-2">
-                View All
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {recommendedPackages.map((pkg) => (
-              <motion.div
-                key={pkg.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Card className="overflow-hidden">
-                  <div className="relative h-48">
-                    <img
-                      src={pkg.image}
-                      alt={pkg.title}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                    <div className="absolute right-2 top-2 rounded-full bg-white px-2 py-1 text-xs font-medium text-[#ff6200]">
-                      {pkg.rating} ★
-                    </div>
-                  </div>
-                  <CardHeader>
-                    <CardTitle>{pkg.title}</CardTitle>
-                    <CardDescription>{pkg.description}</CardDescription>
-                  </CardHeader>
-                  <CardFooter className="flex justify-between">
-                    <span className="text-lg font-bold">${pkg.price}</span>
-                    <Link to={`/packages/${pkg.id}`}>
-                      <Button size="sm" className="bg-[#ff6200] hover:bg-[#ff6200]/90">
-                        {isAuthenticated ? 'Book Now' : 'View Details'}
-                      </Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+          <PopularDestinations />
+        </section>
+
+        {/* Special Offers Section */}
+        <section className="container mx-auto px-4">
+          <SpecialOffers />
         </section>
 
         {/* Why Choose Us Section */}
@@ -257,13 +235,13 @@ export function HomePage() {
                 Discover why travelers love booking with SafarWay
               </p>
             </div>
-            <Testimonials testimonials={testimonials} />
+            <CustomerTestimonials />
           </div>
         </section>
 
         {/* Partner Agencies Section */}
         <section className="container mx-auto px-4">
-          <PartnerAgencies />
+          <FeaturedAgencies />
         </section>
 
         {/* CTA Section */}

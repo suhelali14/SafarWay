@@ -1,5 +1,5 @@
-import { createBrowserRouter, Navigate, Outlet, RouterProvider, BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import {  Navigate, Outlet, BrowserRouter, Routes, Route } from 'react-router-dom';
+
 import { AuthProvider } from '../contexts/AuthContext';
 import { RouteGuard } from '../components/auth/RouteGuard';
 import { Navbar } from '../components/layout/Navbar';
@@ -42,6 +42,10 @@ import AgencyDashboardPage from '../pages/agency/dashboard';
 import { AgencyLayout } from '../components/layouts/AgencyLayout';
 import { PackageCreatePage } from '../pages/agency/packages/PackageCreatePage';
 import { PackageEditPage } from '../pages/agency/packages/PackageEditPage';
+import AgencyPublicProfilePage from '../pages/agency/AgencyPublicProfilePage';
+import { UserProfilePage } from '../pages/profile/UserProfilePage';
+import BookTour from '../pages/BookTour';
+
 
 // Layout with Navbar for public routes and regular users
 const MainLayout = () => {
@@ -80,7 +84,39 @@ export const routes = [
         path: 'profile',
         element: (
           <RouteGuard requiredRole={["CUSTOMER", "AGENCY_ADMIN", "AGENCY_USER", "SAFARWAY_ADMIN"]}>
-            <ProfilePage />
+            <UserProfilePage />
+          </RouteGuard>
+        )
+      },
+      {
+        path: 'profile/bookings',
+        element: (
+          <RouteGuard requiredRole={["CUSTOMER", "AGENCY_ADMIN", "AGENCY_USER", "SAFARWAY_ADMIN"]}>
+            <UserProfilePage />
+          </RouteGuard>
+        )
+      },
+      {
+        path: 'profile/agencies',
+        element: (
+          <RouteGuard requiredRole={["CUSTOMER", "AGENCY_ADMIN", "AGENCY_USER", "SAFARWAY_ADMIN"]}>
+            <UserProfilePage />
+          </RouteGuard>
+        )
+      },
+      {
+        path: 'profile/reviews',
+        element: (
+          <RouteGuard requiredRole={["CUSTOMER", "AGENCY_ADMIN", "AGENCY_USER", "SAFARWAY_ADMIN"]}>
+            <UserProfilePage />
+          </RouteGuard>
+        )
+      },
+      {
+        path: 'profile/security',
+        element: (
+          <RouteGuard requiredRole={["CUSTOMER", "AGENCY_ADMIN", "AGENCY_USER", "SAFARWAY_ADMIN"]}>
+            <UserProfilePage />
           </RouteGuard>
         )
       },
@@ -91,6 +127,14 @@ export const routes = [
       {
         path: 'packages/:id',
         element: <PackageDetailsPage />,
+      },
+      {
+        path: 'book/:id',
+        element: <BookTour />,
+      },
+      {
+        path: 'agency/:agencyId',
+        element: <AgencyPublicProfilePage />,
       },
       {
         path: 'about',
@@ -263,12 +307,35 @@ export function AppRouter() {
             <Route path="onboard" element={<OnboardPage />} />
             <Route path="profile" element={
               <RouteGuard requiredRole={["CUSTOMER", "AGENCY_ADMIN", "AGENCY_USER", "SAFARWAY_ADMIN"]}>
-                <ProfilePage />
+                <UserProfilePage />
+              </RouteGuard>
+            } />
+            <Route path="profile/bookings" element={
+              <RouteGuard requiredRole={["CUSTOMER", "AGENCY_ADMIN", "AGENCY_USER", "SAFARWAY_ADMIN"]}>
+                <UserProfilePage />
+              </RouteGuard>
+            } />
+            <Route path="profile/agencies" element={
+              <RouteGuard requiredRole={["CUSTOMER", "AGENCY_ADMIN", "AGENCY_USER", "SAFARWAY_ADMIN"]}>
+                <UserProfilePage />
+              </RouteGuard>
+            } />
+            <Route path="profile/reviews" element={
+              <RouteGuard requiredRole={["CUSTOMER", "AGENCY_ADMIN", "AGENCY_USER", "SAFARWAY_ADMIN"]}>
+                <UserProfilePage />
+              </RouteGuard>
+            } />
+            <Route path="profile/security" element={
+              <RouteGuard requiredRole={["CUSTOMER", "AGENCY_ADMIN", "AGENCY_USER", "SAFARWAY_ADMIN"]}>
+                <UserProfilePage />
               </RouteGuard>
             } />
             <Route path="packages" element={<PackagesPage />} />
             
             <Route path="packages/:id" element={<PackageDetailsPage />} />
+            
+            <Route path="book/:id" element={<BookTour/>} />
+            <Route path="agency/:agencyId" element={<AgencyPublicProfilePage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="support" element={<SupportPage />} />
@@ -314,7 +381,7 @@ export function AppRouter() {
           <Route path="/agency" element={
             <RouteGuard requiredRole={["AGENCY_ADMIN", "AGENCY_USER"]}>
               <AgencyLayout>
-                <Outlet />
+                
               </AgencyLayout>
             </RouteGuard>
           }>

@@ -8,14 +8,14 @@ import {
   Users, 
   Filter, 
   Star, 
-  ChevronDown, 
+  
   Loader 
 } from 'lucide-react';
 import { 
   Card, 
   CardContent, 
   CardDescription, 
-  CardFooter, 
+
   CardHeader, 
   CardTitle 
 } from '../../components/ui/card';
@@ -45,7 +45,7 @@ import { formatCurrency } from '../../utils/formatters';
 import { Package } from '../../services/api/customerAPI';
 import { customerAPI } from '../../services/api';
 import { toast } from 'react-hot-toast';
-import { generateMockPackages } from '../../utils/mockData';
+
 
 interface SearchFilters {
   destination: string;
@@ -504,13 +504,13 @@ const SearchPage: React.FC = () => {
                           className="w-full h-full object-cover"
                         />
                         {pkg.discount && (
-                          <Badge className="absolute top-2 right-2 bg-red-500">
-                            {pkg.discount}% OFF
+                          <Badge className="absolute top-2 right-2 bg-red-500" label={`-${pkg.discount}%`} 
+                            >
                           </Badge>
                         )}
                         {pkg.isPopular && (
-                          <Badge className="absolute top-2 left-2 bg-amber-500">
-                            Popular
+                          <Badge className="absolute top-2 left-2 bg-amber-500" label='Popular' >
+                            
                           </Badge>
                         )}
                       </div>
@@ -537,8 +537,8 @@ const SearchPage: React.FC = () => {
                           
                           <div className="flex flex-wrap gap-1 mb-4">
                             {pkg.features.map((feature, i) => (
-                              <Badge key={i} variant="outline" className="text-xs">
-                                {feature}
+                              <Badge key={i} variant="outline" className="text-xs" label={feature} >
+                                
                               </Badge>
                             ))}
                           </div>

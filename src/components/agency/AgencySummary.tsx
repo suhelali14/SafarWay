@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { StatCard } from './StatCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Card } from '../ui/card';
 import { PackageIcon, Users, CreditCard, TrendingUp } from 'lucide-react';
-import { agencyService } from '../../services/agencyService';
+
 import { toast } from '../ui/use-toast';
+import { agencyAPI } from '../../services/api';
 
 type TimeRange = 'weekly' | 'monthly' | 'yearly';
 
 export function AgencySummary() {
   const [timeRange, setTimeRange] = useState<TimeRange>('weekly');
   const [summaryData, setSummaryData] = useState({
+    totalActivePackages:0,
     totalBookings: 0,
     totalCustomers: 0,
     totalPackages: 0,
-    totalRevenue: 0,
+    revenue: 0,
     bookingsTrend: 0,
     customersTrend: 0,
     packagesTrend: 0,
@@ -26,22 +28,24 @@ export function AgencySummary() {
     const fetchSummaryData = async () => {
       setIsLoading(true);
       try {
-        const data = await agencyService.getDashboardSummary(timeRange);
+        const response = await agencyAPI.getDashboardSummary(timeRange);
+        const data=response.data;
+        console.log("data",data);
         setSummaryData({
+          totalActivePackages:data.totalActivePackages,
           totalBookings: data.totalBookings,
           totalCustomers: data.totalCustomers,
           totalPackages: data.totalPackages,
-          totalRevenue: data.totalRevenue,
+          revenue: data.revenue,
           bookingsTrend: data.bookingsTrend || 0,
           customersTrend: data.customersTrend || 0,
           packagesTrend: data.packagesTrend || 0,
           revenueTrend: data.revenueTrend || 0,
         });
       } catch (error) {
-        toast({
+        toast.error({
           title: "Failed to fetch summary data",
           description: "Could not load dashboard statistics",
-          variant: "destructive",
         });
       } finally {
         setIsLoading(false);
@@ -117,7 +121,7 @@ export function AgencySummary() {
           />
           <StatCard
             title="Total Revenue"
-            value={`$${summaryData.totalRevenue.toLocaleString()}`}
+            value={`${summaryData.revenue}`}
             icon={<TrendingUp className="h-4 w-4" />}
             trend={{
               value: summaryData.revenueTrend,

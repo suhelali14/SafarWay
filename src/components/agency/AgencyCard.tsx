@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Building2, MapPin, Calendar, Star, Package } from 'lucide-react';
+import {  MapPin, Calendar, Star, Package } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { AgencyDetails } from '../../lib/api/agency';
-import { formatDate } from '../../utils/formatters';
+
 
 interface AgencyCardProps {
   agency: AgencyDetails;
@@ -46,8 +46,9 @@ export function AgencyCard({ agency }: AgencyCardProps) {
         {isVerified && (
           <Badge 
             className="absolute top-2 right-2 bg-green-500 hover:bg-green-600"
+            label='VERIFIED'
           >
-            Verified
+            
           </Badge>
         )}
       </div>

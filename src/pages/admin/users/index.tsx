@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { AdminLayout } from '../../../layouts/AdminLayout';
+
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Badge } from '../../../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs';
-import { Input } from '../../../components/ui/input';
+
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../components/ui/dropdown-menu';
 import { DataTable } from '../../../components/ui/data-table';
 import { Spinner } from '../../../components/ui/spinner';
-import { UserPlus, Search, MoreVertical, Mail, Filter, Clock, ChevronRight } from 'lucide-react';
+import { UserPlus, MoreVertical, Mail, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { adminAPI } from '../../../services/api/adminAPI';
 import { inviteAPI } from '../../../services/api/inviteAPI';
@@ -39,7 +39,7 @@ export default function UsersPage() {
   const [pendingInvitations, setPendingInvitations] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [_searchTerm, _setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('users');
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   
@@ -86,7 +86,7 @@ export default function UsersPage() {
   };
   
   // Handle user status change
-  const handleStatusChange = async (userId: string, newStatus: string) => {
+  const handleStatusChange = async (_userId: string, newStatus: string) => {
     try {
       // Logic for updating user status
       toast.success(`User status updated to ${newStatus}`);
@@ -165,8 +165,10 @@ export default function UsersPage() {
           row.original.role.includes('ADMIN') ? 'bg-blue-100 text-blue-800' :
           row.original.role.includes('USER') ? 'bg-indigo-100 text-indigo-800' :
           'bg-gray-100 text-gray-800'
-        }>
-          {formatRole(row.original.role)}
+        }
+        label= {formatRole(row.original.role)}
+        >
+         
         </Badge>
       ),
     },
@@ -184,8 +186,10 @@ export default function UsersPage() {
           row.original.status === 'INACTIVE' ? 'bg-yellow-100 text-yellow-800' :
           row.original.status === 'SUSPENDED' ? 'bg-red-100 text-red-800' :
           'bg-gray-100 text-gray-800'
-        }>
-          {row.original.status}
+        }
+          label={row.original.status}
+        >
+          
         </Badge>
       ),
     },
@@ -236,8 +240,10 @@ export default function UsersPage() {
           row.original.role.includes('ADMIN') ? 'bg-blue-100 text-blue-800' :
           row.original.role.includes('USER') ? 'bg-indigo-100 text-indigo-800' :
           'bg-gray-100 text-gray-800'
-        }>
-          {formatRole(row.original.role)}
+        }
+        label= {formatRole(row.original.role)}
+        >
+         
         </Badge>
       ),
     },
@@ -290,7 +296,7 @@ export default function UsersPage() {
             <TabsTrigger value="invitations">
               Pending Invitations
               {pendingInvitations.length > 0 && (
-                <Badge className="ml-2 bg-blue-100 text-blue-800">{pendingInvitations.length}</Badge>
+                <Badge className="ml-2 bg-blue-100 text-blue-800" label={`${pendingInvitations.length}`} ></Badge>
               )}
             </TabsTrigger>
           </TabsList>
@@ -325,7 +331,7 @@ export default function UsersPage() {
                     columns={userColumns}
                     data={activeUsers}
                     searchPlaceholder="Search users by name, email, or role..."
-                    searchColumn="email"
+                    searchKey="email"
                   />
                 )}
               </CardContent>
@@ -356,7 +362,7 @@ export default function UsersPage() {
                       columns={invitationColumns}
                       data={pendingInvitations}
                       searchPlaceholder="Search invitations by email or role..."
-                      searchColumn="email"
+                      searchKey="email"
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center p-8 text-center bg-gray-50 rounded-md">

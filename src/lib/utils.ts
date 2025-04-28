@@ -21,7 +21,7 @@ export function formatDate(dateString: string | number | Date): string {
   }).format(date);
 }
 
-export function formatCurrency(amount: number | string, currency: string = 'USD'): string {
+export function formatCurrency(amount: number | string, currency: string = 'INR'): string {
   if (amount === null || amount === undefined) return 'N/A';
   
   const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;

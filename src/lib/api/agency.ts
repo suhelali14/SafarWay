@@ -4,7 +4,7 @@ export interface AgencyDetails {
   id: string;
   name: string;
   description: string;
-  logo: string;
+  logo?: string;
   coverImage: string;
   contactInfo: {
     email: string;
@@ -21,7 +21,6 @@ export interface AgencyDetails {
   foundedYear: number;
   verificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
   badges: string[];
-  logo?: string;
   location: string;
   rating: number;
   reviewCount: number;
@@ -46,6 +45,7 @@ export interface AgencyReview {
   rating: number;
   comment: string;
   createdAt: string;
+  packageName?: string; // Add this property
 }
 
 export interface AgencyPackage {
@@ -143,4 +143,4 @@ export const agencyApi = {
     api.get<{ data: AgencyDetails[], total: number }>('/agencies', { params }),
 };
 
-export default agencyApi; 
+export default agencyApi;

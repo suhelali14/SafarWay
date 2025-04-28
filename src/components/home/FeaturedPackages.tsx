@@ -19,7 +19,7 @@ export function FeaturedPackages({ className = '', limit = 6 }: FeaturedPackages
     const fetchPackages = async () => {
       try {
         setLoading(true);
-        const response = await tourAPI.getAll({ limit, featured: true });
+        const response = await tourAPI.getAll();
         const packagesData = response?.data?.items || [];
         setPackages(Array.isArray(packagesData) ? packagesData : []);
       } catch (err) {
@@ -99,25 +99,27 @@ export function FeaturedPackages({ className = '', limit = 6 }: FeaturedPackages
             className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
           >
             {packages.map((pkg) => (
-              <motion.div key={pkg.id} variants={itemVariants}>
+                <motion.div key={pkg.id} variants={itemVariants}>
                 <PackageCard
-                  id={pkg.id}
-                  title={pkg.title}
-                  description={pkg.description}
-                  location={pkg.location}
-                  price={pkg.price}
-                  duration={pkg.duration}
-                  maxParticipants={pkg.maxParticipants}
-                  rating={pkg.rating || 4.5}
-                  imageUrl={pkg.coverImage || 'https://via.placeholder.com/600x400?text=Travel+Package'}
-                  agencyName={pkg.agency?.name || 'SafarWay Agency'}
-                  agencyLogo={pkg.agency?.logo}
-                  discount={pkg.discount}
-                  isFeatured={pkg.isFeatured}
-                  isPopular={pkg.isPopular}
-                  isNew={pkg.isNew}
+                  packageData={{
+                  id: pkg.id,
+                  title: pkg.title,
+                  description: pkg.description,
+                  price: pkg.price,
+                  discountedPrice: pkg.discountedPrice,
+                  discount: pkg.discount,
+                  imageUrl: pkg.coverImage || 'https://via.placeholder.com/600x400?text=Travel+Package',
+                  location: pkg.location,
+                  duration: pkg.duration,
+                  maxGroupSize: pkg.maxParticipants,
+                  validFrom: pkg.validFrom,
+                  validTill: pkg.validTill,
+                  featured: pkg.isFeatured,
+                  agencyId: pkg.agency?.id || '',
+                  }}
+                  showAgencyLink={true}
                 />
-              </motion.div>
+                </motion.div>
             ))}
           </motion.div>
         )}

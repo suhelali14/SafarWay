@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react"
-import { Search, SlidersHorizontal, ArrowUpDown, MapPin, Users, Star, Loader2 } from "lucide-react"
-import { Button } from "../components/ui/button"
+import { Loader2 } from "lucide-react"
+
 import { Input } from "../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
-import { Card, CardContent, CardFooter, CardHeader } from "../components/ui/card"
-import { Badge } from "../components/ui/badge"
+import { Card, CardContent, CardHeader } from "../components/ui/card"
+
 import { Slider } from "../components/ui/slider"
-import { Link } from "react-router-dom"
+
 import { TourPackage, toursApi } from "../lib/api/tours"
 import { useToast } from "../components/ui/use-toast"
 import { TourCard } from "../components/tours/TourCard"

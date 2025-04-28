@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { inviteService } from '../../services/inviteService';
-import { RootState } from '../store';
+import { RootState } from '../index';
 
 interface InviteState {
   loading: boolean;

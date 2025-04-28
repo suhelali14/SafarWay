@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, Filter, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Search, Edit, Trash2 } from 'lucide-react';
 import { tourAPI } from '../../services/api';
-import { formatCurrency, formatDate } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Select } from '../../components/ui/select';
@@ -25,14 +25,14 @@ interface Tour {
 
 export function ToursPage() {
   const [tours, setTours] = useState<Tour[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, _setFormData] = useState({
     title: '',
     description: '',
     price: '',
@@ -57,11 +57,7 @@ export function ToursPage() {
       setTours(Array.isArray(toursData) ? toursData : []);
     } catch (error) {
       console.error('Error fetching tours:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch tours',
-        variant: 'destructive',
-      });
+      toast.error('Failed to fetch tours');
       setTours([]); // Set empty array on error
     } finally {
       setLoading(false);
@@ -72,18 +68,11 @@ export function ToursPage() {
     e.preventDefault();
     try {
       await tourAPI.create(formData);
-      toast({
-        title: 'Success',
-        description: 'Tour created successfully',
-      });
+      toast.success('Tour created successfully');
       setIsCreateModalOpen(false);
       fetchTours();
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to create tour',
-        variant: 'destructive',
-      });
+      toast.error('Failed to create tour');
     }
   };
 
@@ -93,18 +82,11 @@ export function ToursPage() {
 
     try {
       await tourAPI.update(selectedTour.id, formData);
-      toast({
-        title: 'Success',
-        description: 'Tour updated successfully',
-      });
+      toast.success('Tour updated successfully');
       setIsEditModalOpen(false);
       fetchTours();
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to update tour',
-        variant: 'destructive',
-      });
+      toast.error('Failed to update tour');
     }
   };
 
@@ -113,18 +95,11 @@ export function ToursPage() {
 
     try {
       await tourAPI.delete(selectedTour.id);
-      toast({
-        title: 'Success',
-        description: 'Tour deleted successfully',
-      });
+      toast.success('Tour deleted successfully');
       setIsDeleteModalOpen(false);
       fetchTours();
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to delete tour',
-        variant: 'destructive',
-      });
+      toast.error('Failed to delete tour');
     }
   };
 
@@ -147,23 +122,22 @@ export function ToursPage() {
 
       <div className="flex gap-4 mb-6">
         <div className="flex-1">
-          <Input
-            placeholder="Search tours..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            icon={<Search className="w-4 h-4" />}
-          />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Search tours..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
-        <Select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          options={[
-            { value: 'all', label: 'All Status' },
-            { value: 'active', label: 'Active' },
-            { value: 'inactive', label: 'Inactive' },
-            { value: 'cancelled', label: 'Cancelled' },
-          ]}
-        />
+        <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value)}>
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="cancelled">Cancelled</option>
+        </Select>
       </div>
 
       <div className="bg-white rounded-lg shadow">
@@ -236,23 +210,24 @@ export function ToursPage() {
       </div>
 
       {/* Create Tour Modal */}
-      <Dialog
-        open={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Create New Tour"
-      >
-        <form onSubmit={handleCreateTour} className="space-y-4">
-          {/* Form fields */}
-          <Button type="submit">Create Tour</Button>
-        </form>
-      </Dialog>
+      {isCreateModalOpen && (
+        <Dialog
+          open={isCreateModalOpen}
+        >
+          <h2 className="text-lg font-bold mb-4">Create New Tour</h2>
+          <form onSubmit={handleCreateTour} className="space-y-4">
+            {/* Form fields */}
+            <Button type="submit">Create Tour</Button>
+          </form>
+        </Dialog>
+      )}
 
       {/* Edit Tour Modal */}
       <Dialog
         open={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        title="Edit Tour"
+        
       >
+        <h2 className="text-lg font-bold mb-4">Edit Tour</h2>
         <form onSubmit={handleUpdateTour} className="space-y-4">
           {/* Form fields */}
           <Button type="submit">Update Tour</Button>
@@ -262,8 +237,7 @@ export function ToursPage() {
       {/* Delete Tour Modal */}
       <Dialog
         open={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        title="Delete Tour"
+       
       >
         <p>Are you sure you want to delete this tour?</p>
         <div className="flex justify-end gap-2 mt-4">
@@ -283,4 +257,4 @@ export function ToursPage() {
       </Dialog>
     </div>
   );
-} 
+}

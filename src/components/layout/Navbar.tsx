@@ -6,6 +6,7 @@ import {
   Sheet,
   SheetContent,
   SheetTrigger,
+  SheetTitle,
 } from "../ui/sheet";
 import {
   DropdownMenu,
@@ -13,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Menu, X, User, LogOut, Package, Calendar, Home, Info, Phone, HelpCircle, ChevronDown } from "lucide-react";
+import { Menu, X, User, LogOut, Package, Calendar, Home, HelpCircle, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function Navbar() {
@@ -142,6 +143,7 @@ export function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <div className="flex flex-col space-y-4 mt-4">
                 {commonNavItems.map((item) => (
                   <Link

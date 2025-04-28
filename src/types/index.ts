@@ -1,3 +1,5 @@
+declare module 'pako';
+
 import type { ReactNode } from "react"
 
 export interface TravelPackage {

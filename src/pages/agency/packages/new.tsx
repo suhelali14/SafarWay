@@ -7,7 +7,7 @@ import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../../../components/ui/alert';
 import { Button } from '../../../components/ui/button';
 import { useAuth } from '../../../contexts/AuthContext';
-import { packageService, Package } from '../../../services/api/packageService';
+import { Package } from '../../../services/api/packageService';
 import { useToast } from '../../../hooks/use-toast';
 import { agencyAPI } from '../../../services/api';
 

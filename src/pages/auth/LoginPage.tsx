@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from '../../components/ui/form';
 import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
+
 import { toast } from 'react-hot-toast';
 
 const loginSchema = z.object({
@@ -27,6 +27,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
+  const { user, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -38,7 +39,13 @@ export function LoginPage() {
       password: '',
     },
   });
-
+  useEffect(()=>{
+    if (isAuthenticated) {
+      user?.role=="CUSTOMER"?
+          navigate('/') : user?.role == "SAFARWAY_ADMIN" || user?.role =="SAFARWAY_USER" ? navigate('/admin') : navigate('/agency/dashboard')
+      
+    }
+  })
   const onSubmit = async (data: LoginFormData) => {
     try {
       setIsLoading(true);
@@ -54,7 +61,7 @@ export function LoginPage() {
   };
 
   return (
-    <>
+    <div className='py-16'>
       <Helmet>
         <title>Login - SafarWay</title>
         <meta
@@ -154,6 +161,6 @@ export function LoginPage() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 } 

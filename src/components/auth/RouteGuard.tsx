@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { Skeleton } from '../ui/skeleton';
 
-type UserRole = "CUSTOMER" | "AGENCY_ADMIN" | "AGENCY_USER" | "SAFARWAY_ADMIN";
+type UserRole = "CUSTOMER" | "AGENCY_ADMIN" | "AGENCY_USER" | "SAFARWAY_ADMIN" | "SAFARWAY_USER";
 
 interface RouteGuardProps {
   children: ReactNode;

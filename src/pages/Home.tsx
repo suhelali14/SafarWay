@@ -5,7 +5,7 @@ import {
   Search, 
   MapPin, 
   Calendar, 
-  Users, 
+
   Star, 
   ArrowRight, 
   ChevronRight,
@@ -15,7 +15,7 @@ import {
   Heart,
   Mail,
   Phone,
-  Map
+
 } from 'lucide-react';
 
 // Mock data for featured tours

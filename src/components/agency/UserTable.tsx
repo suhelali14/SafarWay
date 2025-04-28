@@ -3,17 +3,9 @@ import { Button } from "../ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { AddUserDialog } from "./AddUserDialog";
 import { EditUserDialog } from "./EditUserDialog";
-import { MoreHorizontal, Pencil, Trash2, MailPlus, Check, X, UserCog } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel
-} from "../ui/dropdown-menu";
+
 import { Badge } from "../ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,18 +21,19 @@ import { formatDate } from "../../lib/utils";
 import { User } from "../../types/user";
 import { EditIcon, TrashIcon, MailIcon, BanIcon, CheckIcon } from "lucide-react";
 
-interface AddUserFormData {
-  name: string;
-  email: string;
-  password: string;
-  role: string;
-}
+// interface AddUserFormData {
+//   name: string;
+//   email: string;
+//   password: string;
+//   role: string;
+// }
 
-interface UpdateUserFormData {
-  name: string;
-  email: string;
-  role: string;
-}
+
+// interface UpdateUserFormData {
+//   name: string;
+//   email: string;
+//   role: string;
+// }
 
 interface UserTableProps {
   users: User[];
@@ -102,8 +95,8 @@ export function UserTable({ users, onAddUser, onUpdateUser, onDeleteUser, onRese
       AGENCY_USER: "bg-green-100 text-green-800",
     };
     return (
-      <Badge className={roleColors[role] || "bg-gray-100 text-gray-800"}>
-        {role.replace(/_/g, " ")}
+      <Badge className={roleColors[role] || "bg-gray-100 text-gray-800"} label={role.replace(/_/g, " ")}>
+        
       </Badge>
     );
   };
@@ -116,8 +109,8 @@ export function UserTable({ users, onAddUser, onUpdateUser, onDeleteUser, onRese
       INACTIVE: "bg-gray-100 text-gray-800",
     };
     return (
-      <Badge className={statusColors[status] || "bg-gray-100 text-gray-800"}>
-        {status}
+      <Badge className={statusColors[status] || "bg-gray-100 text-gray-800"} label= {status}>
+       
       </Badge>
     );
   };

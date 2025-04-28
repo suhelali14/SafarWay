@@ -43,15 +43,15 @@ export function LocationPicker({ isOpen, onClose, onSelect }: LocationPickerProp
     if (!searchQuery || !isLoaded) return
 
     const geocoder = new window.google.maps.Geocoder()
-    geocoder.geocode({ address: searchQuery }, (results, status) => {
+    geocoder.geocode({ address: searchQuery }, (results: google.maps.GeocoderResult[] | null, status: google.maps.GeocoderStatus) => {
       if (status === 'OK' && results?.[0]) {
-        const { lat, lng } = results[0].geometry.location
-        setSelectedLocation({
-          lat: lat(),
-          lng: lng(),
-          name: results[0].formatted_address
-        })
-        setLocationName(results[0].formatted_address)
+      const { lat, lng } = results[0].geometry.location
+      setSelectedLocation({
+        lat: lat(),
+        lng: lng(),
+        name: results[0].formatted_address
+      })
+      setLocationName(results[0].formatted_address)
       }
     })
   }, [searchQuery, isLoaded])

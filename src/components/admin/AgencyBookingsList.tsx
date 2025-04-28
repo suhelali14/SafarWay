@@ -4,7 +4,7 @@ import { Calendar, Search, Filter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
+
 import { Spinner } from '../ui/spinner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
@@ -249,7 +249,9 @@ export function AgencyBookingsList({ agencyId }: AgencyBookingsListProps) {
                       <span className="text-sm">${booking.amount.toLocaleString()}</span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <Badge className={getStatusBadgeClass(booking.status)}>{booking.status}</Badge>
+                      <span className={`badge ${getStatusBadgeClass(booking.status)}`}>
+                        {booking.status}
+                      </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <Button

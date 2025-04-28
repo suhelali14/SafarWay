@@ -1,11 +1,11 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
+import { AppDispatch, RootState } from '../store';
 import { login, registerCustomer, getCurrentUser, logout } from '../store/slices/authSlice';
 import { useCallback } from 'react';
 import { LoginCredentials, RegisterCustomerData } from '../api/auth';
 
 export const useAuth = () => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const { user, token, loading, error } = useSelector((state: RootState) => state.auth);
 
   const handleLogin = useCallback(async (credentials: LoginCredentials) => {
@@ -19,7 +19,11 @@ export const useAuth = () => {
 
   const handleRegister = useCallback(async (data: RegisterCustomerData) => {
     try {
-      await dispatch(registerCustomer(data)).unwrap();
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, value as string | Blob);
+      });
+      await dispatch(registerCustomer(formData)).unwrap();
       return true;
     } catch (error) {
       return false;
@@ -33,7 +37,7 @@ export const useAuth = () => {
   const checkAuth = useCallback(async () => {
     if (token) {
       try {
-        await dispatch(getCurrentUser()).unwrap();
+        await dispatch(getCurrentUser(true)).unwrap();
         return true;
       } catch (error) {
         return false;

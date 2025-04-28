@@ -9,7 +9,7 @@ export function ProfilePage() {
   const { user } = useAuth();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-16">
       <Helmet>
         <title>Profile | SafarWay</title>
         <meta name="description" content="Manage your SafarWay profile and account settings." />

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Outlet, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -70,19 +70,19 @@ export function AgencyLayout() {
       <Sidebar
         brandInfo={{
           name: user?.agency?.name || 'Agency Portal',
-          logo: user?.agency?.logo,
+          logo: user?.agency?.logo || '/default-logo.png',
         }}
         navigation={navigation}
         userInfo={{
           name: user?.name || 'Agency User',
           email: user?.email,
-          avatar: user?.profilePicture,
+          avatar: user?.profileImage || '/default-avatar.png',
         }}
         onLogout={handleLogout}
         defaultCollapsed={false}
       />
       
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto m-10">
         <Outlet />
       </main>
     </div>

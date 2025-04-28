@@ -1,37 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { AgencyLayout } from '../../components/layouts/AgencyLayout';
+
 import { AgencySummary } from '../../components/agency/AgencySummary';
 import { BookingChart } from '../../components/agency/BookingChart';
 import { RecentPackages } from '../../components/agency/RecentPackages';
 import { RecentBookings } from '../../components/agency/RecentBookings';
-import { agencyService } from '../../services/agencyService';
+
 import { toast } from '../../components/ui/use-toast';
+import { agencyAPI } from '../../services/api';
+
+import { getUserData } from '../../utils/session';
 
 export default function AgencyDashboardPage() {
   const [chartData, setChartData] = useState([]);
   const [recentPackages, setRecentPackages] = useState([]);
   const [recentBookings, setRecentBookings] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
+
+  const userData = getUserData();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       setIsLoading(true);
       try {
         // Fetch dashboard data
-        const dashboardData = await agencyService.getDashboardSummary('weekly');
+        const dashboardData = await agencyAPI.getDashboardSummary(`?agencyId=${userData?.agencyId}`);
         
         // Set chart data
-        if (dashboardData.bookingsChartData) {
-          setChartData(dashboardData.bookingsChartData);
+        if (dashboardData.data) {
+          setChartData(dashboardData.data);
         }
         
         // Fetch recent packages
-        const packagesData = await agencyService.getAllPackages();
+        const packagesData = await agencyAPI.getAllPackages({ agencyId: userData?.agencyId || undefined });
+        console.log("packagesData",packagesData)
         setRecentPackages(
-          packagesData.packages
+          packagesData.data.package
             .slice(0, 5)
-            .map(pkg => ({
+            .map((pkg: {
+              id: string;
+              title: string;
+              destination: string;
+              price: number;
+              rating: number;
+              totalReviews: number;
+              status: string;
+              imageUrl: string;
+            }) => ({
               id: pkg.id,
               title: pkg.title,
               destination: pkg.destination,
@@ -44,25 +59,17 @@ export default function AgencyDashboardPage() {
         );
         
         // Fetch recent bookings
-        const bookingsData = await agencyService.getAllBookings();
+        const bookingsData = await agencyAPI.getAllBookings();
         setRecentBookings(
-          bookingsData.bookings
-            .slice(0, 5)
-            .map(booking => ({
-              id: booking.id,
-              bookingId: booking.bookingId,
-              customerName: booking.customerName,
-              packageName: booking.packageName,
-              date: booking.bookingDate,
-              amount: booking.totalAmount,
-              status: booking.status,
-            }))
+          bookingsData.data.bookings
+           
+           
         );
       } catch (error) {
-        toast({
+        toast.success({
           title: "Error loading dashboard",
           description: "Failed to load dashboard data. Please try again later.",
-          variant: "destructive",
+          
         });
       } finally {
         setIsLoading(false);

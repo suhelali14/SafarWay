@@ -24,7 +24,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
 
     try {
       setLoading(true);
-      await register(values.email, values.password, values.inviteCode);
+      await register({ email: values.email, password: values.password, inviteCode: values.inviteCode });
       message.success('Registration successful');
       onSuccess?.();
     } catch (error: any) {

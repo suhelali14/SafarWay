@@ -8,7 +8,7 @@ export interface UserData {
   id: string;
   email: string;
   name: string;
-  role: 'CUSTOMER' | 'AGENCY_ADMIN' | 'AGENCY_USER' | 'SAFARWAY_ADMIN';
+  role: 'CUSTOMER' | 'AGENCY_ADMIN' | 'AGENCY_USER' | 'SAFARWAY_ADMIN' | 'SAFARWAY_USER';
   status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
   profileImage?: string | null;
   phone?: string;

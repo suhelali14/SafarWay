@@ -47,7 +47,7 @@ export function AcceptInvitePage() {
   const token = searchParams.get('token');
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [tokenVerified, setTokenVerified] = useState(false);
+  const [_tokenVerified, setTokenVerified] = useState(false);
   const [tokenError, setTokenError] = useState('');
   const [inviteData, setInviteData] = useState<{ email?: string; role?: string } | null>(null);
 

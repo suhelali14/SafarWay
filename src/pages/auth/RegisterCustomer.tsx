@@ -4,8 +4,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { customerRegistrationSchema } from '../../lib/validations/auth';
 import { useDispatch, useSelector } from 'react-redux';
+ // Ensure this file exists or update the path
 import { registerCustomer } from '../../lib/store/slices/authSlice';
-import { RootState } from '../../lib/store';
+import { AppDispatch, RootState } from '../../lib/store';
 import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -33,10 +34,11 @@ const steps = [
 ];
 
 export default function RegisterCustomerPage() {
+
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { toast } = useToast();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { loading } = useSelector((state: RootState) => state.auth);
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -65,7 +67,7 @@ export default function RegisterCustomerPage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setValue('profileImage', e.target.files);
+      setValue('profileImage', e.target.files || undefined);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result as string);
@@ -437,4 +439,4 @@ export default function RegisterCustomerPage() {
       </form>
     </AuthLayout>
   );
-} 
+}

@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import CustomerBookingCard from '../../components/customer/BookingCard';
+
 import CustomerLayout from '../../layouts/CustomerLayout';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import { Calendar, Search, Filter, AlertCircle, Plus, FileText } from 'lucide-react';
-import { useToast } from '../../components/ui/use-toast';
+import { Search, Plus, FileText, AlertCircle } from 'lucide-react';
 import { Spinner } from '../../components/ui/spinner';
 import { Alert, AlertDescription, AlertTitle } from '../../components/ui/alert';
-import { getBookings } from '../../services/api';
+
 import BookingList from '../../components/customer/BookingList';
-import { PageHeader } from '../../components/ui/page-header';
+
 
 // Mock data - replace with actual API calls
 const mockBookings = [
@@ -24,7 +23,7 @@ const mockBookings = [
     endDate: '2023-12-17',
     imageUrl: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4',
     price: 1200,
-    currency: 'USD',
+    currency: 'INR',
     travelers: 2,
     status: 'upcoming' as const,
     agency: {
@@ -40,7 +39,7 @@ const mockBookings = [
     endDate: '2023-11-12',
     imageUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34',
     price: 1800,
-    currency: 'USD',
+    currency: 'INR',
     travelers: 2,
     status: 'completed' as const,
     agency: {
@@ -56,7 +55,7 @@ const mockBookings = [
     endDate: '2024-02-25',
     imageUrl: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26',
     price: 2400,
-    currency: 'USD',
+    currency: 'INR',
     travelers: 1,
     status: 'confirmed' as const,
     agency: {
@@ -72,7 +71,7 @@ const mockBookings = [
     endDate: '2023-10-17',
     imageUrl: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9',
     price: 1100,
-    currency: 'USD',
+    currency: 'INR',
     travelers: 3,
     status: 'cancelled' as const,
     agency: {
@@ -88,7 +87,7 @@ const mockBookings = [
     endDate: '2024-06-27',
     imageUrl: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff',
     price: 2200,
-    currency: 'USD',
+    currency: 'INR',
     travelers: 2,
     status: 'pending' as const,
     agency: {
@@ -103,7 +102,7 @@ type BookingStatus = 'all' | 'upcoming' | 'completed' | 'cancelled' | 'pending' 
 
 const BookingsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  // const { toast } = useToast();
   const [bookings, setBookings] = useState<typeof mockBookings>([]);
   const [filteredBookings, setFilteredBookings] = useState<typeof mockBookings>([]);
   const [loading, setLoading] = useState(true);
@@ -178,31 +177,31 @@ const BookingsPage: React.FC = () => {
     filterAndSortBookings();
   }, [bookings, activeTab, searchQuery, sortBy]);
 
-  const handleViewDetails = (id: string) => {
-    navigate(`/customer/bookings/${id}`);
-  };
+  // const handleViewDetails = (id: string) => {
+  //   navigate(`/customer/bookings/${id}`);
+  // };
 
-  const handleCancelBooking = (id: string) => {
-    // Confirmation dialog would be good here
-    toast({
-      title: 'Cancellation Request',
-      description: 'Your cancellation request has been submitted. We will process it shortly.',
-      variant: 'default',
-    });
+  // const handleCancelBooking = (id: string) => {
+  //   // Confirmation dialog would be good here
+  //   toast({
+  //     title: 'Cancellation Request',
+  //     description: 'Your cancellation request has been submitted. We will process it shortly.',
+  //     variant: 'default',
+  //   });
     
-    // In a real app, make an API call to cancel the booking
-    // Then refresh the bookings list
-  };
+  //   // In a real app, make an API call to cancel the booking
+  //   // Then refresh the bookings list
+  // };
 
-  const handleDownloadInvoice = (id: string) => {
-    toast({
-      title: 'Downloading Invoice',
-      description: 'Your invoice will be downloaded shortly.',
-      variant: 'default',
-    });
+  // const handleDownloadInvoice = (id: string) => {
+  //   toast({
+  //     title: 'Downloading Invoice',
+  //     description: 'Your invoice will be downloaded shortly.',
+  //     variant: 'default',
+  //   });
     
-    // In a real app, make an API call to get the invoice PDF
-  };
+  //   // In a real app, make an API call to get the invoice PDF
+  // };
 
   if (loading) {
     return (

@@ -99,7 +99,7 @@ export default function ReportsPage() {
             tailored to your needs.
           </p>
           <div className="flex gap-4">
-            <Select className="flex-1">
+            <Select >
               <option value="">Select Report Type</option>
               <option value="revenue">Revenue Report</option>
               <option value="tours">Tours Report</option>

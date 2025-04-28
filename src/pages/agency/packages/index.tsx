@@ -175,25 +175,25 @@ export function AgencyPackagesPage() {
     }
   };
 
-  const handleStatusChange = async (packageId: string, status: PackageStatus) => {
-    if (!agencyId) return;
+  // const handleStatusChange = async (packageId: string, status: PackageStatus) => {
+  //   if (!agencyId) return;
     
-    try {
-      await packageService.changePackageStatus(agencyId, packageId, status);
-      toast({
-        title: "Success",
-        description: `Package status changed to ${status.toLowerCase()}`
-      });
-      fetchPackages(); // Reload the list
-    } catch (error) {
-      console.error('Error changing package status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to change package status",
-        variant: "destructive"
-      });
-    }
-  };
+  //   try {
+  //     await packageService.changePackageStatus(agencyId, packageId, status);
+  //     toast({
+  //       title: "Success",
+  //       description: `Package status changed to ${status.toLowerCase()}`
+  //     });
+  //     fetchPackages(); // Reload the list
+  //   } catch (error) {
+  //     console.error('Error changing package status:', error);
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to change package status",
+  //       variant: "destructive"
+  //     });
+  //   }
+  // };
 
   const getStatusBadgeVariant = (status: PackageStatus) => {
     switch (status) {
@@ -219,7 +219,7 @@ export function AgencyPackagesPage() {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
@@ -472,8 +472,8 @@ export function AgencyPackagesPage() {
                         {pkg.difficultyLevel || 'N/A'}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getStatusBadgeVariant(pkg.status)}>
-                          {pkg.status}
+                        <Badge variant={getStatusBadgeVariant(pkg.status)} label={pkg.status}>
+                          
                         </Badge>
                       </TableCell>
                       <TableCell>{formatDate(pkg.createdAt)}</TableCell>

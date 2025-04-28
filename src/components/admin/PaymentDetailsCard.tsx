@@ -1,9 +1,10 @@
-import { DollarSign, ArrowLeft, Download, Printer } from 'lucide-react';
+import { IndianRupee, ArrowLeft, Download, Printer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../../ui/card';
-import { Button } from '../../ui/button';
-import { Badge } from '../../ui/badge';
-import { Separator } from '../../ui/separator';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../ui/card';
+import { Button } from '../ui/button'; // Adjusted the path to match the correct location
+import { Chip as Badge } from '@mui/material'; // Replacing with Material-UI Chip as an alternative
+// import { Separator } from '../../ui/separator'; // Removed due to missing module
+import { Divider } from '@mui/material'; // Example replacement using Material-UI Divider
 
 type PaymentDetailsProps = {
   payment: {
@@ -111,16 +112,14 @@ export function PaymentDetailsCard({ payment, showBackButton = true }: PaymentDe
               </Button>
             )}
             <CardTitle className="flex items-center text-xl">
-              <DollarSign className="w-5 h-5 mr-2" />
+              <IndianRupee className="w-5 h-5 mr-2" />
               Payment Details
             </CardTitle>
             <CardDescription>
               Transaction ID: {payment.transactionId}
             </CardDescription>
           </div>
-          <Badge className={getStatusBadgeClass(payment.status)}>
-            {payment.status}
-          </Badge>
+          <Badge className={getStatusBadgeClass(payment.status)} label={payment.status} />
         </div>
       </CardHeader>
 
@@ -131,26 +130,26 @@ export function PaymentDetailsCard({ payment, showBackButton = true }: PaymentDe
             <h3 className="text-sm font-medium text-gray-500 mb-2">Payment Summary</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-md">
               <div>
-                <p className="text-sm text-gray-500">Amount</p>
-                <p className="text-lg font-semibold">${payment.amount.toLocaleString()}</p>
+          <p className="text-sm text-gray-500">Amount</p>
+          <p className="text-lg font-semibold">${payment.amount.toLocaleString()}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Payment Date</p>
-                <p className="font-medium">{formatDate(payment.paymentDate)}</p>
+          <p className="text-sm text-gray-500">Payment Date</p>
+          <p className="font-medium">{formatDate(payment.paymentDate)}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Payment Method</p>
-                <p className="font-medium">{payment.paymentMethod}</p>
+          <p className="text-sm text-gray-500">Payment Method</p>
+          <p className="font-medium">{payment.paymentMethod}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Booking ID</p>
-                <Button
-                  variant="link"
-                  className="p-0 h-auto"
-                  onClick={() => navigate(`/admin/bookings/${payment.bookingId}`)}
-                >
-                  #{payment.bookingId}
-                </Button>
+          <p className="text-sm text-gray-500">Booking ID</p>
+          <Button
+            variant="link"
+            className="p-0 h-auto"
+            onClick={() => navigate(`/admin/bookings/${payment.bookingId}`)}
+          >
+            #{payment.bookingId}
+          </Button>
               </div>
             </div>
           </div>
@@ -160,20 +159,20 @@ export function PaymentDetailsCard({ payment, showBackButton = true }: PaymentDe
             <h3 className="text-sm font-medium text-gray-500 mb-2">Customer Information</h3>
             <div className="bg-gray-50 p-4 rounded-md">
               <div className="mb-3">
-                <p className="text-sm text-gray-500">Name</p>
-                <p className="font-medium">{payment.customerName}</p>
+          <p className="text-sm text-gray-500">Name</p>
+          <p className="font-medium">{payment.customerName}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Email</p>
-                <p className="font-medium">{payment.customerEmail}</p>
+          <p className="text-sm text-gray-500">Email</p>
+          <p className="font-medium">{payment.customerEmail}</p>
               </div>
               {payment.billingAddress && (
-                <div className="mt-3">
-                  <p className="text-sm text-gray-500">Billing Address</p>
-                  <p className="font-medium">
-                    {payment.billingAddress.street}, {payment.billingAddress.city}, {payment.billingAddress.state} {payment.billingAddress.zipCode}, {payment.billingAddress.country}
-                  </p>
-                </div>
+          <div className="mt-3">
+            <p className="text-sm text-gray-500">Billing Address</p>
+            <p className="font-medium">
+              {payment.billingAddress.street}, {payment.billingAddress.city}, {payment.billingAddress.state} {payment.billingAddress.zipCode}, {payment.billingAddress.country}
+            </p>
+          </div>
               )}
             </div>
           </div>
@@ -183,24 +182,24 @@ export function PaymentDetailsCard({ payment, showBackButton = true }: PaymentDe
             <h3 className="text-sm font-medium text-gray-500 mb-2">Booking Information</h3>
             <div className="bg-gray-50 p-4 rounded-md">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Package</p>
-                  <p className="font-medium">{payment.packageName}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Agency</p>
-                  <p className="font-medium">{payment.agencyName}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Destination</p>
-                  <p className="font-medium">{payment.destination}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Travel Dates</p>
-                  <p className="font-medium">
-                    {formatTravelDate(payment.travelDates.startDate)} - {formatTravelDate(payment.travelDates.endDate)}
-                  </p>
-                </div>
+          <div>
+            <p className="text-sm text-gray-500">Package</p>
+            <p className="font-medium">{payment.packageName}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Agency</p>
+            <p className="font-medium">{payment.agencyName}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Destination</p>
+            <p className="font-medium">{payment.destination}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Travel Dates</p>
+            <p className="font-medium">
+              {formatTravelDate(payment.travelDates.startDate)} - {formatTravelDate(payment.travelDates.endDate)}
+            </p>
+          </div>
               </div>
             </div>
           </div>
@@ -210,29 +209,29 @@ export function PaymentDetailsCard({ payment, showBackButton = true }: PaymentDe
             <div>
               <h3 className="text-sm font-medium text-gray-500 mb-2">Payment Breakdown</h3>
               <div className="bg-gray-50 p-4 rounded-md">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm">Subtotal</span>
-                    <span className="font-medium">${subtotal.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Booking Fee</span>
-                    <span className="font-medium">${payment.fees.bookingFee.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Platform Fee</span>
-                    <span className="font-medium">${payment.fees.platformFee.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Tax</span>
-                    <span className="font-medium">${payment.fees.taxAmount.toLocaleString()}</span>
-                  </div>
-                  <Separator className="my-2" />
-                  <div className="flex justify-between font-semibold">
-                    <span>Total</span>
-                    <span>${payment.amount.toLocaleString()}</span>
-                  </div>
-                </div>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm">Subtotal</span>
+              <span className="font-medium">${subtotal.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm">Booking Fee</span>
+              <span className="font-medium">${payment.fees.bookingFee.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm">Platform Fee</span>
+              <span className="font-medium">${payment.fees.platformFee.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm">Tax</span>
+              <span className="font-medium">${payment.fees.taxAmount.toLocaleString()}</span>
+            </div>
+            <Divider className="my-2" />
+            <div className="flex justify-between">
+              <span className="font-semibold">Total</span>
+              <span className="font-semibold">${payment.amount.toLocaleString()}</span>
+            </div>
+          </div>
               </div>
             </div>
           )}
@@ -242,36 +241,36 @@ export function PaymentDetailsCard({ payment, showBackButton = true }: PaymentDe
             <div>
               <h3 className="text-sm font-medium text-gray-500 mb-2">Refund Information</h3>
               <div className="bg-gray-50 p-4 rounded-md">
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500">Refund Date</p>
-                    <p className="font-medium">{formatDate(payment.refundDetails.refundDate)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Refund Amount</p>
-                    <p className="font-medium">${payment.refundDetails.refundAmount.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Reason</p>
-                    <p className="font-medium">{payment.refundDetails.refundReason}</p>
-                  </div>
-                </div>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm text-gray-500">Refund Date</p>
+              <p className="font-medium">{formatDate(payment.refundDetails.refundDate)}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Refund Amount</p>
+              <p className="font-medium">${payment.refundDetails.refundAmount.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Reason</p>
+              <p className="font-medium">{payment.refundDetails.refundReason}</p>
+            </div>
+          </div>
               </div>
             </div>
           )}
         </div>
-      </CardContent>
-
-      <CardFooter className="flex justify-between flex-wrap gap-2">
-        <Button variant="outline" onClick={handlePrintInvoice}>
-          <Printer className="h-4 w-4 mr-2" />
-          Print Invoice
-        </Button>
-        <Button onClick={handleDownloadInvoice}>
-          <Download className="h-4 w-4 mr-2" />
-          Download Invoice
-        </Button>
-      </CardFooter>
-    </Card>
+        </CardContent>
+  
+        <CardFooter className="flex justify-between flex-wrap gap-2">
+          <Button variant="outline" onClick={handlePrintInvoice}>
+            <Printer className="h-4 w-4 mr-2" />
+            Print Invoice
+          </Button>
+          <Button onClick={handleDownloadInvoice}>
+            <Download className="h-4 w-4 mr-2" />
+            Download Invoice
+          </Button>
+        </CardFooter>
+    </Card> 
   );
 } 

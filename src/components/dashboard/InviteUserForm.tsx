@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useDispatch, useSelector } from 'react-redux';
 import { inviteUserSchema } from '../../lib/validations/invite';
-import { createInvite, clearError, clearSuccess } from '../../lib/store/slices/inviteSlice';
-import { RootState } from '../../lib/store';
+import { createInvite } from '../../lib/store/slices/inviteSlice';
+import { RootState, AppDispatch } from '../../lib/store';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -19,15 +19,15 @@ type InviteUserFormData = {
 };
 
 interface InviteUserFormProps {
-  userRole: 'SAFARWAY_ADMIN' | 'SAFARWAY_USER' | 'AGENCY_ADMIN' | 'AGENCY_USER';
+  userRole: 'SAFARWAY_ADMIN' | 'SAFARWAY_USER' | 'AGENCY_ADMIN' | 'AGENCY_USER' | 'CUSTOMER';
   agencyId?: string;
   onSuccess?: () => void;
 }
 
 export function InviteUserForm({ userRole, agencyId, onSuccess }: InviteUserFormProps) {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const { toast } = useToast();
-  const { loading, error, success } = useSelector((state: RootState) => state.invite);
+  const { loading } = useSelector((state: RootState) => state.invite);
   const [isOpen, setIsOpen] = useState(false);
 
   const {
@@ -144,4 +144,4 @@ export function InviteUserForm({ userRole, agencyId, onSuccess }: InviteUserForm
       )}
     </div>
   );
-} 
+}

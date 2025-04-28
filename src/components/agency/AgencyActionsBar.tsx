@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { agencyApi } from '../../lib/api/agency';
@@ -17,7 +16,7 @@ export function AgencyActionsBar({
   onContact, 
   onReport 
 }: AgencyActionsBarProps) {
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   
   // Check if agency is bookmarked
@@ -30,38 +29,35 @@ export function AgencyActionsBar({
   const isBookmarked = bookmarkData?.bookmarked || false;
   
   // Toggle bookmark mutation
-  const { mutate: toggleBookmark, isLoading: isTogglingBookmark } = useMutation({
+  const { mutate: toggleBookmark, status: toggleBookmarkStatus } = useMutation({
     mutationFn: () => agencyApi.toggleBookmark(agencyId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agencyBookmarked', agencyId] });
-      toast({
+      toast.success({
         title: isBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks',
         description: isBookmarked 
           ? 'This agency has been removed from your bookmarks.'
           : 'This agency has been added to your bookmarks.',
-        variant: 'default',
       });
     },
     onError: () => {
-      toast({
+      toast.error({
         title: 'Action failed',
         description: 'Failed to update bookmark status. Please try again.',
-        variant: 'destructive',
       });
-    }
+    },
   });
   
   // Handle bookmark toggle
   const handleBookmarkToggle = () => {
     if (!isAuthenticated) {
-      toast({
+      toast.error({
         title: 'Authentication required',
         description: 'Please login to bookmark this agency.',
-        variant: 'destructive',
       });
       return;
     }
-    
+
     toggleBookmark();
   };
   
@@ -73,10 +69,9 @@ export function AgencyActionsBar({
   // Handle report click
   const handleReportClick = () => {
     if (!isAuthenticated) {
-      toast({
+      toast.error({
         title: 'Authentication required',
         description: 'Please login to report this agency.',
-        variant: 'destructive',
       });
       return;
     }
@@ -100,7 +95,7 @@ export function AgencyActionsBar({
           variant="outline"
           className="gap-2"
           onClick={handleBookmarkToggle}
-          disabled={!isAuthenticated || isLoadingBookmark || isTogglingBookmark}
+          disabled={!isAuthenticated || isLoadingBookmark || toggleBookmarkStatus === 'pending'}
         >
           {isBookmarked ? (
             <>
@@ -126,4 +121,4 @@ export function AgencyActionsBar({
       </div>
     </div>
   );
-} 
+}

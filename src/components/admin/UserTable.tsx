@@ -1,8 +1,7 @@
-import { useState } from "react";
+
 import { Button } from "../ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { ConfirmDeleteDialog } from "../ui/confirm-delete-dialog";
-import { EditUserDialog } from "../agency/EditUserDialog";
+
 import { Pencil, Trash2, MailPlus, Ban, CheckCircle } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
@@ -38,9 +37,7 @@ export function UserTable({
       CUSTOMER: "bg-gray-100 text-gray-800",
     };
     return (
-      <Badge className={roleColors[role] || "bg-gray-100 text-gray-800"}>
-        {role.replace(/_/g, " ")}
-      </Badge>
+      <Badge className={roleColors[role] || "bg-gray-100 text-gray-800"} label={role.replace(/_/g, " ")} />
     );
   };
 
@@ -52,9 +49,10 @@ export function UserTable({
       INACTIVE: "bg-gray-100 text-gray-800",
     };
     return (
-      <Badge className={statusColors[status] || "bg-gray-100 text-gray-800"}>
-        {status}
-      </Badge>
+      <Badge
+        className={statusColors[status] || "bg-gray-100 text-gray-800"}
+        label={status}
+      />
     );
   };
 

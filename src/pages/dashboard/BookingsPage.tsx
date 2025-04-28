@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Calendar, User, DollarSign, Clock } from 'lucide-react';
-import { bookingAPI, tourAPI } from '../../services/api';
+import { Search } from 'lucide-react';
+
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import { Select } from '../../components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
-import toast from 'react-hot-toast';
+
+import { Dialog } from '../../components/ui/dialog';
+
 
 interface Booking {
   id: string;
@@ -30,53 +30,62 @@ interface Booking {
 }
 
 export function BookingsPage() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [bookings, _setBookings] = useState<Booking[]>([]);
+  const [_loading, _setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, _setStatusFilter] = useState('all');
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchBookings();
-  }, []);
+  // useEffect(() => {
+  //   fetchBookings();
+  // }, []);
 
-  const fetchBookings = async () => {
-    try {
-      setLoading(true);
-      const response = await bookingAPI.getAll();
-      // Ensure we have a valid array of bookings
-      const bookingsData = response?.data?.items || [];
-      setBookings(Array.isArray(bookingsData) ? bookingsData : []);
-    } catch (error) {
-      console.error('Error fetching bookings:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch bookings',
-        variant: 'destructive',
-      });
-      setBookings([]); // Set empty array on error
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchBookings = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const response = await customerAPI.getMyBookings();
+  //     // Ensure we have a valid array of bookings
+  //     const bookingsData = response?.data || [];
+  //     setBookings(Array.isArray(bookingsData) ? bookingsData.map(booking => ({
+  //       ...booking,
+  //       tour: {
+  //         title: booking.tour.title,
+  //         price: booking.tour.price,
+  //         duration: booking.tour.duration,
+  //         location: booking.tour.location || booking.tour.destination || ''
+  //       },
+  //       ...booking,
+  //       status: booking.status.toLowerCase() as 'pending' | 'confirmed' | 'cancelled' | 'completed'
+  //     })) : []);
+  //   } catch (error) {
+  //     console.error('Error fetching bookings:', error);
+  //     toast({
+  //       message: 'Error',
+  //       description: 'Failed to fetch bookings',
+  //       variant: 'destructive',
+  //     });
+  //     setBookings([]); // Set empty array on error
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const handleStatusUpdate = async (bookingId: string, newStatus: Booking['status']) => {
-    try {
-      await bookingAPI.update(bookingId, { status: newStatus });
-      toast({
-        title: 'Success',
-        description: 'Booking status updated successfully',
-      });
-      fetchBookings();
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to update booking status',
-        variant: 'destructive',
-      });
-    }
-  };
+  // const handleStatusUpdate = async (bookingId: string, newStatus: Booking['status']) => {
+  //   try {
+  //     await customerAPI.update(bookingId, { status: newStatus });
+  //     toast.success(
+  //      'Booking status updated successfully',
+  //   );
+  //     fetchBookings();
+  //   } catch (error) {
+  //     toast({
+  //       title: 'Error',
+  //       description: 'Failed to update booking status',
+  //       variant: 'destructive',
+  //     });
+  //   }
+  // };
 
   const filteredBookings = bookings.filter((booking) => {
     const matchesSearch = 
@@ -110,24 +119,26 @@ export function BookingsPage() {
 
       <div className="flex gap-4 mb-6">
         <div className="flex-1">
+          <Search className="w-4 h-4" />
           <Input
             placeholder="Search bookings..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            icon={<Search className="w-4 h-4" />}
+           
           />
         </div>
-        <Select
+        {/* <Select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          options={[
-            { value: 'all', label: 'All Status' },
-            { value: 'pending', label: 'Pending' },
-            { value: 'confirmed', label: 'Confirmed' },
-            { value: 'cancelled', label: 'Cancelled' },
-            { value: 'completed', label: 'Completed' },
-          ]}
-        />
+          placeholder="Filter by status"
+        >
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="completed">Completed</option>
+        </Select> */}
+        
       </div>
 
       <div className="bg-white rounded-lg shadow">
@@ -201,14 +212,14 @@ export function BookingsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
+                            // onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
                           >
                             Confirm
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
+                            // onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
                           >
                             Cancel
                           </Button>
@@ -218,7 +229,7 @@ export function BookingsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleStatusUpdate(booking.id, 'completed')}
+                          // onClick={() => handleStatusUpdate(booking.id, 'completed')}
                         >
                           Complete
                         </Button>
@@ -235,8 +246,7 @@ export function BookingsPage() {
       {/* Booking Details Modal */}
       <Dialog
         open={isDetailsModalOpen}
-        onClose={() => setIsDetailsModalOpen(false)}
-        title="Booking Details"
+       
       >
         {selectedBooking && (
           <div className="space-y-4">
@@ -273,4 +283,4 @@ export function BookingsPage() {
       </Dialog>
     </div>
   );
-} 
+}

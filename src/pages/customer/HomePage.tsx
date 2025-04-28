@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Grid, Typography, Card, CardContent, Button, TextField, MenuItem, InputAdornment, Paper, Tabs, Tab, CircularProgress, Divider, IconButton, Chip, Autocomplete } from '@mui/material';
+import { Box, Container, Grid, Typography, Card, CardContent, Button, TextField, InputAdornment, Paper, Tabs, Tab, CircularProgress, Divider, IconButton, Chip, Autocomplete } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import dayjs from 'dayjs';
+import { Dayjs } from 'dayjs';
 import SearchIcon from '@mui/icons-material/Search';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -18,8 +18,8 @@ import TrainIcon from '@mui/icons-material/Train';
 import ExploreIcon from '@mui/icons-material/Explore';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
-import { apiService } from '../../services/api';
-import PackageCard from '../../components/customer/PackageCard';
+import apiService from '../../services/api';
+
 import BookingCard from '../../components/customer/BookingCard';
 import OfferCard from '../../components/customer/OfferCard';
 
@@ -131,12 +131,12 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentBookings, setRecentBookings] = useState<Booking[]>([]);
-  const [upcomingTrips, setUpcomingTrips] = useState<UpcomingTrip[]>([]);
+  const [_upcomingTrips, setUpcomingTrips] = useState<UpcomingTrip[]>([]);
   const [recommendedPackages, setRecommendedPackages] = useState<TourPackage[]>([]);
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [searchTab, setSearchTab] = useState(0);
-  const [popularDestinations, setPopularDestinations] = useState<Theme[]>([
+  const [popularDestinations, _setPopularDestinations] = useState<Theme[]>([
     { name: 'Maldives', image: 'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80' },
     { name: 'Switzerland', image: 'https://images.unsplash.com/photo-1527668752968-14dc70a27c95?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80' },
     { name: 'Paris', image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1473&q=80' },
@@ -279,12 +279,12 @@ const HomePage = () => {
     return wishlistItems.some(item => item.packageId === packageId);
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
-  };
+  // const formatDate = (dateString: string) => {
+  //   const date = new Date(dateString);
+  //   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+  // };
 
-  const handleSearchTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleSearchTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSearchTab(newValue);
   };
 
@@ -312,10 +312,10 @@ const HomePage = () => {
       <NavbarSection>
         <Container>
           <Grid container alignItems="center" justifyContent="space-between">
-            <Grid item>
+            <Grid >
               <Typography variant="h5" fontWeight="bold">SafarWay</Typography>
             </Grid>
-            <Grid item>
+            <Grid >
               <Box display="flex" gap={2}>
                 <Button color="inherit">Packages</Button>
                 <Button color="inherit">Hotels</Button>
@@ -359,7 +359,7 @@ const HomePage = () => {
           </Paper>
 
           <Grid container spacing={2}>
-            <Grid item xs={12} md={3}>
+            <Grid >
               <Autocomplete
                 options={locations}
                 renderInput={(params) => (
@@ -382,15 +382,15 @@ const HomePage = () => {
                   />
                 )}
                 value={destination}
-                onChange={(event, newValue) => setDestination(newValue || '')}
+                onChange={(_event, newValue) => setDestination(newValue || '')}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid >
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="When?"
                   value={travelDate}
-                  onChange={(newValue) => setTravelDate(newValue)}
+                  onChange={(newValue: Dayjs | null) => setTravelDate(newValue)}
                   slotProps={{
                     textField: {
                       fullWidth: true,
@@ -407,7 +407,7 @@ const HomePage = () => {
                 />
               </LocalizationProvider>
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid >
               <TextField
                 label="Guests"
                 type="number"
@@ -425,7 +425,7 @@ const HomePage = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid >
               <TextField
                 label="Budget (Max)"
                 type="number"
@@ -443,7 +443,7 @@ const HomePage = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid >
               <Button 
                 variant="contained" 
                 color="primary" 
@@ -470,7 +470,7 @@ const HomePage = () => {
           </Box>
           <Grid container spacing={3}>
             {offers.map((offer) => (
-              <Grid item xs={12} md={6} key={offer.id}>
+              <Grid >
                 <OfferCard offer={offer} />
               </Grid>
             ))}
@@ -483,8 +483,8 @@ const HomePage = () => {
             Popular Destinations
           </Typography>
           <Grid container spacing={2}>
-            {popularDestinations.map((destination, index) => (
-              <Grid item xs={6} sm={3} key={index}>
+            {popularDestinations.map((destination, _) => (
+              <Grid >
                 <Card sx={{ 
                   height: 180, 
                   backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url(${destination.image})`,
@@ -517,7 +517,7 @@ const HomePage = () => {
           </Typography>
           <Grid container spacing={3}>
             {recommendedPackages.map((pkg) => (
-              <Grid item xs={12} sm={6} md={4} key={pkg.id}>
+              <Grid >
                 <Card sx={{ 
                   height: '100%', 
                   display: 'flex', 
@@ -637,7 +637,7 @@ const HomePage = () => {
               Your Travel Summary
             </Typography>
             <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid >
                 <Card sx={{ borderRadius: 2 }}>
                   <CardContent>
                     <Typography variant="h6">Total Bookings</Typography>
@@ -647,7 +647,7 @@ const HomePage = () => {
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid>
                 <Card sx={{ borderRadius: 2 }}>
                   <CardContent>
                     <Typography variant="h6">Upcoming Trips</Typography>
@@ -657,7 +657,7 @@ const HomePage = () => {
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid >
                 <Card sx={{ borderRadius: 2 }}>
                   <CardContent>
                     <Typography variant="h6">Completed Trips</Typography>
@@ -667,7 +667,7 @@ const HomePage = () => {
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid >
                 <Card sx={{ borderRadius: 2 }}>
                   <CardContent>
                     <Typography variant="h6">Total Spent</Typography>
@@ -689,8 +689,23 @@ const HomePage = () => {
             </Typography>
             <Grid container spacing={3}>
               {recentBookings.slice(0, 4).map((booking) => (
-                <Grid item xs={12} md={6} key={booking.id}>
-                  <BookingCard booking={booking} />
+                <Grid >
+                  <BookingCard
+                    id={booking.id}
+                    destination={booking.destination} 
+                    imageUrl={booking.imageUrl || ''}
+                    status={booking.status as "upcoming" | "confirmed" | "pending" | "completed" | "cancelled"}
+                    agency={{ name: "SafarWay" }}
+                    startDate={booking.startDate}
+                    endDate={booking.endDate}
+                    price={booking.totalAmount}
+                    currency="USD"
+                    travelers={1}
+                    bookingReference={booking.id}
+                    paymentStatus="paid"
+                    onViewDetails={() => {}}
+                    
+    />
                 </Grid>
               ))}
             </Grid>

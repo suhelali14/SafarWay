@@ -25,7 +25,6 @@ import {
   Star,
   Clock,
   CheckCircle,
-  XCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { adminAPI } from '../../services/api';

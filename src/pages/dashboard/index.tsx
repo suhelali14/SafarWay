@@ -1,4 +1,4 @@
-import { Package, Calendar, DollarSign, Star, } from 'lucide-react'
+import { Package, Calendar, IndianRupee, Star, } from 'lucide-react'
 import { StatCard } from '../../components/dashboard/cards/stat-card'
 
 export function DashboardPage() {
@@ -26,7 +26,7 @@ export function DashboardPage() {
     {
       title: 'Total Earnings',
       value: '₹4,89,250',
-      icon: DollarSign,
+      icon: IndianRupee,
       trend: {
         value: 4.1,
         isPositive: false

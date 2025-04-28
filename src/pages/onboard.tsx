@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
@@ -36,7 +36,7 @@ export default function OnboardPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const { login } = useAuth();
+  
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +44,7 @@ export default function OnboardPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [tokenVerified, setTokenVerified] = useState(false);
   const [verifyingToken, setVerifyingToken] = useState(true);
-
+  const { user, isAuthenticated } = useAuth();
   // Initialize form with zod schema
   const form = useForm<z.infer<typeof onboardingFormSchema>>({
     resolver: zodResolver(onboardingFormSchema),
@@ -55,7 +55,13 @@ export default function OnboardPage() {
       confirmPassword: '',
     },
   });
-
+  useMemo(()=>{
+      if (isAuthenticated) {
+        user?.role=="CUSTOMER"?
+            navigate('/') : user?.role == "SAFARWAY_ADMIN" || user?.role =="SAFARWAY_USER" ? navigate('/admin') : navigate('/agency/dashboard')
+        
+      }
+    },[isAuthenticated, navigate])
   // Verify token on page load
   useEffect(() => {
     const verifyToken = async () => {
@@ -107,14 +113,17 @@ export default function OnboardPage() {
       toast.success('Registration completed successfully!');
       
       // Login the user with the returned token
-      login(response.data.token);
+      
+      if (response.success) {
+        navigate('/login', {
+          state: { message: 'Registration successful! Please log in.' },
+        });
+      } else {  
+        setError('Failed to complete registration. Please try again.');
+      }
       
       // Redirect to the appropriate dashboard based on user role
-      if (['AGENCY_ADMIN', 'AGENCY_USER'].includes(response.data.user.role)) {
-        navigate('/agency/dashboard');
-      } else {
-        navigate('/admin/dashboard');
-      }
+     
     } catch (err: any) {
       console.error('Error completing registration:', err);
       setError(err.response?.data?.message || 'Failed to complete registration. Please try again.');

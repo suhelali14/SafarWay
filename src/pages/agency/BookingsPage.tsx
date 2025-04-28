@@ -21,6 +21,8 @@ import {
 import { toast } from 'react-hot-toast';
 import { Search, Eye, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { agencyAPI } from '../../services/api';
+import { getUserData } from '../../utils/session';
 
 interface Booking {
   id: string;
@@ -42,20 +44,18 @@ export const AgencyBookingsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
-
+  const userData = getUserData();
+  
   useEffect(() => {
     fetchBookings();
   }, []);
 
   const fetchBookings = async () => {
     try {
-      const response = await fetch('/api/agency/bookings', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setBookings(data);
+      const response = await agencyAPI.getAllBookings(`?agencyId=${userData?.agencyId}`);
+        
+     
+      setBookings(response.data);
     } catch (error) {
       console.error('Error fetching bookings:', error);
       toast.error('Failed to load bookings');
@@ -66,16 +66,10 @@ export const AgencyBookingsPage = () => {
 
   const handleStatusChange = async (id: string, status: string) => {
     try {
-      const response = await fetch(`/api/agency/bookings/${id}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ status })
-      });
+      
+      const response = await agencyAPI.getAllBookings(`?agencyId=${userData?.agencyId}status`);
 
-      if (!response.ok) throw new Error('Failed to update booking status');
+      if (!response.status) throw new Error('Failed to update booking status');
 
       setBookings(bookings.map(booking => 
         booking.id === id ? { ...booking, status: status as Booking['status'] } : booking
@@ -100,7 +94,7 @@ export const AgencyBookingsPage = () => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'INR'
     }).format(amount);
   };
 

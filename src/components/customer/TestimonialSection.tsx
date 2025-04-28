@@ -91,7 +91,7 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({
         ) : (
           <Grid container spacing={3}>
             {testimonials.map((testimonial) => (
-              <Grid item xs={12} sm={6} md={4} key={testimonial.id}>
+              <Grid >
                 <TestimonialCard testimonial={testimonial} />
               </Grid>
             ))}

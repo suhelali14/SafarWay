@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getToken } from '../../utils/session';
-import { isApiAvailable, safeApiCall } from '../../utils/apiUtils';
+import { isApiAvailable } from '../../utils/apiUtils';
 
 // Use environment variable if available, otherwise fallback to a hardcoded URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -131,7 +131,7 @@ export const customerAPI = {
           imageUrl: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4',
           images: [],
           price: 1299,
-          currency: 'USD',
+          currency: 'INR',
           rating: 4.8,
           reviews: [],
           features: ['All Inclusive', 'Beach', 'Guided Tours'],
@@ -162,7 +162,7 @@ export const customerAPI = {
           imageUrl: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26',
           images: [],
           price: 1599,
-          currency: 'USD',
+          currency: 'INR',
           rating: 4.7,
           reviews: [],
           features: ['Cultural', 'City Tour', 'Food Experience'],
@@ -224,7 +224,7 @@ export const customerAPI = {
             'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b'
           ],
           price: 1299,
-          currency: 'USD',
+          currency: 'INR',
           rating: 4.8,
           reviews: [
             {

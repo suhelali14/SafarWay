@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Users, Tag, Building2 } from 'lucide-react';
+import { Calendar, MapPin, Users, Building2 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { formatDate, formatCurrency } from '../../utils/formatters';
 
 interface PackageCardProps {
+
   packageData: {
     id: string;
     title: string;
@@ -70,8 +71,9 @@ export function PackageCard({
         {featured && (
           <Badge 
             className="absolute top-2 left-2 bg-amber-500 hover:bg-amber-600"
+            label='Featured'
           >
-            Featured
+            
           </Badge>
         )}
         
@@ -79,8 +81,9 @@ export function PackageCard({
         {discount && discount > 0 && (
           <Badge 
             className="absolute top-2 right-2 bg-red-500 hover:bg-red-600"
+            label={`${Math.round(discount)}% OFF`}
           >
-            {discount}% OFF
+            
           </Badge>
         )}
       </div>
@@ -129,15 +132,15 @@ export function PackageCard({
               {discount && discount > 0 ? (
                 <>
                   <span className="text-xs text-gray-500 line-through">
-                    {formatCurrency(price, 'USD')}
+                    {formatCurrency(price, 'INR')}
                   </span>
                   <span className="text-lg font-bold text-primary">
-                    {formatCurrency(discountedPrice || (price - (price * discount / 100)), 'USD')}
+                    {formatCurrency(discountedPrice || (price - (price * discount / 100)), 'INR')}
                   </span>
                 </>
               ) : (
                 <span className="text-lg font-bold text-primary">
-                  {formatCurrency(price, 'USD')}
+                  {formatCurrency(price, 'INR')}
                 </span>
               )}
             </div>

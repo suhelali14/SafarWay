@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import  { ReactNode } from 'react';
 import { Card, CardContent } from '../../ui/card';
 import { LucideIcon } from 'lucide-react';
 

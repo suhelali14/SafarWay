@@ -10,8 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
 import { 
-  Calendar, MapPin, Users, CreditCard, ChevronLeft, FileText, 
-  Clock, AlertCircle, Phone, Mail, Home, Building, CheckCircle
+  Calendar, Users, CreditCard, ChevronLeft, FileText, 
+  Clock, AlertCircle, Phone, Mail, Building, CheckCircle
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '../../components/ui/use-toast';
@@ -25,7 +25,7 @@ const mockBooking = {
   endDate: '2023-10-22',
   imageUrl: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4',
   price: 1299,
-  currency: 'USD',
+  currency: 'INR',
   travelers: 2,
   status: 'upcoming',
   agency: {
@@ -137,9 +137,9 @@ const statusColors: Record<string, { color: string, bgColor: string }> = {
   cancelled: { color: 'text-red-700', bgColor: 'bg-red-50' }
 };
 
-const paymentStatusVariants: Record<string, string> = {
-  paid: 'success',
-  partial: 'warning',
+const paymentStatusVariants: Record<string, "default" | "destructive" | "outline" | "secondary" | null | undefined> = {
+  paid: 'default',
+  partial: 'outline',
   pending: 'outline',
   refunded: 'secondary'
 };
@@ -276,8 +276,9 @@ const BookingDetailsPage: React.FC = () => {
             <Badge 
               variant={booking.status === 'cancelled' ? 'destructive' : 'secondary'}
               className={`${statusColors[booking.status]?.bgColor} ${statusColors[booking.status]?.color} text-xs`}
+              label= {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
             >
-              {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+             
             </Badge>
           </div>
           
@@ -352,8 +353,8 @@ const BookingDetailsPage: React.FC = () => {
                         </div>
                         <div className="flex items-center mt-1">
                           <strong>Payment Status:</strong> 
-                          <Badge variant={paymentStatusVariants[booking.paymentStatus]} className="ml-2">
-                            {booking.paymentStatus.charAt(0).toUpperCase() + booking.paymentStatus.slice(1)}
+                          <Badge variant={paymentStatusVariants[booking.paymentStatus] || 'default'} className="ml-2" label= {booking.paymentStatus.charAt(0).toUpperCase() + booking.paymentStatus.slice(1)}>
+                           
                           </Badge>
                         </div>
                       </div>
@@ -545,8 +546,8 @@ const BookingDetailsPage: React.FC = () => {
                     <div key={index} className="border rounded-lg p-4">
                       <div className="flex justify-between items-center mb-3">
                         <h3 className="font-medium">Traveler {index + 1}</h3>
-                        <Badge variant="outline">
-                          {index === 0 ? 'Main Traveler' : 'Accompanying Traveler'}
+                        <Badge variant="outline" label={index === 0 ? 'Main Traveler' : 'Accompanying Traveler'}>
+                          
                         </Badge>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -611,12 +612,13 @@ const BookingDetailsPage: React.FC = () => {
                       <p className="text-sm text-gray-500">Payment Status</p>
                       <div className="mt-1">
                         <Badge 
-                          variant={paymentStatusVariants[booking.paymentStatus]}
+                          variant={paymentStatusVariants[booking.paymentStatus] || 'default'}
                           className="text-sm"
+                          label={booking.paymentStatus === 'paid' ? 'Fully Paid' : 
+                            booking.paymentStatus === 'partial' ? 'Partially Paid' :
+                            booking.paymentStatus === 'refunded' ? 'Refunded' : 'Payment Pending'}
                         >
-                          {booking.paymentStatus === 'paid' ? 'Fully Paid' : 
-                           booking.paymentStatus === 'partial' ? 'Partially Paid' :
-                           booking.paymentStatus === 'refunded' ? 'Refunded' : 'Payment Pending'}
+                          
                         </Badge>
                       </div>
                     </div>

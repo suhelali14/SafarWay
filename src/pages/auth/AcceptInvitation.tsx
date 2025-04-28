@@ -11,8 +11,8 @@ export default function AcceptInvitation() {
   const location = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [userEmail, setUserEmail] = useState('');
-  const [userName, setUserName] = useState('');
+  const [_userEmail, setUserEmail] = useState('');
+  const [_userName, setUserName] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function AcceptInvitation() {
         }
 
         // Verify the token with the API
-        const response = await authAPI.verifyInviteToken(token);
+        const response = await authAPI.verifyToken();
         
         if (response.data) {
           setUserEmail(response.data.email);
@@ -51,7 +51,7 @@ export default function AcceptInvitation() {
   }, [location, navigate, toast]);
 
   return (
-    <AuthLayout>
+    <AuthLayout title="Accept Invitation" subtitle="Join us and start your journey!">
       <div className="flex flex-col items-center justify-center space-y-4">
         {isLoading ? (
           <>

@@ -28,7 +28,7 @@ export function ContactPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-16">
       <Helmet>
         <title>Contact Us | SafarWay</title>
         <meta name="description" content="Get in touch with SafarWay for any questions or support needs." />

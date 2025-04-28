@@ -1,97 +1,154 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, MapPin, Calendar, Users, Star } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
-import { useAuth } from '../../contexts/AuthContext';
-import { api } from '../../lib/api';
-import { generateMockTours } from '../../utils/mockData';
+
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '../../components/ui/card';
 import { Skeleton } from '../../components/ui/skeleton';
-import { Badge } from '../../components/ui/badge';
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../../components/ui/sheet';
-import { Checkbox } from '../../components/ui/checkbox';
+
 import { Label } from '../../components/ui/label';
 import { Slider } from '../../components/ui/slider';
+import { TourPackage, TourType, PackageFilters } from '../../services/api';
+import { customerPackages } from '../../services/api/customerPackages';
+import { PackageCard } from '../../components/packages/PackageCard';
 
-interface Tour {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  duration: number;
-  maxGroupSize: number;
-  difficulty: 'easy' | 'moderate' | 'challenging';
-  rating: number;
-  image: string;
-  location: string;
-  startDate: string;
-  agency: {
-    id: string;
-    name: string;
-    rating: number;
-  };
-}
+import { useToast } from '../../hooks/use-toast';
+import { Package } from '../../services/api/packageService';
 
 export function PackagesPage() {
-  const { isAuthenticated } = useAuth();
-  const [tours, setTours] = useState<Tour[]>([]);
+  // const { isAuthenticated } = useAuth();
+  // const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  // State for packages data
+  const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalPackages, setTotalPackages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  
+  // Search and filters state
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState([0, 5000]);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [selectedTourType, setSelectedTourType] = useState<string>('all');
+  const [selectedDestination, setSelectedDestination] = useState<string>('');
   const [selectedDuration, setSelectedDuration] = useState<string>('all');
-  const [selectedRating, setSelectedRating] = useState<string>('all');
-  const [showFilters, setShowFilters] = useState(false);
+  
+  // List of available destinations (will be populated from API data)
+  const [availableDestinations, setAvailableDestinations] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchTours();
-  }, []);
+    fetchPackages();
+  }, [currentPage]);
 
-  const fetchTours = async () => {
+  // Function to fetch packages with current filters
+  const fetchPackages = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/packages/all');
       
-      if (Array.isArray(response.data)) {
-        setTours(response.data);
+      // Prepare filters object
+      const filters: PackageFilters = {
+        page: currentPage,
+        limit: 12,
+        status: 'PUBLISHED' // Only show published packages
+      };
+      
+      // Add search query if available
+      if (searchQuery.trim()) {
+        filters.searchQuery = searchQuery;
+      }
+      
+      // Add price filters if changed from default
+      if (priceRange[0] > 0 || priceRange[1] < 5000) {
+        filters.priceRange = [priceRange[0], priceRange[1]]; // Ensure it's a tuple
+      }
+      
+      // Add tour type if selected
+      if (selectedTourType !== 'all') {
+        filters.tourType = selectedTourType as TourType;
+      }
+      
+      // Add destination if selected
+      if (selectedDestination) {
+        filters.destination = selectedDestination;
+      }
+      
+      // Add duration filters
+      if (selectedDuration !== 'all') {
+        if (selectedDuration === 'short') {
+          filters.duration = 3;
+        } else if (selectedDuration === 'medium') {
+          filters.duration = 4;
+          filters.duration = 7;
+        } else if (selectedDuration === 'long') {
+          filters.duration = 8;
+        }
+      }
+      
+      console.log('Fetching packages with filters:', filters);
+      
+      const response = await customerPackages.getAllPackages(filters);
+      
+      console.log('Received packages:', response.pagination);
+      // Update state with response data
+      if (response && response.data) {
+        setPackages(response.data);
+        setTotalPackages(response.pagination.total);
+        setTotalPages(response.pagination.pages);
+        
+        // Extract unique destinations for the filter dropdown
+        const destinations = new Set<string>();
+        response.data.forEach(pkg => {
+          if (pkg.destination) {
+            destinations.add(pkg.destination);
+          }
+        });
+        setAvailableDestinations(Array.from(destinations).sort());
       } else {
-        console.error('API returned non-array data:', response.data);
-        // Use mock data as fallback
-        const mockTours = generateMockTours();
-        setTours(mockTours);
+        console.error('API response format error:', response);
+        toast({
+          title: "Error loading packages",
+          description: "Couldn't retrieve package data. Please try again later.",
+          variant: "destructive"
+        });
       }
     } catch (error) {
-      console.error('Error fetching tours:', error);
-      // Use mock data as fallback
-      const mockTours = generateMockTours();
-      setTours(mockTours);
+      console.error('Error fetching packages:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load packages. Please try again later.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredTours = (tours || []).filter((tour) => {
-    const matchesSearch = tour.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tour.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tour.location.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesPrice = tour.price >= priceRange[0] && tour.price <= priceRange[1];
-    
-    const matchesDifficulty = selectedDifficulty === 'all' || tour.difficulty === selectedDifficulty;
-    
-    const matchesDuration = selectedDuration === 'all' || 
-      (selectedDuration === 'short' && tour.duration <= 3) ||
-      (selectedDuration === 'medium' && tour.duration > 3 && tour.duration <= 7) ||
-      (selectedDuration === 'long' && tour.duration > 7);
-    
-    const matchesRating = selectedRating === 'all' || tour.rating >= parseInt(selectedRating);
+  // Apply filters and search
+  const handleApplyFilters = () => {
+    setCurrentPage(1); // Reset to first page
+    fetchPackages();
+  };
 
-    return matchesSearch && matchesPrice && matchesDifficulty && matchesDuration && matchesRating;
-  });
+  // Reset all filters
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setPriceRange([0, 5000]);
+    setSelectedTourType('all');
+    setSelectedDestination('');
+    setSelectedDuration('all');
+    setCurrentPage(1);
+    
+    // Fetch packages with reset filters
+    fetchPackages();
+  };
 
+  // Animation variants
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -106,9 +163,30 @@ export function PackagesPage() {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 }
   };
-
+  
+  // Convert TourPackage to PackageCard props
+  const mapPackageToCardProps = (pkg: TourPackage) => {
+    return {
+      id: pkg.id,
+      title: pkg.title,
+      description: pkg.description || pkg.summary || '',
+      price: pkg.pricePerPerson,
+      discountedPrice: pkg.price, // In the API, price is actually the discounted price
+      discount: pkg.discountPrice ? Math.round(((pkg.pricePerPerson - pkg.price!) / pkg.pricePerPerson) * 100) : undefined,
+      imageUrl: pkg.coverImage || '',
+      location: pkg.destination,
+      duration: pkg.duration,
+      maxGroupSize: pkg.maxGroupSize || pkg.maxPeople || 10,
+      validFrom: pkg.validFrom || pkg.startDate,
+      validTill: pkg.validTill || pkg.endDate,
+      featured: false, // Could be determined by some criteria
+      agencyId: pkg.agencyId
+    };
+  };
+  console.log('Packages:', packages);
+  // console.log('Packages mapped:', packages.map(mapPackageToCardProps));
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-16">
       <Helmet>
         <title>Tour Packages | SafarWay</title>
         <meta name="description" content="Browse and book amazing tour packages for your next adventure." />
@@ -129,6 +207,11 @@ export function PackagesPage() {
             className="pl-10"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleApplyFilters();
+              }
+            }}
           />
         </div>
         
@@ -162,18 +245,41 @@ export function PackagesPage() {
                 </div>
               </div>
               
-              {/* Difficulty */}
+              {/* Tour Type */}
               <div className="space-y-2">
-                <Label>Difficulty</Label>
-                <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                <Label>Package Type</Label>
+                <Select value={selectedTourType} onValueChange={setSelectedTourType}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select difficulty" />
+                    <SelectValue placeholder="Select package type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Difficulties</SelectItem>
-                    <SelectItem value="easy">Easy</SelectItem>
-                    <SelectItem value="moderate">Moderate</SelectItem>
-                    <SelectItem value="challenging">Challenging</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="ADVENTURE">Adventure</SelectItem>
+                    <SelectItem value="CULTURAL">Cultural</SelectItem>
+                    <SelectItem value="WILDLIFE">Wildlife</SelectItem>
+                    <SelectItem value="BEACH">Beach</SelectItem>
+                    <SelectItem value="MOUNTAIN">Mountain</SelectItem>
+                    <SelectItem value="CITY">City Tour</SelectItem>
+                    <SelectItem value="CRUISE">Cruise</SelectItem>
+                    <SelectItem value="OTHER">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Destination */}
+              <div className="space-y-2">
+                <Label>Destination</Label>
+                <Select value={selectedDestination} onValueChange={setSelectedDestination}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select destination" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Destinations</SelectItem>
+                    {availableDestinations.map(destination => (
+                      <SelectItem key={destination} value={destination}>
+                        {destination}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -194,27 +300,22 @@ export function PackagesPage() {
                 </Select>
               </div>
               
-              {/* Rating */}
-              <div className="space-y-2">
-                <Label>Minimum Rating</Label>
-                <Select value={selectedRating} onValueChange={setSelectedRating}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select rating" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Ratings</SelectItem>
-                    <SelectItem value="4">4+ Stars</SelectItem>
-                    <SelectItem value="4.5">4.5+ Stars</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex gap-2">
+                <Button 
+                  className="flex-1" 
+                  onClick={handleApplyFilters}
+                >
+                  Apply Filters
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  className="flex-1" 
+                  onClick={handleResetFilters}
+                >
+                  Reset
+                </Button>
               </div>
-              
-              <Button 
-                className="w-full" 
-                onClick={() => setShowFilters(false)}
-              >
-                Apply Filters
-              </Button>
             </div>
           </SheetContent>
         </Sheet>
@@ -223,11 +324,11 @@ export function PackagesPage() {
       {/* Results Count */}
       <div className="mb-6">
         <p className="text-gray-600">
-          Showing {filteredTours.length} of {tours.length} packages
+          Showing {packages.length} of {totalPackages} packages
         </p>
       </div>
 
-      {/* Tour Cards */}
+      {/* Package Cards */}
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -248,84 +349,63 @@ export function PackagesPage() {
             </Card>
           ))}
         </div>
-      ) : filteredTours.length > 0 ? (
-        <motion.div 
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          variants={container}
-          initial="hidden"
-          animate="show"
-        >
-          {filteredTours.map((tour) => (
-            <motion.div key={tour.id} variants={item}>
-              <Card className="overflow-hidden">
-                <div className="relative h-48">
-                  <img
-                    src={tour.image}
-                    alt={tour.title}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                  <Badge 
-                    className="absolute right-2 top-2"
-                    variant={tour.difficulty === 'easy' ? 'default' : 
-                            tour.difficulty === 'moderate' ? 'secondary' : 'destructive'}
-                  >
-                    {tour.difficulty.charAt(0).toUpperCase() + tour.difficulty.slice(1)}
-                  </Badge>
-                </div>
-                <CardHeader>
-                  <CardTitle className="line-clamp-1">{tour.title}</CardTitle>
-                  <CardDescription className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {tour.location}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="mb-4 line-clamp-2 text-sm text-gray-600">
-                    {tour.description}
-                  </p>
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {tour.duration} days
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      Max {tour.maxGroupSize}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 text-amber-500" />
-                      {tour.rating.toFixed(1)}
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <div className="text-lg font-bold">${tour.price}</div>
-                  <Button>View Details</Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
       ) : (
-        <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
-          <h3 className="mb-2 text-xl font-semibold">No packages found</h3>
-          <p className="mb-4 text-gray-600">
-            Try adjusting your search or filters to find what you're looking for.
-          </p>
-          <Button 
-            variant="outline" 
-            onClick={() => {
-              setSearchQuery('');
-              setPriceRange([0, 5000]);
-              setSelectedDifficulty('all');
-              setSelectedDuration('all');
-              setSelectedRating('all');
-            }}
-          >
-            Clear Filters
-          </Button>
-        </div>
+        <>
+          {packages.length > 0 ? (
+            <motion.div 
+              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+              variants={container}
+              initial="hidden"
+              animate="show"
+            >
+              {packages.map((pkg) => (
+                <motion.div key={pkg.id} variants={item}>
+                  <PackageCard packageData={mapPackageToCardProps(pkg as TourPackage)} />
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="text-center">
+                <h3 className="text-lg font-medium">No packages found</h3>
+                <p className="mt-1 text-gray-500">Try adjusting your filters or search terms</p>
+                <Button 
+                  className="mt-4" 
+                  onClick={handleResetFilters}
+                >
+                  Reset Filters
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center">
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                
+                <span className="flex h-10 items-center px-4 text-sm">
+                  Page {currentPage} of {totalPages}
+                </span>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

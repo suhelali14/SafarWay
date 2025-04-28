@@ -19,7 +19,7 @@ export default function InvitesPage() {
         <div>
           <h2 className="text-xl font-semibold mb-4">Invite New User</h2>
           <InviteUserForm
-            userRole={user?.role || ''}
+            userRole={user?.role || 'CUSTOMER'} // Default to a valid role
             agencyId={user?.agencyId}
           />
         </div>
@@ -31,4 +31,4 @@ export default function InvitesPage() {
       </div>
     </div>
   );
-} 
+}

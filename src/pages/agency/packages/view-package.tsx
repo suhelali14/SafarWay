@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Separator } from '../../../components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs';
 import { packageService, Package, PackageStatus } from '../../../services/api/packageService';
@@ -11,7 +11,7 @@ import { useToast } from '../../../hooks/use-toast';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Skeleton } from '../../../components/ui/skeleton';
 import { Gallery } from '../../../components/ui/gallery';
-import { ArrowLeft, CalendarRange, Clock, Edit, ExternalLink, Globe, Mail, MapPin, Phone, Users, Pencil, Trash2, Eye, Share2, Clock3 } from 'lucide-react';
+import { ArrowLeft, CalendarRange, Clock, Edit, Globe, Mail, MapPin, Phone, Users, Pencil, Trash2, Eye, Share2, Clock3 } from 'lucide-react';
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -131,7 +131,7 @@ export function ViewPackagePage() {
     if (!amount && amount !== 0) return 'N/A';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
@@ -264,6 +264,8 @@ export function ViewPackagePage() {
       );
     }
 
+    const maxPeople = packageData.maxPeople || 'N/A';
+
     return (
       <>
         {/* Package Header with Cover Image */}
@@ -277,8 +279,8 @@ export function ViewPackagePage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-0 left-0 p-6 text-white">
-                <Badge variant={getStatusBadgeVariant(packageData.status)} className="mb-3">
-                  {packageData.status}
+                <Badge variant={getStatusBadgeVariant(packageData.status)} className="mb-3" label={packageData.status}>
+                  
                 </Badge>
                 <h1 className="text-3xl font-bold mb-2 text-white">{packageData.name}</h1>
                 <div className="flex items-center space-x-4 text-white/90">
@@ -292,15 +294,15 @@ export function ViewPackagePage() {
                   </div>
                   <div className="flex items-center">
                     <Users className="h-4 w-4 mr-1" />
-                    {packageData.minCapacity}-{packageData.maxPeople} people
+                    {packageData.minCapacity}-{maxPeople} people
                   </div>
                 </div>
               </div>
             </div>
           ) : (
             <div className="p-6">
-              <Badge variant={getStatusBadgeVariant(packageData.status)} className="mb-3">
-                {packageData.status}
+              <Badge variant={getStatusBadgeVariant(packageData.status)} className="mb-3" label={packageData.status}>
+                
               </Badge>
               <h1 className="text-3xl font-bold mb-2">{packageData.name}</h1>
               <div className="flex items-center space-x-4 text-muted-foreground">
@@ -314,7 +316,7 @@ export function ViewPackagePage() {
                 </div>
                 <div className="flex items-center">
                   <Users className="h-4 w-4 mr-1" />
-                  {packageData.minCapacity}-{packageData.maxPeople} people
+                  {packageData.minCapacity}-{maxPeople} people
                 </div>
               </div>
             </div>
@@ -352,12 +354,12 @@ export function ViewPackagePage() {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Regular Price</span>
-                        <span className="font-medium">{formatCurrency(packageData.price)}</span>
+                        <span className="font-medium">{formatCurrency(packageData.price ?? 0)}</span>
                       </div>
-                      {packageData.discountPrice && packageData.discountPrice < packageData.price && (
+                      {packageData.discountPrice && packageData.discountPrice < (packageData.price ?? 0) && (
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Discount Price</span>
-                          <span className="font-medium text-green-600">{formatCurrency(packageData.discountPrice)}</span>
+                          <span className="font-medium text-green-600">{formatCurrency(packageData.discountPrice ?? 0)}</span>
                         </div>
                       )}
                     </div>
@@ -553,4 +555,4 @@ export function ViewPackagePage() {
       </AlertDialog>
     </>
   );
-} 
+}

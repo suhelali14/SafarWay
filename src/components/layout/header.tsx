@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { Menu, X, Plane, Building2, Train, Car, Bus, Mountain, DollarSign, Shield } from "lucide-react"
+import { Menu, X, Plane, Building2, Train, Car, Bus, Mountain, IndianRupee, Shield } from "lucide-react"
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false)
@@ -12,7 +12,7 @@ export function Header() {
     { href: "/trains", label: "Trains", icon: <Train size={20} /> },
     { href: "/cabs", label: "Cabs", icon: <Car size={20} /> },
     { href: "/bus", label: "Bus", icon: <Bus size={20} /> },
-    { href: "/forex", label: "Forex", icon: <DollarSign size={20} /> },
+    { href: "/forex", label: "Forex", icon: <IndianRupee size={20} /> },
     { href: "/insurance", label: "Insurance", icon: <Shield size={20} /> }
   ]
 

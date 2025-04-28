@@ -3,6 +3,7 @@ import { agencyService } from './agencyService';
 import { packageService } from './packageService';
 import { adminAPI } from './adminAPI';
 import * as customerAPIModule from './customerAPI';
+import { customerPackages } from './customerPackages';
 
 // Create a complete customerAPI object with all methods
 const customerAPI = {
@@ -26,10 +27,10 @@ export const tourAPI = {
 // Create a bookingAPI for backward compatibility
 export const bookingAPI = {
   getAll: () => Promise.resolve({ data: { items: [] } }),
-  getById: (id: string) => Promise.resolve({ data: {} }),
-  create: (data: any) => Promise.resolve({ data: {} }),
-  update: (id: string, data: any) => Promise.resolve({ data: {} }),
-  delete: (id: string) => Promise.resolve({ data: {} }),
+  getById: (_dataid: string) => Promise.resolve({ data: {} }),
+  create: (_data: any) => Promise.resolve({ data: {} }),
+  update: (_id: string, _data: any) => Promise.resolve({ data: {} }),
+  delete: (_id: string) => Promise.resolve({ data: {} }),
 };
 
 // Export all services
@@ -38,5 +39,6 @@ export {
   agencyService,
   packageService,
   adminAPI,
-  customerAPI
+  customerAPI,
+  customerPackages,
 };

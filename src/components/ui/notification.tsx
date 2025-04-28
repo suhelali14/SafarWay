@@ -18,19 +18,25 @@ const NotificationColors = {
   warning: 'bg-yellow-50 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200',
 };
 
+interface NotificationData {
+  id: string;
+  type: 'success' | 'error' | 'info' | 'warning';
+  message: string;
+}
+
 export const NotificationContainer = () => {
   const { notifications, removeNotification } = useUI();
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-      {notifications.map((notification) => (
-        <Notification
-          key={notification.id}
-          id={notification.id}
-          type={notification.type}
-          message={notification.message}
-          onClose={() => removeNotification(notification.id)}
-        />
+      {notifications.map((notification: NotificationData) => (
+      <Notification
+        key={notification.id}
+        id={notification.id}
+        type={notification.type}
+        message={notification.message}
+        onClose={() => removeNotification(notification.id)}
+      />
       ))}
     </div>
   );

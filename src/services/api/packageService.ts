@@ -34,7 +34,7 @@ export interface Package {
   endDate?: string;
   minCapacity?: number;
   minimumAge?: number;
-  maxGroupSize: number;
+  maxPeople: number;
   maximumPeople?: number;
   tourType: TourType;
   packageType?: string; // Kept for backward compatibility
@@ -60,6 +60,7 @@ export interface Package {
   createdBy?: string;
   agencyId: string;
   itinerary?: any[];
+
 }
 
 export interface PaginatedResponse<T> {
@@ -119,7 +120,7 @@ export const getAgencyPackages = async (
     
     const url = `${API_URL}/agency/packages`;
     const queryString = params.toString();
-    
+    console.log('Agency ID:', agencyId);
     console.log('Fetching packages from:', url + (queryString ? `?${queryString}` : ''));
     
     const response = await axios.get(
@@ -150,7 +151,7 @@ export const getPackageById = async (agencyId: string, packageId: string): Promi
         },
       }
     );
-    
+    console.log('Agency ID:', agencyId);
     return response.data.data;
   } catch (error) {
     console.error('Error fetching package details:', error);
@@ -164,11 +165,25 @@ export const createPackage = async (agencyId: string, packageData: Partial<Packa
     const token = getToken();
     console.log("Creating package with token:", token ? "Token exists" : "No token found");
     console.log("API URL:", `${API_URL}/agency/packages`);
-    console.log("Package data:", JSON.stringify(packageData).substring(0, 200) + "...");
+    
+    // Create a copy to avoid modifying the original data
+    const processedData = { ...packageData };
+    console.log('Agency ID:', agencyId);
+    // Ensure galleryImages is processed properly
+    if (typeof processedData.galleryImages === 'string') {
+      try {
+        // If it's a JSON string, parse it
+        processedData.galleryImages = JSON.parse(processedData.galleryImages);
+      } catch (e) {
+        console.warn("Failed to parse galleryImages string:", e);
+      }
+    }
+    
+    console.log("Processed package data:", JSON.stringify(processedData).substring(0, 200) + "...");
     
     const response = await axios.post(
       `${API_URL}/agency/packages`,
-      packageData,
+      processedData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -198,9 +213,23 @@ export const updatePackage = async (
 ): Promise<Package> => {
   try {
     const token = getToken();
+    console.log('Agency ID:', agencyId);
+    // Create a copy to avoid modifying the original data
+    const processedData = { ...packageData };
+    
+    // Ensure galleryImages is processed properly
+    if (typeof processedData.galleryImages === 'string') {
+      try {
+        // If it's a JSON string, parse it
+        processedData.galleryImages = JSON.parse(processedData.galleryImages);
+      } catch (e) {
+        console.warn("Failed to parse galleryImages string:", e);
+      }
+    }
+    
     const response = await axios.put(
       `${API_URL}/agency/packages/${packageId}`,
-      packageData,
+      processedData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -219,6 +248,7 @@ export const updatePackage = async (
 // Delete a package
 export const deletePackage = async (agencyId: string, packageId: string): Promise<void> => {
   try {
+    console.log('Agency ID:', agencyId);
     const token = getToken();
     await axios.delete(
       `${API_URL}/agency/packages/${packageId}`,
@@ -241,6 +271,7 @@ export const changePackageStatus = async (
   status: PackageStatus
 ): Promise<Package> => {
   try {
+    console.log('Agency ID:', agencyId);
     const token = getToken();
     const response = await axios.patch(
       `${API_URL}/agency/packages/${packageId}/status`,

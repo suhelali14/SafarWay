@@ -3,12 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
   MapPin, 
-  Calendar, 
-  Users, 
-  ClipboardList, 
   Star, 
   Clock, 
-  Plane, 
   Check, 
   X, 
   Heart 
@@ -21,9 +17,10 @@ import {
 } from '../../components/ui/tabs';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
+
 import { 
-  Card, 
+
+  Card,
   CardContent, 
   CardDescription, 
   CardFooter, 
@@ -43,7 +40,6 @@ import { Package } from '../../services/api/customerAPI';
 import { customerAPI } from '../../services/api';
 import { bookingService } from '../../services/api/bookingService';
 import { toast } from 'react-hot-toast';
-import { generateMockPackage } from '../../utils/mockData';
 
 // Extended package details
 interface PackageDetail extends Package {
@@ -67,7 +63,7 @@ const PackageDetail: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
   
   // Booking form state
   const [selectedDate, setSelectedDate] = useState('');
@@ -287,8 +283,8 @@ const PackageDetail: React.FC = () => {
               {packageData.features.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {packageData.features.map((feature, index) => (
-                    <Badge key={index} variant="secondary" className="rounded-full px-3">
-                      {feature}
+                    <Badge key={index} variant="secondary" className="rounded-full px-3" label= {feature}>
+                     
                     </Badge>
                   ))}
                 </div>
@@ -303,8 +299,8 @@ const PackageDetail: React.FC = () => {
                 className="w-full h-full object-cover"
               />
               {packageData.discount && (
-                <Badge className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 text-sm">
-                  {packageData.discount}% OFF
+                <Badge className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 text-sm" label={`-${packageData.discount}%`} >
+                  
                 </Badge>
               )}
             </div>
@@ -443,7 +439,7 @@ const PackageDetail: React.FC = () => {
                           <span className="text-base line-through text-gray-500">
                             {formatCurrency(packageData.price, packageData.currency)}
                           </span>
-                          <Badge className="bg-red-500">{packageData.discount}% OFF</Badge>
+                          <Badge className="bg-red-500" label={`${packageData.discount}% OFF`}></Badge>
                         </div>
                       )}
                     </div>

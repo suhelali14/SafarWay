@@ -16,10 +16,7 @@ import {
   Settings,
   ArrowRight,
   ChevronRight,
-  CalendarCheck,
-  DollarSign,
-  AlertTriangle,
-  Calendar
+
 } from 'lucide-react';
 import { 
   Card, 
@@ -32,13 +29,12 @@ import {
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
 import { Skeleton } from '../../../components/ui/skeleton';
-import { useToast } from '../../../hooks/use-toast';
+
 import { useAuth } from '../../../contexts/AuthContext';
 import { 
   agencyService, 
   DashboardSummary, 
-  Booking, 
-  AgencyProfile 
+ 
 } from '../../../services/api/agencyService';
 import {
   BarChart,
@@ -46,10 +42,10 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as ChartTooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Line } from 'react-chartjs-2';
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -57,6 +53,7 @@ import {
   PointElement,
   LineElement,
   Title,
+  Tooltip,
   Legend,
 } from 'chart.js';
 
@@ -186,12 +183,12 @@ const ReviewCard = ({ review }: { review: ReviewProps }) => (
 
 // Main Dashboard Component
 export default function AgencyDashboardPage() {
-  const { toast } = useToast();
+  // const { _toast } = useToast();
   const { user } = useAuth();
-  const [refreshInterval, setRefreshInterval] = useState(600000); // 10 minutes
+  const [refreshInterval, _setRefreshInterval] = useState(60000); // 10 minutes
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState('week');
+  const [_loading, setLoading] = useState(true);
+  const [_timeRange, _setTimeRange] = useState('week');
 
   // Fetch dashboard summary
   const { 
@@ -203,13 +200,7 @@ export default function AgencyDashboardPage() {
     queryKey: ['agencyDashboard'],
     queryFn: () => agencyService.getDashboardSummary(),
     refetchInterval: refreshInterval,
-    onError: () => {
-      toast({
-        title: 'Error',
-        description: 'Failed to load dashboard data',
-        variant: 'destructive',
-      });
-    }
+    
   });
 
   // Fetch agency profile
@@ -219,13 +210,7 @@ export default function AgencyDashboardPage() {
   } = useQuery({
     queryKey: ['agencyProfile'],
     queryFn: () => agencyService.getProfile(),
-    onError: () => {
-      toast({
-        title: 'Error',
-        description: 'Failed to load agency profile',
-        variant: 'destructive',
-      });
-    }
+   
   });
 
   // Mock data for reviews - in a real application, you would fetch this from the API
@@ -282,7 +267,7 @@ export default function AgencyDashboardPage() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const data = await agencyService.getDashboardSummary(timeRange);
+        const data = await agencyService.getDashboardSummary();
         setSummary(data);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
@@ -292,56 +277,57 @@ export default function AgencyDashboardPage() {
     };
 
     fetchDashboardData();
-  }, [timeRange]);
+  }, []);
 
-  const bookingsChartData = {
-    labels: summary?.bookingStats.labels || [],
-    datasets: [
-      {
-        label: 'Bookings',
-        data: summary?.bookingStats.datasets.bookings || [],
-        borderColor: 'rgb(53, 162, 235)',
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
-      },
-    ],
-  };
+  // const bookingsChartData = {
+  //   labels: summary?.recentBookings || [],
+  //   datasets: [
+  //     {
+  //       label: 'Bookings',
+  //       data: summary?.bookingStats.datasets.bookings || [],
+  //       borderColor: 'rgb(53, 162, 235)',
+  //       backgroundColor: 'rgba(53, 162, 235, 0.5)',
+  //     },
+  //   ],
+  // };
 
-  const revenueChartData = {
-    labels: summary?.bookingStats.labels || [],
-    datasets: [
-      {
-        label: 'Revenue',
-        data: summary?.bookingStats.datasets.revenue || [],
-        borderColor: 'rgb(75, 192, 192)',
-        backgroundColor: 'rgba(75, 192, 192, 0.5)',
-      },
-    ],
-  };
+  // const revenueChartData = {
+  //   labels: summary?.bookingStats.labels || [],
+  //   datasets: [
+  //     {
+  //       label: 'Revenue',
+  //       data: summary?.bookingStats.datasets.revenue || [],
+  //       borderColor: 'rgb(75, 192, 192)',
+  //       backgroundColor: 'rgba(75, 192, 192, 0.5)',
+  //     },
+  //   ],
+  // };
 
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
-  };
+  // const chartOptions = {
+  //   responsive: true,
+  //   plugins: {
+  //       legend: {
+  //         position: 'top' as const,
+  //       },
+  //       tooltip: ChartTooltip,
+  //     },
+  //   scales: {
+  //     y: {
+  //       beginAtZero: true,
+  //     },
+  //   },
+  // };
 
-  const getBookingStatusColor = (status: string) => {
-    const statusMap: Record<string, string> = {
-      'CONFIRMED': 'success',
-      'PENDING': 'warning',
-      'CANCELLED': 'destructive',
-      'COMPLETED': 'default',
-    };
-    return statusMap[status] || 'default';
-  };
-
+  // const getBookingStatusColor = (status: string) => {
+  //   const statusMap: Record<string, string> = {
+  //     'CONFIRMED': 'success',
+  //     'PENDING': 'warning',
+  //     'CANCELLED': 'destructive',
+  //     'COMPLETED': 'default',
+  //   };
+  //   return statusMap[status] || 'default';
+  // };
+  console.log("summary",summary)
   return (
     <>
       <Helmet>
@@ -376,8 +362,9 @@ export default function AgencyDashboardPage() {
                 <Badge 
                   variant={profileData.status === 'VERIFIED' ? 'success' : profileData.status === 'PENDING' ? 'warning' : 'secondary'}
                   className="text-xs"
+                  label={profileData.status}
                 >
-                  {profileData.status}
+                  
                 </Badge>
               </div>
             </div>
@@ -403,7 +390,7 @@ export default function AgencyDashboardPage() {
             <>
               <StatCard 
                 title="Total Customers" 
-                value={dashboardData?.totalCustomers || 0}
+                value={summary?.totalCustomers || 0}
                 icon={Users}
                 color="text-indigo-600"
                 bgColor="bg-indigo-100"
@@ -411,7 +398,7 @@ export default function AgencyDashboardPage() {
               
               <StatCard 
                 title="Active Packages" 
-                value={dashboardData?.activePackages || 0}
+                value={summary?.totalActivePackages || 0}
                 icon={Package}
                 color="text-emerald-600"
                 bgColor="bg-emerald-100"
@@ -419,7 +406,7 @@ export default function AgencyDashboardPage() {
               
               <StatCard 
                 title="Upcoming Trips" 
-                value={dashboardData?.upcomingPackages || 0}
+                value={summary?.upcomingPackages || 0}
                 icon={CalendarDays}
                 color="text-amber-600"
                 bgColor="bg-amber-100"
@@ -427,7 +414,7 @@ export default function AgencyDashboardPage() {
               
               <StatCard 
                 title="Completed Bookings" 
-                value={dashboardData?.completedBookings || 0}
+                value={summary?.completedBookings || 0}
                 icon={TrendingUp}
                 color="text-blue-600"
                 bgColor="bg-blue-100"
@@ -435,7 +422,7 @@ export default function AgencyDashboardPage() {
               
               <StatCard 
                 title="Total Revenue" 
-                value={formatCurrency(dashboardData?.totalRevenue || 0)}
+                value={formatCurrency(summary?.totalRevenue || 0)}
                 icon={CreditCard}
                 color="text-purple-600"
                 bgColor="bg-purple-100"
@@ -496,11 +483,11 @@ export default function AgencyDashboardPage() {
                             <td className="px-4 py-3 whitespace-nowrap">
                               {formatDate(pkg.validFrom)} - {formatDate(pkg.validTill)}
                               {new Date(pkg.validTill) < new Date() && (
-                                <Badge variant="destructive" className="ml-2">Expired</Badge>
+                                <Badge variant="destructive" className="ml-2" label='Expired'></Badge>
                               )}
                               {new Date(pkg.validTill) > new Date() && 
                                 new Date(pkg.validTill) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && (
-                                <Badge variant="warning" className="ml-2">Expiring Soon</Badge>
+                                <Badge variant="warning" className="ml-2" label='Expiring Soon'></Badge>
                               )}
                             </td>
                             <td className="px-4 py-3 text-center whitespace-nowrap">{pkg.bookingsCount}</td>
@@ -509,8 +496,10 @@ export default function AgencyDashboardPage() {
                                 pkg.status === 'PUBLISHED' ? 'bg-green-100 text-green-800' :
                                 pkg.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
                                 'bg-gray-100 text-gray-800'
-                              }>
-                                {pkg.status}
+                              }
+                                label={pkg.status.charAt(0).toUpperCase() + pkg.status.slice(1)}>
+                              
+                               
                               </Badge>
                             </td>
                             <td className="px-4 py-3 text-right whitespace-nowrap">
@@ -579,8 +568,8 @@ export default function AgencyDashboardPage() {
                       <div className="flex-1">
                         <div className="flex justify-between">
                           <p className="font-medium">{booking.customer}</p>
-                          <Badge className={getStatusColor(booking.status)}>
-                            {booking.status}
+                          <Badge className={getStatusColor(booking.status)} label= {booking.status} >
+                           
                           </Badge>
                         </div>
                         <p className="text-sm text-gray-500">
@@ -626,9 +615,9 @@ export default function AgencyDashboardPage() {
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
-                      <Tooltip 
-                        formatter={(value) => [`₹${value}`, 'Revenue']}
-                        cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+                      <ChartTooltip 
+                      formatter={(value) => [`₹${value}`, 'Revenue']}
+                      cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
                       />
                       <Bar dataKey="value" fill="#3B82F6" radius={[4, 4, 0, 0]} />
                     </BarChart>

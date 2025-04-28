@@ -11,7 +11,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../../lib/utils';
+
 
 export const Topbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

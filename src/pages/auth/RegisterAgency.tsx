@@ -14,6 +14,7 @@ import { Textarea } from '../../components/ui/textarea';
 import { useToast } from '../../components/ui/use-toast';
 import { Loader2, Check, ChevronRight, ChevronLeft, Upload } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { AppDispatch } from '../../lib/store';
 
 type AgencyRegistrationFormData = {
   agencyName: string;
@@ -34,9 +35,9 @@ const steps = [
 
 export default function RegisterAgencyPage() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { loading } = useSelector((state: RootState) => state.auth);
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
@@ -62,7 +63,7 @@ export default function RegisterAgencyPage() {
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setValue('logo', e.target.files);
+      setValue('logo', e.target.files || undefined);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewLogo(reader.result as string);
@@ -74,9 +75,9 @@ export default function RegisterAgencyPage() {
   const handleGalleryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      setValue('galleryImages', files);
+      setValue('galleryImages', files || undefined);
       const newPreviews: string[] = [];
-      
+
       for (let i = 0; i < files.length; i++) {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -501,4 +502,4 @@ export default function RegisterAgencyPage() {
       </form>
     </AuthLayout>
   );
-} 
+}

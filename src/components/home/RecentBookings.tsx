@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Skeleton } from '../ui/skeleton';
-import BookingCard, { BookingCardProps } from './BookingCard';
+import BookingCard from './BookingCard';
 
 export interface Booking {
   id: string;
