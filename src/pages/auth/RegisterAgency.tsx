@@ -133,7 +133,7 @@ export default function RegisterAgencyPage() {
         title: 'Success',
         description: 'Your agency account has been created successfully',
       });
-      navigate('/dashboard');
+      navigate('/');
     } catch (error: any) {
       toast({
         title: 'Error',

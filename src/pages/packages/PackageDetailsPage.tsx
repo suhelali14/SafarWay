@@ -236,8 +236,7 @@ export function PackageDetailsPage() {
       {
         book ? (
           <BookPackageForm 
-            TourPackage={packageData} 
-           
+          tourPackage={packageData}
           />
         ) :
       <motion.div

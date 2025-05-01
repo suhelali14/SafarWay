@@ -45,6 +45,11 @@ import { PackageEditPage } from '../pages/agency/packages/PackageEditPage';
 import AgencyPublicProfilePage from '../pages/agency/AgencyPublicProfilePage';
 import { UserProfilePage } from '../pages/profile/UserProfilePage';
 import BookTour from '../pages/BookTour';
+import BookingConfirmation from '../components/customer/BookingConfirmation';
+import BookingFailure from '../components/customer/BookingFailed';
+import ViewBooking from '../components/customer/ViewBooking';
+import MyBookings from '../components/customer/MyBooking';
+import ManageBooking from '../components/customer/ManageBooking';
 
 
 // Layout with Navbar for public routes and regular users
@@ -333,7 +338,11 @@ export function AppRouter() {
             <Route path="packages" element={<PackagesPage />} />
             
             <Route path="packages/:id" element={<PackageDetailsPage />} />
-            
+            <Route path="/booking/confirmation" element={<BookingConfirmation />} />
+            <Route path='bookings/failed' element={<BookingFailure />} />
+            <Route path="/bookings" element={<MyBookings />} />
+            <Route path="/bookings/:bookingId" element={<ViewBooking />} />
+            <Route path="/bookings/:bookingId/manage" element={<ManageBooking />} />
             <Route path="book/:id" element={<BookTour/>} />
             <Route path="agency/:agencyId" element={<AgencyPublicProfilePage />} />
             <Route path="about" element={<AboutPage />} />

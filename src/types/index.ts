@@ -35,3 +35,76 @@ export interface Testimonial {
   text: string
 }
 
+
+
+export interface Booking {
+  id: string;
+  startDate: string;
+  endDate?: string;
+  numberOfPeople: number;
+  totalPrice: number;
+  platformFee: number;
+  agencyPayoutAmount: number;
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'PENDING_APPROVAL' | 'PENDING_PAYMENT' | 'RESERVED';
+  paymentStatus: 'PENDING' | 'SUCCESS' | 'REFUNDED' | 'PARTIALLY_REFUNDED';
+  paymentMethod: string;
+  cashfreeOrderId: string;
+  transactionId: string;
+  payoutStatus: string;
+  refundRequested: boolean;
+  refundStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
+  paymentMode: 'PARTIAL' | 'FULL';
+  agencyApproval: boolean;
+  partialAmountPaid: boolean;
+  createdAt: string;
+  updatedAt: string;
+  notes?: string;
+  tourPackage: {
+    id: string;
+    title: string;
+    duration: number;
+    pricePerPerson: number;
+    coverImage?: string;
+    tourType: 'ADVENTURE' | 'CULTURAL' | 'WILDLIFE' | 'BEACH' | 'MOUNTAIN' | 'CITY' | 'CRUISE' | 'OTHER';
+  };
+  agency: {
+    id: string;
+    name: string;
+    contactEmail: string;
+    contactPhone: string;
+  };
+  customer: {
+    id: string;
+    user: {
+      name: string;
+      email: string;
+      phone?: string;
+    };
+  };
+  travelers: BookingPerson[];
+  payments: Payment[];
+}
+
+export interface BookingPerson {
+  id: string;
+  fullName: string;
+  dateOfBirth: string;
+  email?: string;
+  phoneNumber?: string;
+  documents: PersonDocument[];
+}
+
+export interface PersonDocument {
+  id: string;
+  documentType: string;
+  documentNumber: string;
+  fileUrl?: string;
+}
+
+export interface Payment {
+  id: string;
+  amount: number;
+  status: 'PENDING' | 'SUCCESS' | 'REFUNDED' | 'PARTIALLY_REFUNDED';
+  paymentType: 'PARTIAL' | 'FULL';
+  createdAt: string;
+}
