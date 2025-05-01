@@ -4,10 +4,13 @@ import { getToken } from '../utils/session';
 import { toast } from 'react-hot-toast';
 import { Package } from './api/packageService';
 
+
 // Types
 
 export type PackageStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 export type TourType = 'ADVENTURE' | 'CULTURAL' | 'WILDLIFE' | 'BEACH' | 'MOUNTAIN' | 'CITY' | 'CRUISE' | 'OTHER';
+
+
 
 export interface LoginCredentials {
   email: string;
@@ -222,7 +225,7 @@ const api: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 seconds
+  timeout: 20000, // 20 seconds
 });
 
 // Add request interceptor to add auth token
@@ -440,9 +443,17 @@ export const customerAPI = {
   getProfile: () => 
     api.get<User>('/customers/profile'),
   
-  getMyBookings: () => 
-    api.get<Booking[]>('/customers/bookings'),
-  
+  getMyBookings: (params?: { status?: string; sort?: string }) =>
+    api.get('/customers/my-bookings', {
+      params,
+    }),
+
+  getBookingById: (bookingId: string) =>
+    api.get(`/customers/${bookingId}`),
+
+  requestCancellation: (bookingId: string, reason: string) =>
+    api.post(`/customers/${bookingId}/cancel`, { reason }),
+
   getOngoingTrips: () => 
     api.get<Booking[]>('/customers/trips/ongoing'),
   
@@ -470,6 +481,15 @@ export const customerAPI = {
   addToWishlist: (packageId: string) => api.post(`/wishlist/${packageId}`),
   removeFromWishlist: (wishlistItemId: string) => api.delete(`/wishlist/${wishlistItemId}`),
   getFeaturedPackages: () => api.get('/packages/featured'),
+  createBooking: (bookingData: any) => api.post('/bookings', bookingData),
+
+  getPaymentSuccess: (bookingId: string) =>
+    api.get(`/payments/success`, { params: { bookingId } }),
+  downloadInvoice: (bookingId: string) =>
+    api.get(`payments/invoices`, { params: { bookingId }  }),
+
+  getPaymentBookingFailure: (bookingId: string) =>
+    api.get(`/payments/failure`, { params: { bookingId } }),
 };
 
 // Tour API

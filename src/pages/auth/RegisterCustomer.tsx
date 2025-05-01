@@ -111,7 +111,7 @@ export default function RegisterCustomerPage() {
         title: 'Success',
         description: 'Your account has been created successfully',
       });
-      navigate('/dashboard');
+      navigate('/');
     } catch (error: any) {
       toast({
         title: 'Error',

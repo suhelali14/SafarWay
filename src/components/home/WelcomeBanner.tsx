@@ -38,7 +38,7 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
         </p>
         
         <Button 
-          onClick={() => navigate(hasActiveBooking ? '/my-bookings' : '/tour-packages')}
+          onClick={() => navigate(hasActiveBooking ? '/bookings' : '/tour-packages')}
           className="bg-white text-blue-700 hover:bg-blue-50 hover:text-blue-800 transition-colors"
         >
           {hasActiveBooking ? 'Continue your trip' : 'Explore Packages'}

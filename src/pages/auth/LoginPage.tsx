@@ -51,7 +51,7 @@ export function LoginPage() {
       setIsLoading(true);
       await login(data.email, data.password);
       toast.success('Welcome back!');
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       toast.error('Invalid email or password');
       console.error('Login error:', error);

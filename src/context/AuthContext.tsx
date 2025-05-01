@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('token', 'mock-token');
       localStorage.setItem('user', JSON.stringify(mockUser));
       toast.success('Login successful!');
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       toast.error('Login failed. Please try again.');
       throw error;
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('token', 'mock-token');
       localStorage.setItem('user', JSON.stringify(mockUser));
       toast.success('Registration successful!');
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       toast.error('Registration failed. Please try again.');
       throw error;
