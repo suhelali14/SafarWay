@@ -91,7 +91,7 @@ export default function PaymentPage() {
 
   const handlePayment = async () => {
     if (!bookingDetails) return;
-
+   
     setIsProcessing(true);
 
     try {

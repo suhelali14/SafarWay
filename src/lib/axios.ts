@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'sonner';
+import { getToken } from '../utils/session';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
 
@@ -15,8 +16,8 @@ const axiosInstance = axios.create({
 // Add request interceptor for auth token
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Get token from local storage or wherever you store it
-    const token = localStorage.getItem('token');
+    // Get token from cookies using the session utility
+    const token = getToken();
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

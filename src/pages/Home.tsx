@@ -17,6 +17,7 @@ import {
   Phone,
 
 } from 'lucide-react';
+import FeatureShowcase from '../components/home/FeatureShowcase';
 
 // Mock data for featured tours
 const featuredTours = [
@@ -229,6 +230,9 @@ export const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* New Features Showcase */}
+      <FeatureShowcase />
 
       {/* Featured Tours Section */}
       <section className="py-16 md:py-24 bg-gray-50">

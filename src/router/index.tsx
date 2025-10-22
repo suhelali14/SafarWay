@@ -50,14 +50,25 @@ import BookingFailure from '../components/customer/BookingFailed';
 import ViewBooking from '../components/customer/ViewBooking';
 import MyBookings from '../components/customer/MyBooking';
 import ManageBooking from '../components/customer/ManageBooking';
+import OfflineBookingForm from '../pages/agency/OfflineBooking';
+// Import social media components
+import CustomerPostsPage from '../pages/customer/PostsPage';
+import ExplorePage from '../components/posts/ExplorePage';
+import PostsPage from '../components/posts/PostsPage';
+import FloatingUploadButton from '../components/posts/FloatingUploadButton';
+import FloatingActionButton from '../components/ui/FloatingActionButton';
+import AnnouncementBanner from '../components/ui/AnnouncementBanner';
 
 
 // Layout with Navbar for public routes and regular users
 const MainLayout = () => {
   return (
     <>
+      <AnnouncementBanner />
       <Navbar />
       <Outlet />
+      <FloatingUploadButton />
+      <FloatingActionButton />
       <Footer />
     </>
   );
@@ -343,6 +354,10 @@ export function AppRouter() {
             <Route path="/bookings" element={<MyBookings />} />
             <Route path="/bookings/:bookingId" element={<ViewBooking />} />
             <Route path="/bookings/:bookingId/manage" element={<ManageBooking />} />
+            {/* Social Media Routes */}
+            <Route path="posts" element={<PostsPage />} />
+            <Route path="explore" element={<ExplorePage />} />
+            <Route path="reels" element={<PostsPage />} />
             <Route path="book/:id" element={<BookTour/>} />
             <Route path="agency/:agencyId" element={<AgencyPublicProfilePage />} />
             <Route path="about" element={<AboutPage />} />
@@ -362,6 +377,8 @@ export function AppRouter() {
             <Route index element={<Navigate to="/customer/bookings" replace />} />
             <Route path="bookings" element={<BookingsPage />} />
             <Route path="bookings/:id" element={<BookingDetailsPage />} />
+            <Route path="posts" element={<CustomerPostsPage />} />
+            <Route path="explore" element={<ExplorePage />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>
 
@@ -396,6 +413,7 @@ export function AppRouter() {
           }>
             <Route index element={<Navigate to="/agency/dashboard" replace />} />
             <Route path="dashboard" element={<AgencyDashboardPage />} />
+            <Route path="offlineBooking" element={<OfflineBookingForm />} />
             <Route path="packages" element={<AgencyPackagesPage />} />
             <Route path="packages/new" element={<PackageCreatePage />} />
             <Route path="packages/edit/:id" element={<PackageEditPage />} />

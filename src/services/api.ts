@@ -350,6 +350,13 @@ export const agencyAPI = {
   
   processRefundRequest: (id: string, status: string, remarks?: string) => 
     api.patch(`/agency/refunds/${id}`, { status, remarks }),
+
+  createOfflineBooking: (data:any) => api.post('/bookings/offline/create', data),
+
+  uploadDocument: (formData:any) =>
+    api.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
 };
 
 // Admin API

@@ -1,9 +1,10 @@
-import { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { HeroSection, SpecialOffers, PopularDestinations, FeaturedAgencies, CustomerTestimonials } from '../../components/home';
 import { WhyChooseUs } from '../../components/home/WhyChooseUs';
+import SocialMediaBanner from '../../components/home/SocialMediaBanner';
 
 import { Button } from '../../components/ui/button';
 import { Link } from 'react-router-dom';
@@ -11,7 +12,10 @@ import {  ArrowRight } from 'lucide-react';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
 
 import { Helmet } from 'react-helmet-async';
-
+import { bookingService } from '../../services/api/bookingService';
+import { customerAPI } from '../../services/api';
+import { Booking } from '../../types/index';
+import { BookingFilters } from '../../services/api/bookingService';
 
 // const testimonials = [
 //   {
@@ -91,6 +95,7 @@ const activeBookings = [
   },
 ];
 
+
 // Mock data for agency dashboard
 // const agencyStats = [
 //   { title: 'Total Packages', value: 24, icon: Package },
@@ -101,9 +106,32 @@ const activeBookings = [
 export function HomePage() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [bookings, setBookings] = useState<Booking[]>([]);
   
   // Handle routing logic based on authentication and user role
   // This was causing infinite re-renders because it had no dependency array
+  const fetchBookings = async () => {
+    
+    
+    try {
+     
+      const filters: BookingFilters = {
+              limit: 4,
+            };
+            
+          
+      const response = await customerAPI.getMyBookings(filters);
+      const bookingsData = response.data.data as Booking[]; // Assuming the API returns an array of bookings
+      console.log("Bookings Data:", bookingsData);
+      setBookings(bookingsData)
+     
+    
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    
+    } 
+  };
   useEffect(() => {
     // First, handle protected route access for unauthenticated users
     if (!isAuthenticated && (location.pathname === '/agency/dashboard' || location.pathname === '/bookings')) {
@@ -122,7 +150,14 @@ export function HomePage() {
       }
       // No need to navigate customer role users as they should stay on home page
     }
-  }, [isAuthenticated, user, navigate]); // Proper dependency array
+  }, [isAuthenticated, user?.role, navigate, location.pathname]); // Proper dependency array
+  
+  // Separate effect for fetching bookings to avoid infinite loops
+  useEffect(() => {
+    if (isAuthenticated && user?.role === "CUSTOMER") {
+      fetchBookings();
+    }
+  }, [isAuthenticated, user?.role]); // Only depend on authentication state and role
   
   // Use a memoized value for user name to prevent unnecessary re-renders
   const userName = useMemo(() => user?.name || 'Guest', [user?.name]);
@@ -145,22 +180,9 @@ export function HomePage() {
 
       <main className="space-y-24 py-16">
         {/* Welcome Section (for authenticated users) */}
-        {isAuthenticated && (
-          <section className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="rounded-xl bg-gradient-to-r from-[#ff6200] to-amber-600 p-8 text-white shadow-lg"
-            >
-              <h1 className="mb-2 text-3xl font-bold">Welcome back, {userName}!</h1>
-              <p className="text-lg text-white/90">Ready for your next adventure?</p>
-            </motion.div>
-          </section>
-        )}
 
         {/* Active Bookings Section (for authenticated users) */}
-        {isAuthenticated && activeBookings.length > 0 && (
+        {isAuthenticated && bookings.length > 0 && (
           <section className="container mx-auto px-4">
             <div className="mb-8 flex items-center justify-between">
               <h2 className="text-2xl font-bold">Your Active Bookings</h2>
@@ -172,7 +194,7 @@ export function HomePage() {
               </Link>
             </div>
             <div className="grid gap-6 sm:grid-cols-2">
-              {activeBookings.map((booking) => (
+              {bookings.map((booking) => (
                 <motion.div
                   key={booking.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -182,21 +204,21 @@ export function HomePage() {
                   <Card className="overflow-hidden">
                     <div className="relative h-48">
                       <img
-                        src={booking.image}
-                        alt={booking.title}
+                        src={booking.tourPackage.coverImage || '/placeholder.jpg'}
+                        alt={booking.tourPackage.title}
                         className="h-full w-full object-cover"
                         loading="lazy"
                       />
                       <div className={`absolute right-2 top-2 rounded-full px-2 py-1 text-xs font-medium ${
-                        booking.status === 'Confirmed' ? 'bg-green-500 text-white' : 'bg-amber-500 text-white'
+                        booking.status === 'COMPLETED' ? 'bg-green-500 text-white' : 'bg-amber-500 text-white'
                       }`}>
                         {booking.status}
                       </div>
                     </div>
                     <CardHeader>
-                      <CardTitle>{booking.title}</CardTitle>
+                      <CardTitle>{booking.tourPackage.title}</CardTitle>
                       <CardDescription>
-                        {new Date(booking.startDate).toLocaleDateString()} - {new Date(booking.endDate).toLocaleDateString()}
+                        {new Date(booking.startDate).toLocaleDateString()} - {new Date(booking.endDate || booking.startDate).toLocaleDateString()}
                       </CardDescription>
                     </CardHeader>
                     <CardFooter>
@@ -220,6 +242,9 @@ export function HomePage() {
         <section className="container mx-auto px-4">
           <SpecialOffers />
         </section>
+
+        {/* Social Media Features Banner */}
+        <SocialMediaBanner />
 
         {/* Why Choose Us Section */}
         <section className="container mx-auto px-4">

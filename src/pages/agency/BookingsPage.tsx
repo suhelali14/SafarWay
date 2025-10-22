@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -21,40 +21,47 @@ import {
 import { toast } from 'react-hot-toast';
 import { Search, Eye, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { agencyAPI } from '../../services/api';
+import { agencyAPI, TourPackage } from '../../services/api';
 import { getUserData } from '../../utils/session';
+import { ErrorBoundary } from 'react-error-boundary';
+import { debounce } from 'lodash';
+import { Booking } from '../../types';
 
-interface Booking {
-  id: string;
-  packageId: string;
-  packageName: string;
-  customerName: string;
-  customerEmail: string;
-  startDate: string;
-  endDate: string;
-  totalAmount: number;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  paymentStatus: 'pending' | 'paid' | 'refunded';
-  createdAt: string;
-}
 
-export const AgencyBookingsPage = () => {
+const ErrorFallback: React.FC<{ error: Error; resetErrorBoundary: () => void }> = ({ error, resetErrorBoundary }) => (
+  <div className="p-6 text-center">
+    <h2 className="text-xl font-bold mb-4">Something went wrong</h2>
+    <p className="text-red-600 mb-4">{error.message}</p>
+    <Button onClick={resetErrorBoundary}>Try Again</Button>
+  </div>
+);
+
+export const AgencyBookingsPage: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
   const userData = getUserData();
-  
+  //const[customer,setCustomer]=useState<User | null>(null);
+  const [travelPackage, setTravelPackage] = useState<TourPackage | null>(null);
   useEffect(() => {
+    if (!userData?.agencyId) {
+      toast.error('Agency ID not found');
+      setLoading(false);
+      return;
+    }
     fetchBookings();
   }, []);
 
   const fetchBookings = async () => {
     try {
+      setLoading(true);
       const response = await agencyAPI.getAllBookings(`?agencyId=${userData?.agencyId}`);
-        
-     
+      console.log('Bookings---:', response.data);
+      const getPackage = await agencyAPI.getPackageById(response.data.packageId);
+      console.log('Package:', getPackage.data);
+      setTravelPackage(getPackage.data);
       setBookings(response.data);
     } catch (error) {
       console.error('Error fetching bookings:', error);
@@ -63,15 +70,11 @@ export const AgencyBookingsPage = () => {
       setLoading(false);
     }
   };
-
+  console.log('Bookings------------------:', bookings);
   const handleStatusChange = async (id: string, status: string) => {
     try {
-      
-      const response = await agencyAPI.getAllBookings(`?agencyId=${userData?.agencyId}status`);
-
-      if (!response.status) throw new Error('Failed to update booking status');
-
-      setBookings(bookings.map(booking => 
+      await agencyAPI.updateBookingStatus(id,  status );
+      setBookings(bookings.map(booking =>
         booking.id === id ? { ...booking, status: status as Booking['status'] } : booking
       ));
       toast.success('Booking status updated successfully');
@@ -81,34 +84,39 @@ export const AgencyBookingsPage = () => {
     }
   };
 
-  const filteredBookings = bookings.filter(booking => {
-    const matchesSearch = 
-      booking.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.packageName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
-    const matchesPayment = paymentFilter === 'all' || booking.paymentStatus === paymentFilter;
-    return matchesSearch && matchesStatus && matchesPayment;
-  });
+  const debouncedSearch = useCallback(
+    debounce((value: string) => setSearchTerm(value), 300),
+    []
+  );
 
+  const filteredBookings = useMemo(() => {
+    return bookings.filter(_booking => {
+      
+      return true;
+    });
+  }, [bookings, searchTerm, statusFilter, paymentFilter]);
+
+  console.log('Filtered Bookings:', bookings);
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'INR'
+      currency: 'INR',
     }).format(amount);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
   const getStatusColor = (status: Booking['status']) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'confirmed':
+      case 'awaiting_customer_arrival':
         return 'text-green-600';
       case 'cancelled':
         return 'text-red-600';
@@ -120,9 +128,10 @@ export const AgencyBookingsPage = () => {
   };
 
   const getPaymentStatusColor = (status: Booking['paymentStatus']) => {
-    switch (status) {
-      case 'paid':
+    switch (status.toLowerCase()) {
+      case 'success':
         return 'text-green-600';
+      case 'failed':
       case 'refunded':
         return 'text-red-600';
       default:
@@ -139,7 +148,10 @@ export const AgencyBookingsPage = () => {
   }
 
   return (
-    <>
+    <ErrorBoundary
+      FallbackComponent={ErrorFallback}
+      onReset={fetchBookings}
+    >
       <Helmet>
         <title>Bookings | SafarWay Agency</title>
       </Helmet>
@@ -156,8 +168,7 @@ export const AgencyBookingsPage = () => {
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder="Search bookings..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => debouncedSearch(e.target.value)}
                   className="pl-9"
                 />
               </div>
@@ -171,6 +182,7 @@ export const AgencyBookingsPage = () => {
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="awaiting_customer_arrival">Awaiting Customer</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
                 </SelectContent>
@@ -184,7 +196,8 @@ export const AgencyBookingsPage = () => {
                 <SelectContent>
                   <SelectItem value="all">All Payments</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="success">Paid</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
                   <SelectItem value="refunded">Refunded</SelectItem>
                 </SelectContent>
               </Select>
@@ -216,20 +229,20 @@ export const AgencyBookingsPage = () => {
                   filteredBookings.map((booking) => (
                     <TableRow key={booking.id}>
                       <TableCell className="font-medium">#{booking.id.slice(0, 8)}</TableCell>
-                      <TableCell>{booking.packageName}</TableCell>
+                      <TableCell>{travelPackage?.title || 'N/A'}</TableCell>
                       <TableCell>
-                        <div>{booking.customerName}</div>
-                        <div className="text-sm text-gray-500">{booking.customerEmail}</div>
+                        <div>{booking.customer.user.name || 'Unknown'}</div>
+                        <div className="text-sm text-gray-500">{booking.customer.user.email || 'N/A'}</div>
                       </TableCell>
                       <TableCell>
                         <div>{formatDate(booking.startDate)}</div>
-                        <div className="text-sm text-gray-500">to {formatDate(booking.endDate)}</div>
+                        <div className="text-sm text-gray-500">to {formatDate(booking.endDate || '')}</div>
                       </TableCell>
-                      <TableCell>{formatCurrency(booking.totalAmount)}</TableCell>
+                      <TableCell>{formatCurrency(booking.totalPrice)}</TableCell>
                       <TableCell>
                         <Select
-                          value={booking.status}
-                          onValueChange={(value) => handleStatusChange(booking.id, value)}
+                          value={booking.status.toLowerCase()}
+                          onValueChange={(value) => handleStatusChange(booking.id, value.toUpperCase())}
                         >
                           <SelectTrigger className={`w-[130px] ${getStatusColor(booking.status)}`}>
                             <SelectValue />
@@ -237,6 +250,7 @@ export const AgencyBookingsPage = () => {
                           <SelectContent>
                             <SelectItem value="pending">Pending</SelectItem>
                             <SelectItem value="confirmed">Confirmed</SelectItem>
+                            <SelectItem value="awaiting_customer_arrival">Awaiting Customer</SelectItem>
                             <SelectItem value="cancelled">Cancelled</SelectItem>
                             <SelectItem value="completed">Completed</SelectItem>
                           </SelectContent>
@@ -244,26 +258,22 @@ export const AgencyBookingsPage = () => {
                       </TableCell>
                       <TableCell>
                         <span className={getPaymentStatusColor(booking.paymentStatus)}>
-                          {booking.paymentStatus.charAt(0).toUpperCase() + booking.paymentStatus.slice(1)}
+                          {booking.paymentStatus.charAt(0).toUpperCase() + booking.paymentStatus.slice(1).toLowerCase()}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            asChild
-                          >
+                          <Button variant="ghost" size="icon" asChild>
                             <Link to={`/agency/bookings/${booking.id}`}>
                               <Eye className="h-4 w-4" />
                             </Link>
                           </Button>
-                          {booking.status === 'pending' && (
+                          {booking.status === 'PENDING' && (
                             <>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => handleStatusChange(booking.id, 'confirmed')}
+                                onClick={() => handleStatusChange(booking.id, 'CONFIRMED')}
                                 className="text-green-600 hover:text-green-700"
                               >
                                 <CheckCircle className="h-4 w-4" />
@@ -271,7 +281,7 @@ export const AgencyBookingsPage = () => {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => handleStatusChange(booking.id, 'cancelled')}
+                                onClick={() => handleStatusChange(booking.id, 'CANCELLED')}
                                 className="text-red-600 hover:text-red-700"
                               >
                                 <XCircle className="h-4 w-4" />
@@ -288,6 +298,6 @@ export const AgencyBookingsPage = () => {
           </div>
         </Card>
       </div>
-    </>
+    </ErrorBoundary>
   );
-}; 
+};

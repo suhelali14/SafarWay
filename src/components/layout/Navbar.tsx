@@ -14,8 +14,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Menu, X, User, LogOut, Package, Calendar, Home, HelpCircle, ChevronDown } from "lucide-react";
+import { Menu, X, User, LogOut, Package, Calendar, Home, HelpCircle, ChevronDown, Camera, Compass, Play } from "lucide-react";
 import { motion } from "framer-motion";
+import NewBadge from "../ui/NewBadge";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -46,6 +47,8 @@ export function Navbar() {
   const commonNavItems = [
     { label: "Home", href: "/", icon: Home },
     { label: "Packages", href: "/packages", icon: Package },
+    { label: "Posts", href: "/posts", icon: Camera, badge: <NewBadge /> },
+    { label: "Explore", href: "/explore", icon: Compass, badge: <NewBadge /> },
     { label: "Bookings", href: "/bookings", icon: Calendar },
     { label: "Support", href: "/support", icon: HelpCircle },
   ];
@@ -74,13 +77,18 @@ export function Navbar() {
               <Link
                 key={item.href}
                 to={item.href}
-                className={`text-sm font-medium transition-colors hover:text-[#ff6200] ${
+                className={`relative text-sm font-medium transition-colors hover:text-[#ff6200] ${
                   location.pathname === item.href
                     ? "text-[#ff6200]"
                     : "text-gray-700"
                 }`}
               >
                 {item.label}
+                {item.badge && (
+                  <span className="absolute -top-2 -right-2">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             ))}
           </div>
@@ -149,7 +157,7 @@ export function Navbar() {
                   <Link
                     key={item.href}
                     to={item.href}
-                    className={`flex items-center space-x-2 text-sm font-medium transition-colors hover:text-[#ff6200] ${
+                    className={`relative flex items-center space-x-2 text-sm font-medium transition-colors hover:text-[#ff6200] ${
                       location.pathname === item.href
                         ? "text-[#ff6200]"
                         : "text-gray-700"
@@ -158,6 +166,11 @@ export function Navbar() {
                   >
                     <item.icon className="h-4 w-4" />
                     <span>{item.label}</span>
+                    {item.badge && (
+                      <span className="ml-2">
+                        {item.badge}
+                      </span>
+                    )}
                   </Link>
                 ))}
                 {user ? (

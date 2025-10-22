@@ -30,11 +30,17 @@ export interface BadgeProps {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'success' | 'warning';
   className?: string;
   label?: string;
+  children?: React.ReactNode;
+  onClick?: () => void;
 }
-function Badge({ className, variant, label }: BadgeProps) {
+
+function Badge({ className, variant, label, children, onClick }: BadgeProps) {
   return (
-    <div className={cn(badgeVariants({ variant }), className)}>
-      {label}
+    <div 
+      className={cn(badgeVariants({ variant }), className, onClick && 'cursor-pointer')}
+      onClick={onClick}
+    >
+      {children || label}
     </div>
   )
 }
